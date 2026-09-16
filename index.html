@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>7Anime - Classroom of the Elite Hindi Dubbed</title>
+    <!-- Google Fonts & Font Awesome Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: #0b0c1b;
+            color: #ffffff;
+            padding-bottom: 70px; /* Mobile nav space */
+        }
+
+        /* Header / Navbar */
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 5%;
+            background: rgba(11, 12, 27, 0.95);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid #1f2142;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: #6c5ce7;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .logo span {
+            color: #fff;
+        }
+
+        .search-box {
+            position: relative;
+            width: 40%;
+            max-width: 400px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 8px 15px 8px 35px;
+            background: #181935;
+            border: 1px solid #2a2c5a;
+            border-radius: 20px;
+            color: #fff;
+            outline: none;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #a0a0b0;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+
+        /* Anime Card Component */
+        .anime-details-card {
+            background: #131429;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid #23254d;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        @media (min-width: 768px) {
+            .anime-details-card {
+                flex-direction: row;
+            }
+            body {
+                padding-bottom: 0;
+            }
+        }
+
+        .poster-wrapper {
+            position: relative;
+            flex: 1;
+            max-width: 100%;
+            cursor: pointer;
+        }
+
+        @media (min-width: 768px) {
+            .poster-wrapper {
+                max-width: 350px;
+            }
+        }
+
+        .poster-img {
+            width: 100%;
+            height: 100%;
+            min-height: 400px;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.3s ease;
+        }
+
+        .poster-wrapper:hover .poster-img {
+            transform: scale(1.02);
+        }
+
+        .badge-dub {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: #e74c3c;
+            color: #fff;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* Content Area */
+        .anime-info {
+            flex: 2;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 5px;
+            color: #fff;
+        }
+
+        .sub-title {
+            color: #a0a0b0;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .tags {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        .tag {
+            background: #1f2142;
+            color: #6c5ce7;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .description {
+            color: #c0c0d0;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        /* Season Details Grid */
+        .season-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .season-box {
+            background: #181935;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #2a2c5a;
+            text-align: center;
+        }
+
+        .season-box h4 {
+            font-size: 14px;
+            color: #fff;
+        }
+
+        .season-box p {
+            font-size: 12px;
+            color: #2ecc71;
+        }
+
+        /* Buttons */
+        .action-btns {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+            border: none;
+        }
+
+        .btn-watch {
+            background: #6c5ce7;
+            color: #fff;
+        }
+
+        .btn-watch:hover {
+            background: #5b4bc4;
+        }
+
+        .btn-watchlist {
+            background: #1f2142;
+            color: #fff;
+        }
+
+        /* Mobile Bottom Nav Bar */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: #0b0c1b;
+            border-top: 1px solid #1f2142;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            z-index: 1000;
+        }
+
+        @media (min-width: 768px) {
+            .bottom-nav {
+                display: none;
+            }
+        }
+
+        .nav-item {
+            color: #a0a0b0;
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 11px;
+            gap: 4px;
+        }
+
+        .nav-item.active {
+            color: #6c5ce7;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Navigation -->
+    <header>
+        <a href="index.html" class="logo">
+            <i class="fa-solid fa-play"></i> 7<span>Anime</span>
+        </a>
+        <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" placeholder="Search anime...">
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="anime-details-card">
+            
+            <!-- Direct Image Click to Video Player -->
+            <a href="videoplayer.html" class="poster-wrapper">
+                <span class="badge-dub">HINDI DUBBED</span>
+                <!-- Converted Direct Embed Google Drive Link -->
+                <img src="https://lh3.googleusercontent.com/d/1J0za-zSCfOStt-bs8dzV7j4YlmVBOHuF" alt="Classroom of the Elite" class="poster-img">
+            </a>
+
+            <!-- Anime Info & Details -->
+            <div class="anime-info">
+                <div>
+                    <h1 class="title">Classroom of the Elite</h1>
+                    <p class="sub-title">Youkoso Jitsuryoku Shijou Shugi no Kyoushitsu e</p>
+                    
+                    <div class="tags">
+                        <span class="tag">Psychological</span>
+                        <span class="tag">Drama</span>
+                        <span class="tag">School</span>
+                        <span class="tag">Thriller</span>
+                    </div>
+
+                    <p class="description">
+                        Kiyotaka Ayanokouji is a quiet and unassuming student who enters Advanced Nurturing High School, a prestigious institution guaranteeing 100% employment. However, he ends up in Class D, where the school's harsh merit-based system tests their survival skills.
+                    </p>
+
+                    <!-- Season 1 to 4 Details -->
+                    <div class="season-grid">
+                        <div class="season-box">
+                            <h4>Season 1</h4>
+                            <p>Hindi Dub (12 Ep)</p>
+                        </div>
+                        <div class="season-box">
+                            <h4>Season 2</h4>
+                            <p>Hindi Dub (13 Ep)</p>
+                        </div>
+                        <div class="season-box">
+                            <h4>Season 3</h4>
+                            <p>Hindi Dub (13 Ep)</p>
+                        </div>
+                        <div class="season-box">
+                            <h4>Season 4</h4>
+                            <p>Hindi Dub (Announced)</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="action-btns">
+                    <a href="videoplayer.html" class="btn btn-watch">
+                        <i class="fa-solid fa-play"></i> Watch Now
+                    </a>
+                    <button class="btn btn-watchlist">
+                        <i class="fa-solid fa-plus"></i> Add to Watchlist
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Mobile Navigation Bar -->
+    <div class="bottom-nav">
+        <a href="index.html" class="nav-item active">
+            <i class="fa-solid fa-house"></i> Home
+        </a>
+        <a href="#" class="nav-item">
+            <i class="fa-solid fa-compass"></i> Explore
+        </a>
+        <a href="#" class="nav-item">
+            <i class="fa-solid fa-bookmark"></i> Watchlist
+        </a>
+    </div>
+
+</body>
+</html>
