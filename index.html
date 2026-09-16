@@ -30,7 +30,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px 5%;
+            padding: 12px 5%;
             background: rgba(15, 15, 26, 0.95);
             position: sticky;
             top: 0;
@@ -40,7 +40,7 @@
         }
 
         .logo {
-            font-size: 28px;
+            font-size: 26px;
             font-weight: 800;
             color: #fff;
             display: flex;
@@ -78,87 +78,94 @@
         .search-box input {
             background: #1f1f2e;
             border: 1px solid #333;
-            padding: 10px 38px 10px 15px;
+            padding: 8px 35px 8px 15px;
             border-radius: 20px;
             color: #fff;
             outline: none;
-            width: 220px;
+            width: 200px;
             transition: all 0.3s ease;
         }
 
         .search-box input:focus {
-            width: 260px;
+            width: 240px;
             border-color: #8a2be2;
             box-shadow: 0 0 10px rgba(138, 43, 226, 0.4);
         }
 
         .search-box i {
             position: absolute;
-            right: 14px;
+            right: 12px;
             color: #aaa;
             cursor: pointer;
         }
 
-        /* --- HERO BANNER --- */
+        /* --- HERO BANNER (FIXED IMAGE & HEIGHT) --- */
         .hero {
             position: relative;
-            height: 65vh;
-            min-height: 400px;
-            background: linear-gradient(to right, rgba(11, 12, 16, 0.95) 20%, rgba(11, 12, 16, 0.4)), 
-                        url('https://lh3.googleusercontent.com/d/1DrYU7Rcf8h1JHkkakd6ks9MAiFYsnj4V') center/cover no-repeat;
+            height: 50vh;
+            min-height: 320px;
+            max-height: 450px;
+            background: linear-gradient(to right, rgba(11, 12, 16, 0.95) 35%, rgba(11, 12, 16, 0.3)), 
+                        url('https://lh3.googleusercontent.com/d/1DrYU7Rcf8h1JHkkakd6ks9MAiFYsnj4V') top center / cover no-repeat;
             display: flex;
             align-items: center;
             padding: 0 5%;
         }
 
         .hero-content {
-            max-width: 550px;
+            max-width: 500px;
+            z-index: 2;
         }
 
         .badge {
             background: #ff0055;
-            padding: 4px 12px;
+            padding: 4px 10px;
             border-radius: 5px;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: bold;
             display: inline-block;
-            margin-bottom: 12px;
+            margin-bottom: 8px;
         }
 
         .hero-title {
-            font-size: 44px;
+            font-size: 36px;
             font-weight: 800;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             line-height: 1.1;
         }
 
         .hero-meta {
             color: #aaa;
-            font-size: 14px;
-            margin-bottom: 15px;
+            font-size: 13px;
+            margin-bottom: 12px;
         }
 
         .hero-desc {
             color: #ccc;
-            margin-bottom: 22px;
-            font-size: 14px;
-            line-height: 1.5;
+            margin-bottom: 18px;
+            font-size: 13px;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
 
         .hero-buttons {
             display: flex;
-            gap: 15px;
+            gap: 12px;
         }
 
         .btn {
-            padding: 12px 26px;
-            border-radius: 25px;
+            padding: 10px 20px;
+            border-radius: 20px;
             font-weight: bold;
             cursor: pointer;
             border: none;
             display: inline-flex;
             align-items: center;
             gap: 8px;
+            font-size: 13px;
             transition: all 0.2s ease-in-out;
         }
 
@@ -177,17 +184,17 @@
             filter: brightness(1.2);
         }
 
-        /* --- MAIN ANIME GRID --- */
+        /* --- MAIN ANIME GRID (FIXED POSTER RATIO) --- */
         .container {
-            padding: 40px 5%;
+            padding: 25px 5%;
         }
 
         .section-title {
-            font-size: 22px;
+            font-size: 20px;
             display: flex;
             align-items: center;
             gap: 10px;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
 
         .section-title i {
@@ -196,14 +203,13 @@
 
         .grid-container {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 16px;
         }
 
-        /* Anime Card */
         .anime-card {
             background: #151522;
-            border-radius: 12px;
+            border-radius: 10px;
             overflow: hidden;
             cursor: pointer;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -211,44 +217,47 @@
         }
 
         .anime-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 10px 22px rgba(138, 43, 226, 0.4);
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(138, 43, 226, 0.4);
         }
 
+        /* Aspect Ratio 2:3 for Perfect Posters */
         .card-img-container {
             position: relative;
             width: 100%;
-            height: 260px;
+            aspect-ratio: 2 / 3;
             background-color: #1a1a2e;
+            overflow: hidden;
         }
 
         .card-img-container img {
             width: 100%;
             height: 100%;
             object-fit: cover;
+            object-position: center;
             display: block;
         }
 
         .rating-badge {
             position: absolute;
-            top: 10px;
-            right: 10px;
+            top: 8px;
+            right: 8px;
             background: rgba(0, 0, 0, 0.85);
             color: #ffcc00;
-            padding: 3px 8px;
-            border-radius: 5px;
-            font-size: 12px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 11px;
             font-weight: bold;
         }
 
         .card-info {
-            padding: 12px;
+            padding: 10px;
         }
 
         .card-title {
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 700;
-            margin-bottom: 5px;
+            margin-bottom: 4px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -257,52 +266,53 @@
         .card-tags {
             font-size: 11px;
             color: #888;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .no-results {
             display: none;
             text-align: center;
             grid-column: 1 / -1;
-            padding: 40px;
+            padding: 30px;
             color: #888;
         }
 
         /* --- FOOTER --- */
         footer {
             background: #07070a;
-            padding: 30px 5%;
+            padding: 25px 5%;
             text-align: center;
             border-top: 1px solid rgba(255, 255, 255, 0.05);
-            margin-top: 50px;
+            margin-top: 40px;
         }
 
         .footer-links {
             display: flex;
             justify-content: center;
             flex-wrap: wrap;
-            gap: 20px;
-            margin: 15px 0;
-            font-size: 14px;
+            gap: 18px;
+            margin: 12px 0;
+            font-size: 13px;
             color: #aaa;
         }
 
-        /* --- RESPONSIVE MOBILE FIXES --- */
+        /* --- MOBILE LAYOUT FIXES --- */
         @media (max-width: 768px) {
             header {
                 flex-direction: column;
-                padding: 15px 4%;
-                gap: 12px;
+                gap: 10px;
+                padding: 10px 4%;
             }
 
             .logo {
-                font-size: 24px;
+                font-size: 22px;
             }
 
             nav ul {
-                width: 100%;
-                justify-content: center;
                 gap: 15px;
-                font-size: 14px;
+                font-size: 13px;
             }
 
             .search-box {
@@ -319,28 +329,18 @@
 
             .hero {
                 height: auto;
-                padding: 40px 5%;
+                min-height: 280px;
+                padding: 30px 4%;
+                background-position: center top;
             }
 
             .hero-title {
-                font-size: 28px;
-            }
-
-            .hero-desc {
-                font-size: 13px;
+                font-size: 26px;
             }
 
             .grid-container {
-                grid-template-columns: repeat(auto-fill, minmax(135px, 1fr));
+                grid-template-columns: repeat(2, 1fr);
                 gap: 12px;
-            }
-
-            .card-img-container {
-                height: 190px;
-            }
-
-            .card-title {
-                font-size: 13px;
             }
         }
     </style>
@@ -372,6 +372,7 @@
             <div class="hero-meta">Action • Fantasy • Sci-Fi | Ep 12 Available</div>
             <p class="hero-desc">Sung Jin-Woo continues his journey to become the strongest hunter in a world full of monsters and hidden secrets.</p>
             <div class="hero-buttons">
+                <!-- Redirects to solo_leveling_videoplayer.html -->
                 <button class="btn btn-primary" onclick="openAnimePage('solo_leveling')">
                     <i class="fa-solid fa-play"></i> Watch Now
                 </button>
@@ -380,13 +381,13 @@
         </div>
     </section>
 
-    <!-- Main Anime Section -->
+    <!-- Main Anime Grid -->
     <main class="container">
         <h2 class="section-title"><i class="fa-solid fa-fire-flame-curated"></i> Trending This Week</h2>
 
         <div class="grid-container" id="animeGrid">
             
-            <!-- Solo Leveling -->
+            <!-- Solo Leveling Card -->
             <div class="anime-card" onclick="openAnimePage('solo_leveling')">
                 <div class="card-img-container">
                     <img src="https://lh3.googleusercontent.com/d/1DrYU7Rcf8h1JHkkakd6ks9MAiFYsnj4V" alt="Solo Leveling" loading="lazy">
@@ -398,7 +399,7 @@
                 </div>
             </div>
 
-            <!-- One Piece -->
+            <!-- One Piece Card -->
             <div class="anime-card" onclick="openAnimePage('one_piece')">
                 <div class="card-img-container">
                     <img src="https://lh3.googleusercontent.com/d/1wkSteRmquT7BZezkr-HJ9evPLioapODU" alt="One Piece" loading="lazy">
@@ -410,7 +411,7 @@
                 </div>
             </div>
 
-            <!-- Demon Slayer -->
+            <!-- Demon Slayer Card -->
             <div class="anime-card" onclick="openAnimePage('demon_slayer')">
                 <div class="card-img-container">
                     <img src="https://lh3.googleusercontent.com/d/1TYC722ZdHTuVgsF_1aOmDA3sV3awwQ2b" alt="Demon Slayer" loading="lazy">
@@ -422,7 +423,7 @@
                 </div>
             </div>
 
-            <!-- Jujutsu Kaisen -->
+            <!-- Jujutsu Kaisen Card -->
             <div class="anime-card" onclick="openAnimePage('jujutsu_kaisen')">
                 <div class="card-img-container">
                     <img src="https://lh3.googleusercontent.com/d/1ji9UpculbqZoreDoLGxqG4WAIf1h-gv0" alt="Jujutsu Kaisen" loading="lazy">
@@ -452,14 +453,14 @@
 
     <!-- --- JAVASCRIPT LOGIC --- -->
     <script>
-        // 1. Dynamic Page Redirection Logic
+        // 1. Target URL Dynamic Navigation
         function openAnimePage(animeSlug) {
             if(!animeSlug) return;
             const targetPage = animeSlug.toLowerCase() + '_videoplayer.html';
             window.location.href = targetPage;
         }
 
-        // 2. Real-time Search Logic
+        // 2. Real-time Live Search Engine Logic
         const searchInput = document.getElementById('searchInput');
         const noResults = document.getElementById('noResults');
 
@@ -485,7 +486,6 @@
             }
         }
 
-        // Live filtering as user types
         searchInput.addEventListener('input', executeSearch);
     </script>
 </body>
