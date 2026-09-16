@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>7anime - Classroom of the Elite</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0b0c16;
+            --card-bg: #141625;
+            --accent-purple: #6c5ce7;
+            --accent-purple-hover: #5a4bcf;
+            --text-main: #ffffff;
+            --text-sub: #94a3b8;
+            --border-color: #232740;
+            --badge-bg: #22263f;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding-bottom: 40px;
+        }
+
+        /* Navbar */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 5%;
+            background-color: #0f101d;
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 800;
+            color: #fff;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo span {
+            color: var(--accent-purple);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-sub);
+            text-decoration: none;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #fff;
+        }
+
+        .search-box {
+            position: relative;
+            width: 300px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 8px 15px 8px 35px;
+            background: #1a1d30;
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            color: #fff;
+            font-size: 13px;
+            outline: none;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-sub);
+            font-size: 13px;
+        }
+
+        .user-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: var(--text-sub);
+        }
+
+        .user-actions i {
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        /* Layout Container */
+        .container {
+            max-width: 1300px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+
+        /* Hero Banner / Details */
+        .anime-details-card {
+            display: flex;
+            gap: 25px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .poster-img {
+            width: 170px;
+            height: 240px;
+            object-fit: cover;
+            border-radius: 8px;
+            flex-shrink: 0;
+        }
+
+        .anime-info {
+            flex-grow: 1;
+        }
+
+        .anime-title {
+            font-size: 26px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .tags-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .tag-pill {
+            background: var(--badge-bg);
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            color: var(--text-sub);
+        }
+
+        .tag-pill.primary {
+            background: var(--accent-purple);
+            color: #fff;
+        }
+
+        .rating-tag {
+            color: #f1c40f;
+            font-weight: bold;
+            font-size: 13px;
+        }
+
+        .synopsis {
+            color: var(--text-sub);
+            font-size: 13.5px;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            max-width: 900px;
+        }
+
+        .meta-stats {
+            display: flex;
+            gap: 20px;
+            font-size: 13px;
+            color: var(--text-sub);
+        }
+
+        .hero-actions {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-action {
+            background: var(--accent-purple);
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            text-decoration: none;
+        }
+
+        .btn-action.icon-only {
+            background: var(--badge-bg);
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        /* Player Section */
+        .player-wrapper {
+            background: #000;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            margin-bottom: 25px;
+        }
+
+        .player-topbar {
+            background: #121422;
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .auto-next-toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 12px;
+            color: var(--text-sub);
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 36px;
+            height: 20px;
+        }
+
+        .switch input { opacity: 0; width: 0; height: 0; }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #333;
+            transition: .4s;
+            border-radius: 20px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 14px; width: 14px;
+            left: 3px; bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider { background-color: var(--accent-purple); }
+        input:checked + .slider:before { transform: translateX(16px); }
+
+        .iframe-container {
+            position: relative;
+            width: 100%;
+            padding-top: 56.25%; /* 16:9 Aspect Ratio */
+            background: #000;
+        }
+
+        .iframe-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* Player Custom Control Strip */
+        .player-controls-bar {
+            background: #121422;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid var(--border-color);
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .ctrl-btn, .ctrl-select {
+            background: var(--badge-bg);
+            border: 1px solid var(--border-color);
+            color: #fff;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .ctrl-btn:hover { background: var(--border-color); }
+
+        /* Lower Controls Row Layout */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 25px;
+        }
+
+        .episodes-card, .download-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        .episodes-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .season-dropdown {
+            background: var(--badge-bg);
+            color: white;
+            border: 1px solid var(--border-color);
+            padding: 8px 15px;
+            border-radius: 6px;
+            outline: none;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .ep-search {
+            background: var(--badge-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 8px 12px;
+            color: white;
+            outline: none;
+            font-size: 13px;
+            width: 180px;
+        }
+
+        .episodes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+            gap: 10px;
+            max-height: 250px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .ep-btn {
+            background: var(--badge-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-sub);
+            padding: 12px 0;
+            border-radius: 6px;
+            cursor: pointer;
+            text-align: center;
+            font-size: 13px;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+
+        .ep-btn:hover {
+            color: white;
+            background: var(--border-color);
+        }
+
+        .ep-btn.active {
+            background: var(--accent-purple);
+            color: white;
+            border-color: var(--accent-purple);
+        }
+
+        /* Download Section Widget */
+        .download-card h3 {
+            font-size: 15px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .dl-select-group {
+            margin-bottom: 15px;
+        }
+
+        .dl-select-group label {
+            display: block;
+            font-size: 12px;
+            color: var(--text-sub);
+            margin-bottom: 6px;
+        }
+
+        .dl-select {
+            width: 100%;
+            background: var(--badge-bg);
+            border: 1px solid var(--border-color);
+            color: white;
+            padding: 10px;
+            border-radius: 6px;
+            outline: none;
+            font-size: 13px;
+        }
+
+        .btn-download-full {
+            width: 100%;
+            background: var(--accent-purple);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            transition: 0.3s;
+            text-decoration: none;
+        }
+
+        .btn-download-full:hover {
+            background: var(--accent-purple-hover);
+        }
+
+        /* Mobile Adjustments */
+        @media (max-width: 850px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .anime-details-card {
+                flex-direction: column;
+            }
+
+            .poster-img {
+                width: 100%;
+                height: auto;
+                max-height: 280px;
+            }
+
+            .hero-actions {
+                position: relative;
+                right: 0;
+                top: 0;
+                margin-top: 15px;
+            }
+
+            .nav-links, .search-box {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Navigation -->
+    <header class="header">
+        <div class="logo-container">
+            <a href="#" class="logo">7<span>anime</span></a>
+            <ul class="nav-links">
+                <li><a href="#"><i class="fa-solid fa-house"></i> Home</a></li>
+                <li><a href="#"><i class="fa-solid fa-compass"></i> Explore</a></li>
+            </ul>
+        </div>
+        <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" placeholder="Search anime, movies...">
+        </div>
+        <div class="user-actions">
+            <i class="fa-solid fa-bell"></i>
+            <i class="fa-solid fa-moon"></i>
+            <i class="fa-solid fa-circle-user" style="font-size: 20px;"></i>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Anime Details Banner -->
+        <div class="anime-details-card">
+            <img src="https://lh3.googleusercontent.com/d/1J0za-zSCfOStt-bs8dzV7j4YlmVBOHuF" alt="Classroom of the Elite Poster" class="poster-img" onerror="this.src='https://via.placeholder.com/170x240/141625/ffffff?text=Classroom+of+the+Elite'">
+            <div class="anime-info">
+                <h1 class="anime-title">Classroom of the Elite</h1>
+                <div class="tags-row">
+                    <span class="tag-pill primary">Anime</span>
+                    <span class="rating-tag"><i class="fa-solid fa-star"></i> 9.0/10</span>
+                    <span class="tag-pill">Rank #1</span>
+                    <span class="tag-pill">Psychological</span>
+                    <span class="tag-pill">Drama</span>
+                    <span class="tag-pill">School</span>
+                    <span class="tag-pill">Thriller</span>
+                </div>
+                <p class="synopsis">
+                    Kiyotaka Ayanokōji enrolls at Tokyo Metropolitan Advanced Nurturing High School, a seemingly utopian institution where students enjoy remarkable freedom. However, behind the ideal facade lies a fierce system where only the top classes receive true privileges. Joining the lowest-ranked Class D, Kiyotaka navigates intense academic and psychological battles alongside his classmates.
+                </p>
+                <div class="meta-stats">
+                    <span><strong>Episodes:</strong> <span id="ep-count-display">43</span> Total</span>
+                    <span>|</span>
+                    <span><strong>Year:</strong> 2017 - 2024</span>
+                    <span>|</span>
+                    <span><strong>Status:</strong> Completed</span>
+                </div>
+            </div>
+            <div class="hero-actions">
+                <a href="download_step1.html" class="btn-action"><i class="fa-solid fa-download"></i> Download</a>
+                <button class="btn-action icon-only"><i class="fa-solid fa-bookmark"></i></button>
+            </div>
+        </div>
+
+        <!-- Video Player Section -->
+        <div class="player-wrapper">
+            <div class="player-topbar">
+                <div id="player-title">Episode 1 - Loading...</div>
+                <div class="auto-next-toggle">
+                    <span>Auto Next</span>
+                    <label class="switch">
+                        <input type="checkbox" checked>
+                        <span class="slider"></span>
+                    </label>
+                    <i class="fa-solid fa-gear" style="margin-left:10px; cursor:pointer;"></i>
+                </div>
+            </div>
+
+            <!-- Embedded Video iFrame -->
+            <div class="iframe-container">
+                <iframe id="anime-player" src="" allowfullscreen></iframe>
+            </div>
+
+            <!-- Functional Player Control Bar -->
+            <div class="player-controls-bar">
+                <div class="control-group">
+                    <button class="ctrl-btn" id="play-pause-btn"><i class="fa-solid fa-play"></i></button>
+                    <button class="ctrl-btn"><i class="fa-solid fa-volume-high"></i></button>
+                </div>
+                <div class="control-group">
+                    <select class="ctrl-select" id="quality-selector">
+                        <option value="1080p">Quality: 1080p (HD)</option>
+                        <option value="720p" selected>Quality: 720p (HD)</option>
+                        <option value="480p">Quality: 480p</option>
+                        <option value="360p">Quality: 360p</option>
+                    </select>
+                    <select class="ctrl-select" id="speed-selector" onchange="changeSpeed(this.value)">
+                        <option value="0.5">Speed: 0.5x</option>
+                        <option value="1" selected>Speed: 1.0x</option>
+                        <option value="1.25">Speed: 1.25x</option>
+                        <option value="1.5">Speed: 1.5x</option>
+                        <option value="2">Speed: 2.0x</option>
+                    </select>
+                    <button class="ctrl-btn" id="next-ep-btn"><i class="fa-solid fa-forward-step"></i> Next</button>
+                    <button class="ctrl-btn" onclick="toggleFullscreen()"><i class="fa-solid fa-expand"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lower Grid: Episodes Selection & Download Widget -->
+        <div class="content-grid">
+            <!-- Episode Selector Card -->
+            <div class="episodes-card">
+                <div class="episodes-header">
+                    <select class="season-dropdown" id="season-select" onchange="loadSeason(this.value)">
+                        <option value="s1">Season 1</option>
+                        <option value="s2">Season 2</option>
+                        <option value="s3">Season 3</option>
+                        <option value="s4">Season 4</option>
+                    </select>
+                    <input type="text" class="ep-search" placeholder="Search episode..." onkeyup="filterEpisodes(this.value)">
+                </div>
+
+                <div class="episodes-grid" id="episodes-grid-container">
+                    <!-- Dynamic episode buttons inserted via JavaScript -->
+                </div>
+            </div>
+
+            <!-- Download Widget Card -->
+            <div class="download-card">
+                <h3><i class="fa-solid fa-circle-down" style="color: var(--accent-purple);"></i> Download Episode</h3>
+                <div class="dl-select-group">
+                    <label>Select Preferred Quality</label>
+                    <select class="dl-select">
+                        <option>1080p (FHD) - ~350MB</option>
+                        <option selected>720p (HD) - ~180MB</option>
+                        <option>480p (SD) - ~90MB</option>
+                    </select>
+                </div>
+                <a href="download_step1.html" class="btn-download-full">
+                    <i class="fa-solid fa-download"></i> Download Episode
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Anime Episode Database Mapping
+        const animeData = {
+            s1: [
+                "https://drive.google.com/file/d/1mLI2Q7uNC23G1rilqnzmW2dz52pg_aVC/preview",
+                "https://drive.google.com/file/d/1Iu2jSuKeh8lr4ycHR3RjtNmprYY1iR7y/preview",
+                "https://drive.google.com/file/d/1Ou_et2AxJzVw1fstL1nMC65Fg4SCCyfm/preview",
+                "https://drive.google.com/file/d/1l8dencMDEKZNdhibV7LW5EbI_XPevYQN/preview",
+                "https://drive.google.com/file/d/1HLdSusLSRE1w9w_Nr83J_Wy1UbTm-GZC/preview",
+                "https://drive.google.com/file/d/1
