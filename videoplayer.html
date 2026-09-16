@@ -23,7 +23,7 @@
         }
 
         @media (min-width: 1024px) {
-            body { padding-bottom: 0; }
+            body { padding-bottom: 20px; }
         }
 
         /* Header Navigation */
@@ -89,7 +89,7 @@
             cursor: pointer;
         }
 
-        /* Main Player Container */
+        /* Main Container */
         .main-layout {
             max-width: 1400px;
             margin: 20px auto;
@@ -107,7 +107,7 @@
             }
         }
 
-        /* Left Section: Video Player & Controls */
+        /* Left Section */
         .player-section {
             display: flex;
             flex-direction: column;
@@ -117,7 +117,7 @@
         .video-container {
             position: relative;
             width: 100%;
-            padding-top: 56.25%; /* 16:9 Aspect Ratio */
+            padding-top: 56.25%;
             background: #000;
             border-radius: 12px;
             overflow: hidden;
@@ -133,7 +133,7 @@
             border: none;
         }
 
-        /* Control Panel below Player (As per PDF Reference) */
+        /* Quick Controls Bar */
         .player-quick-controls {
             display: flex;
             align-items: center;
@@ -167,7 +167,7 @@
             font-size: 16px;
         }
 
-        /* Episode Navigation Row */
+        /* Previous / Next Bar */
         .ep-navigation {
             display: flex;
             align-items: center;
@@ -189,7 +189,6 @@
             display: flex;
             align-items: center;
             gap: 6px;
-            text-decoration: none;
         }
 
         .nav-btn:hover {
@@ -201,6 +200,55 @@
             font-size: 14px;
             font-weight: 600;
             color: #fff;
+        }
+
+        /* Audio Toggles */
+        .audio-toggle-card {
+            background: #131429;
+            padding: 15px 20px;
+            border-radius: 10px;
+            border: 1px solid #23254d;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .toggle-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .toggle-btn {
+            background: #181935;
+            border: 1px solid #2a2c5a;
+            color: #a0a0b0;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .toggle-btn.active {
+            background: #6c5ce7;
+            color: #fff;
+            border-color: #6c5ce7;
+        }
+
+        .switch-container {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .switch-label {
+            font-size: 12px;
+            color: #a0a0b0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
         }
 
         /* Anime Info Box */
@@ -263,55 +311,7 @@
             line-height: 1.5;
         }
 
-        /* Audio & Player Toggles */
-        .audio-toggle-card {
-            background: #131429;
-            padding: 15px 20px;
-            border-radius: 10px;
-            border: 1px solid #23254d;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-
-        .toggle-group {
-            display: flex;
-            gap: 10px;
-        }
-
-        .toggle-btn {
-            background: #181935;
-            border: 1px solid #2a2c5a;
-            color: #a0a0b0;
-            padding: 6px 14px;
-            border-radius: 6px;
-            font-size: 12px;
-            cursor: pointer;
-        }
-
-        .toggle-btn.active {
-            background: #6c5ce7;
-            color: #fff;
-            border-color: #6c5ce7;
-        }
-
-        .switch-container {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .switch-label {
-            font-size: 12px;
-            color: #a0a0b0;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        /* Right Section: Season & Episode Sidebar */
+        /* Sidebar & Episode Section */
         .sidebar-section {
             display: flex;
             flex-direction: column;
@@ -352,12 +352,12 @@
             cursor: pointer;
         }
 
-        /* Episode Grid */
+        /* Image 1 Grid Style Match */
         .episodes-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(55px, 1fr));
-            gap: 8px;
-            max-height: 300px;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            max-height: 350px;
             overflow-y: auto;
             padding-right: 5px;
         }
@@ -371,51 +371,32 @@
             border-radius: 4px;
         }
 
-        .ep-item {
-            background: #181935;
-            border: 1px solid #2a2c5a;
-            color: #fff;
-            padding: 10px 0;
+        .ep-btn {
+            background: #1c1d2e;
+            border: 1px solid #282a45;
+            color: #a0a0b0;
+            padding: 12px 0;
             text-align: center;
             border-radius: 6px;
-            font-size: 12px;
-            font-weight: 600;
+            font-size: 14px;
+            font-weight: 500;
             cursor: pointer;
-            transition: all 0.2s;
-            text-decoration: none;
+            transition: all 0.2s ease;
         }
 
-        .ep-item:hover {
+        .ep-btn:hover {
             border-color: #6c5ce7;
-            color: #6c5ce7;
+            color: #fff;
         }
 
-        .ep-item.active {
+        .ep-btn.active {
             background: #6c5ce7;
             border-color: #6c5ce7;
             color: #fff;
+            font-weight: 600;
         }
 
-        /* Quick Info Box */
-        .quick-info-list {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            font-size: 12px;
-        }
-
-        .info-item {
-            display: flex;
-            justify-content: space-between;
-            color: #a0a0b0;
-        }
-
-        .info-item span:last-child {
-            color: #fff;
-            font-weight: 500;
-        }
-
-        /* Bottom Nav for Mobile */
+        /* Bottom Nav Mobile */
         .bottom-nav {
             position: fixed;
             bottom: 0;
@@ -455,7 +436,7 @@
         </a>
         <div class="search-box">
             <i class="fa-solid fa-magnifying-glass"></i>
-            <input type="text" placeholder="Search episode or anime...">
+            <input type="text" placeholder="Search episode...">
         </div>
         <div class="user-actions">
             <i class="fa-regular fa-bell"></i>
@@ -463,18 +444,17 @@
         </div>
     </header>
 
-    <!-- Main Container Layout -->
+    <!-- Main Content Grid Layout -->
     <div class="main-layout">
         
-        <!-- Left Section: Player & Details -->
+        <!-- Main Player Area -->
         <div class="player-section">
             
-            <!-- Dynamic Video Player Container -->
             <div class="video-container">
-                <iframe id="video-player" src="https://drive.google.com/file/d/1mLI2Q7uNC23G1rilqnzmW2dz52pg_aVC/preview" allowfullscreen></iframe>
+                <iframe id="video-player" src="" allowfullscreen></iframe>
             </div>
 
-            <!-- Player Quick Controls Bar (PDF Reference Architecture) -->
+            <!-- Quick Player Bar -->
             <div class="player-quick-controls">
                 <button class="control-btn"><i class="fa-solid fa-sliders"></i> Settings</button>
                 <button class="control-btn"><i class="fa-solid fa-closed-captioning"></i> CC</button>
@@ -485,14 +465,14 @@
                 <button class="control-btn"><i class="fa-solid fa-window-restore"></i> PiP</button>
             </div>
 
-            <!-- Previous / Next Episode Row -->
+            <!-- Navigation Bar -->
             <div class="ep-navigation">
                 <button class="nav-btn" id="prev-btn" onclick="changeEpisode(-1)"><i class="fa-solid fa-chevron-left"></i> Previous</button>
                 <span class="current-ep-title" id="ep-indicator">Season 1 • Episode 1</span>
                 <button class="nav-btn" id="next-btn" onclick="changeEpisode(1)">Next <i class="fa-solid fa-chevron-right"></i></button>
             </div>
 
-            <!-- Audio Audio Tracks & Toggles -->
+            <!-- Audio & Track Controls -->
             <div class="audio-toggle-card">
                 <div class="toggle-group">
                     <button class="toggle-btn">SUB</button>
@@ -504,7 +484,7 @@
                 </div>
             </div>
 
-            <!-- Anime Info Box -->
+            <!-- Info Container -->
             <div class="anime-info-box">
                 <div class="info-header">
                     <div>
@@ -525,12 +505,12 @@
 
         </div>
 
-        <!-- Right Section: Sidebar (Season & Episode Selection) -->
+        <!-- Episodes & Season Selection Sidebar -->
         <div class="sidebar-section">
             
             <div class="sidebar-card">
                 <div class="sidebar-header">
-                    <span class="sidebar-title"><i class="fa-solid fa-list-ul"></i> Episodes</span>
+                    <span class="sidebar-title"><i class="fa-solid fa-list-ul"></i> Select Episode</span>
                 </div>
 
                 <!-- Season Selector Dropdown -->
@@ -541,30 +521,15 @@
                     <option value="s4">Season 4 (5 Episodes)</option>
                 </select>
 
-                <!-- Dynamic Episode Grid -->
-                <div class="episodes-grid" id="episodes-grid">
-                    <!-- Episodes rendered via JS -->
-                </div>
-            </div>
-
-            <!-- Quick Anime Metadata -->
-            <div class="sidebar-card">
-                <div class="sidebar-header">
-                    <span class="sidebar-title">Quick Info</span>
-                </div>
-                <div class="quick-info-list">
-                    <div class="info-item"><span>Status:</span> <span style="color:#2ecc71;">Completed / Ongoing</span></div>
-                    <div class="info-item"><span>Audio:</span> <span>Hindi Dubbed</span></div>
-                    <div class="info-item"><span>Type:</span> <span>TV Series</span></div>
-                    <div class="info-item"><span>Quality:</span> <span>1080p HD</span></div>
-                </div>
+                <!-- Grid Buttons matching Image 1 -->
+                <div class="episodes-grid" id="episodes-grid"></div>
             </div>
 
         </div>
 
     </div>
 
-    <!-- Mobile Navigation Bar -->
+    <!-- Mobile Navigation -->
     <div class="bottom-nav">
         <a href="index.html" class="nav-item">
             <i class="fa-solid fa-house"></i> Home
@@ -580,7 +545,7 @@
         </a>
     </div>
 
-    <!-- All Episode Data & Dynamic Player Script -->
+    <!-- Script Section -->
     <script>
         const animeData = {
             s1: [
@@ -616,4 +581,29 @@
                 "https://drive.google.com/file/d/1US6jJ0OTkfEDLQgPP4UcbtJnu0mJdmP6/preview",
                 "https://drive.google.com/file/d/1EASbEA4Cgr9ci61fZyIQmkZpK66ST2dO/preview",
                 "https://drive.google.com/file/d/1et_Hurl7KlW6vj2cQffiZa90M23r9lvv/preview",
-                "https://drive.google.com/file/
+                "https://drive.google.com/file/d/1PT877Uu-hUPNy9ZF9rnqJOV6T6IcSAH7/preview",
+                "https://drive.google.com/file/d/1B1HL09ImQWI1YqgdDivJRlflEc1LqCKG/preview",
+                "https://drive.google.com/file/d/1J0VIIhCE6zxYMGd23jpMw7gwpKqnpeMS/preview",
+                "https://drive.google.com/file/d/196Z3ogkBTAd42ZmWq0TuoIe7QUzwKNwl/preview",
+                "https://drive.google.com/file/d/1NckDO2dEbOUE2NggyZUcpjqgjqLxDSps/preview",
+                "https://drive.google.com/file/d/1nBGNW6AQzPCO_OMoBAIYjGCIn5ewCvFb/preview",
+                "https://drive.google.com/file/d/1O_aMc-OHSv0HKCJ2dh-8PFivlItoDBWQ/preview",
+                "https://drive.google.com/file/d/1YgtWvkY2NbivG84wnpga_LT87xvngb5_/preview",
+                "https://drive.google.com/file/d/1ps4Vp8tQy55lb4OgWnUuvsYTEwRHr5po/preview",
+                "https://drive.google.com/file/d/1etKY6GNC0ZmqXedsT7bO4YWRs8u5snkv/preview"
+            ],
+            s4: [
+                "https://drive.google.com/file/d/1JGQZsEsnV3rCxol4scspTZkT7SS88n98/preview",
+                "https://drive.google.com/file/d/19cNfNi9riQkpNi5vaJPHE0yg1dt6eeJi/preview",
+                "https://drive.google.com/file/d/1xXfYn7hp-t9c0UPfGZTQaCAnfty10FR1/preview",
+                "https://drive.google.com/file/d/15LUE5Al2covTuEkWSXcIHYF9QqVhH8Ne/preview",
+                "https://myvidplay.com/e/j1lu0r3vtv01"
+            ]
+        };
+
+        let currentSeason = 's1';
+        let currentEpIndex = 0;
+
+        function renderEpisodeGrid() {
+            const grid = document.getElementById('episodes-grid');
+            grid.inn
