@@ -1,371 +1,317 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>7Anime - Classroom of the Elite Hindi Dubbed</title>
-    <!-- Google Fonts & Font Awesome Icons -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <title>7Anime - Watch Your Favorite Anime, Anytime, Anywhere</title>
+    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <style>
+        :root {
+            --bg-color: #0b0c1b;
+            --card-bg: #15182d;
+            --primary: #8b5cf6;
+            --primary-hover: #7c3aed;
+            --text-main: #ffffff;
+            --text-sub: #9ca3af;
+            --accent-pink: #ec4899;
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         body {
-            background-color: #0b0c1b;
-            color: #ffffff;
-            padding-bottom: 70px; /* Mobile nav space */
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding-bottom: 40px;
         }
 
-        /* Header / Navbar */
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        /* Navbar */
         header {
             display: flex;
-            align-items: center;
             justify-content: space-between;
+            align-items: center;
             padding: 15px 5%;
-            background: rgba(11, 12, 27, 0.95);
+            background-color: rgba(11, 12, 27, 0.95);
             position: sticky;
             top: 0;
-            z-index: 100;
-            border-bottom: 1px solid #1f2142;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         }
 
         .logo {
-            font-size: 24px;
-            font-weight: 700;
-            color: #6c5ce7;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 5px;
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--text-main);
         }
-
         .logo span {
-            color: #fff;
+            color: var(--primary);
         }
 
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-sub);
+            font-size: 15px;
+            transition: 0.3s;
+        }
+
+        .nav-links a.active, .nav-links a:hover {
+            color: var(--text-main);
+        }
+
+        /* Search Bar Logic */
         .search-box {
             position: relative;
-            width: 40%;
-            max-width: 400px;
+            display: flex;
+            align-items: center;
         }
 
         .search-box input {
-            width: 100%;
+            background: #1a1e36;
+            border: 1px solid #2e3458;
             padding: 8px 15px 8px 35px;
-            background: #181935;
-            border: 1px solid #2a2c5a;
             border-radius: 20px;
-            color: #fff;
+            color: white;
             outline: none;
+            width: 250px;
         }
 
         .search-box i {
             position: absolute;
             left: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #a0a0b0;
+            color: var(--text-sub);
         }
 
-        /* Container */
-        .container {
-            max-width: 1200px;
-            margin: 20px auto;
-            padding: 0 20px;
-        }
-
-        /* Anime Card Component */
-        .anime-details-card {
-            background: #131429;
+        /* Hero Banner */
+        .hero {
+            margin: 20px 5%;
+            height: 400px;
             border-radius: 16px;
-            overflow: hidden;
-            border: 1px solid #23254d;
+            background: linear-gradient(to right, rgba(11, 12, 27, 0.9), rgba(11, 12, 27, 0.2)), url('https://images.alphacoders.com/134/1344400.png') center/cover;
             display: flex;
-            flex-direction: column;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-
-        @media (min-width: 768px) {
-            .anime-details-card {
-                flex-direction: row;
-            }
-            body {
-                padding-bottom: 0;
-            }
-        }
-
-        .poster-wrapper {
+            align-items: center;
+            padding: 40px;
             position: relative;
-            flex: 1;
-            max-width: 100%;
-            cursor: pointer;
         }
 
-        @media (min-width: 768px) {
-            .poster-wrapper {
-                max-width: 350px;
-            }
+        .hero-content {
+            max-width: 500px;
         }
 
-        .poster-img {
-            width: 100%;
-            height: 100%;
-            min-height: 400px;
-            object-fit: cover;
-            display: block;
-            transition: transform 0.3s ease;
-        }
-
-        .poster-wrapper:hover .poster-img {
-            transform: scale(1.02);
-        }
-
-        .badge-dub {
-            position: absolute;
-            top: 15px;
-            left: 15px;
-            background: #e74c3c;
-            color: #fff;
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        /* Content Area */
-        .anime-info {
-            flex: 2;
-            padding: 25px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
-        .title {
-            font-size: 28px;
-            font-weight: 700;
-            margin-bottom: 5px;
-            color: #fff;
-        }
-
-        .sub-title {
-            color: #a0a0b0;
-            font-size: 14px;
-            margin-bottom: 15px;
-        }
-
-        .tags {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin-bottom: 15px;
-        }
-
-        .tag {
-            background: #1f2142;
-            color: #6c5ce7;
+        .badge {
+            background: var(--accent-pink);
             padding: 4px 10px;
-            border-radius: 6px;
             font-size: 12px;
-            font-weight: 600;
+            border-radius: 4px;
+            font-weight: bold;
         }
 
-        .description {
-            color: #c0c0d0;
+        .hero-title {
+            font-size: 40px;
+            margin: 10px 0;
+            font-weight: 800;
+        }
+
+        .hero-desc {
             font-size: 14px;
-            line-height: 1.6;
+            color: var(--text-sub);
             margin-bottom: 20px;
         }
 
-        /* Season Details Grid */
-        .season-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-            gap: 10px;
-            margin-bottom: 25px;
-        }
-
-        .season-box {
-            background: #181935;
-            padding: 10px;
+        .btn-play {
+            background: var(--primary);
+            color: white;
+            padding: 10px 24px;
             border-radius: 8px;
-            border: 1px solid #2a2c5a;
-            text-align: center;
-        }
-
-        .season-box h4 {
-            font-size: 14px;
-            color: #fff;
-        }
-
-        .season-box p {
-            font-size: 12px;
-            color: #2ecc71;
-        }
-
-        /* Buttons */
-        .action-btns {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-
-        .btn {
-            padding: 12px 25px;
-            border-radius: 25px;
             font-weight: 600;
-            text-decoration: none;
             display: inline-flex;
             align-items: center;
             gap: 8px;
             cursor: pointer;
-            transition: background 0.2s;
             border: none;
+            transition: 0.3s;
         }
 
-        .btn-watch {
-            background: #6c5ce7;
-            color: #fff;
+        .btn-play:hover {
+            background: var(--primary-hover);
         }
 
-        .btn-watch:hover {
-            background: #5b4bc4;
-        }
-
-        .btn-watchlist {
-            background: #1f2142;
-            color: #fff;
-        }
-
-        /* Mobile Bottom Nav Bar */
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background: #0b0c1b;
-            border-top: 1px solid #1f2142;
+        /* Grid Sections */
+        .section-title {
+            margin: 30px 5% 15px;
+            font-size: 20px;
             display: flex;
-            justify-content: space-around;
-            padding: 10px 0;
-            z-index: 1000;
-        }
-
-        @media (min-width: 768px) {
-            .bottom-nav {
-                display: none;
-            }
-        }
-
-        .nav-item {
-            color: #a0a0b0;
-            text-decoration: none;
-            display: flex;
-            flex-direction: column;
+            justify-content: space-between;
             align-items: center;
-            font-size: 11px;
-            gap: 4px;
         }
 
-        .nav-item.active {
-            color: #6c5ce7;
+        .anime-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 20px;
+            padding: 0 5%;
+        }
+
+        .anime-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+        }
+
+        .anime-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+        }
+
+        .anime-img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+        }
+
+        .anime-info {
+            padding: 12px;
+        }
+
+        .anime-name {
+            font-size: 15px;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .anime-meta {
+            font-size: 12px;
+            color: var(--text-sub);
+            margin-top: 5px;
         }
     </style>
 </head>
 <body>
 
-    <!-- Header Navigation -->
+    <!-- Header Navbar -->
     <header>
-        <a href="index.html" class="logo">
-            <i class="fa-solid fa-play"></i> 7<span>Anime</span>
-        </a>
+        <div class="logo"><span>7</span>Anime</div>
+        <ul class="nav-links">
+            <li><a href="index.html" class="active"><i class="fa-solid fa-house"></i> Home</a></li>
+            <li><a href="search.html"><i class="fa-solid fa-compass"></i> Explore</a></li>
+            <li><a href="#">Movies</a></li>
+            <li><a href="#">TV Series</a></li>
+        </ul>
         <div class="search-box">
             <i class="fa-solid fa-magnifying-glass"></i>
-            <input type="text" placeholder="Search anime...">
+            <input type="text" id="searchInput" placeholder="Search anime..." onkeydown="handleSearch(event)">
         </div>
     </header>
 
-    <!-- Main Content -->
-    <div class="container">
-        <div class="anime-details-card">
-            
-            <!-- Direct Image Click to Video Player -->
-            <a href="videoplayer.html" class="poster-wrapper">
-                <span class="badge-dub">HINDI DUBBED</span>
-                <!-- Converted Direct Embed Google Drive Link -->
-                <img src="https://lh3.googleusercontent.com/d/1J0za-zSCfOStt-bs8dzV7j4YlmVBOHuF" alt="Classroom of the Elite" class="poster-img">
-            </a>
-
-            <!-- Anime Info & Details -->
-            <div class="anime-info">
-                <div>
-                    <h1 class="title">Classroom of the Elite</h1>
-                    <p class="sub-title">Youkoso Jitsuryoku Shijou Shugi no Kyoushitsu e</p>
-                    
-                    <div class="tags">
-                        <span class="tag">Psychological</span>
-                        <span class="tag">Drama</span>
-                        <span class="tag">School</span>
-                        <span class="tag">Thriller</span>
-                    </div>
-
-                    <p class="description">
-                        Kiyotaka Ayanokouji is a quiet and unassuming student who enters Advanced Nurturing High School, a prestigious institution guaranteeing 100% employment. However, he ends up in Class D, where the school's harsh merit-based system tests their survival skills.
-                    </p>
-
-                    <!-- Season 1 to 4 Details -->
-                    <div class="season-grid">
-                        <div class="season-box">
-                            <h4>Season 1</h4>
-                            <p>Hindi Dub (12 Ep)</p>
-                        </div>
-                        <div class="season-box">
-                            <h4>Season 2</h4>
-                            <p>Hindi Dub (13 Ep)</p>
-                        </div>
-                        <div class="season-box">
-                            <h4>Season 3</h4>
-                            <p>Hindi Dub (13 Ep)</p>
-                        </div>
-                        <div class="season-box">
-                            <h4>Season 4</h4>
-                            <p>Hindi Dub (Announced)</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Action Buttons -->
-                <div class="action-btns">
-                    <a href="videoplayer.html" class="btn btn-watch">
-                        <i class="fa-solid fa-play"></i> Watch Now
-                    </a>
-                    <button class="btn btn-watchlist">
-                        <i class="fa-solid fa-plus"></i> Add to Watchlist
-                    </button>
-                </div>
-            </div>
-
+    <!-- Main Hero Banner (Solo Leveling) -->
+    <div class="hero">
+        <div class="hero-content">
+            <span class="badge">🔥 Trending #1</span>
+            <h1 class="hero-title">Solo Leveling</h1>
+            <p class="hero-desc">Sung Jin-Woo continues his journey to become the strongest hunter in a world full of monsters.</p>
+            <!-- Click karne per direct open hoga -->
+            <button class="btn-play" onclick="openAnime('solo_leveling')">
+                <i class="fa-solid fa-play"></i> Watch Now
+            </button>
         </div>
     </div>
 
-    <!-- Mobile Navigation Bar -->
-    <div class="bottom-nav">
-        <a href="index.html" class="nav-item active">
-            <i class="fa-solid fa-house"></i> Home
-        </a>
-        <a href="#" class="nav-item">
-            <i class="fa-solid fa-compass"></i> Explore
-        </a>
-        <a href="#" class="nav-item">
-            <i class="fa-solid fa-bookmark"></i> Watchlist
-        </a>
+    <!-- Trending Section -->
+    <div class="section-title">
+        <span>🔥 Trending This Week</span>
     </div>
 
+    <div class="anime-grid">
+        <!-- Solo Leveling Card -->
+        <div class="anime-card" onclick="openAnime('solo_leveling')">
+            <img class="anime-img" src="https://m.media-amazon.com/images/M/MV5BODlhMTY5N2UtNzA1Yi00ODliLTg2OTUtN2ExZDdiNmNmZDZhXkEyXkFqcGc@._V1_.jpg" alt="Solo Leveling">
+            <div class="anime-info">
+                <div class="anime-name">Solo Leveling</div>
+                <div class="anime-meta">Action • Fantasy | Ep 12</div>
+            </div>
+        </div>
+
+        <!-- One Piece Card -->
+        <div class="anime-card" onclick="openAnime('one_piece')">
+            <img class="anime-img" src="https://m.media-amazon.com/images/M/MV5BMTNjNGU4NTUtYmVjMy00ZjIyLTgxN2MtVTlkNWVlN2JhMSSXkEyXkFqcGc@._V1_.jpg" alt="One Piece">
+            <div class="anime-info">
+                <div class="anime-name">One Piece</div>
+                <div class="anime-meta">Action • Adventure | Ep 1100</div>
+            </div>
+        </div>
+
+        <!-- Jujutsu Kaisen Card -->
+        <div class="anime-card" onclick="openAnime('jujutsu_kaisen')">
+            <img class="anime-img" src="https://m.media-amazon.com/images/M/MV5BNGY4MTg3NjgtMmFkIN00NTg5LWE3MWItMjc5YTBhNDg3ZDFlXkEyXkFqcGc@._V1_.jpg" alt="Jujutsu Kaisen">
+            <div class="anime-info">
+                <div class="anime-name">Jujutsu Kaisen S2</div>
+                <div class="anime-meta">Action • Supernatural | Ep 23</div>
+            </div>
+        </div>
+
+        <!-- Demon Slayer Card -->
+        <div class="anime-card" onclick="openAnime('demon_slayer')">
+            <img class="anime-img" src="https://m.media-amazon.com/images/M/MV5BYzA2Nzk5M2EtMjEwNi00OWE4LWIxOWEtOGI2NTNmZmU0N2VhXkEyXkFqcGc@._V1_.jpg" alt="Demon Slayer">
+            <div class="anime-info">
+                <div class="anime-name">Demon Slayer S4</div>
+                <div class="anime-meta">Action • Fantasy | Ep 12</div>
+            </div>
+        </div>
+
+        <!-- Attack on Titan Card -->
+        <div class="anime-card" onclick="openAnime('attack_on_titan')">
+            <img class="anime-img" src="https://m.media-amazon.com/images/M/MV5BMTMyMDAyMDY3MF5BMl5BanBnXkFtZTgwMDMyNjM0NTM@._V1_.jpg" alt="Attack on Titan">
+            <div class="anime-info">
+                <div class="anime-name">Attack on Titan</div>
+                <div class="anime-meta">Action • Drama | Ep 87</div>
+            </div>
+        </div>
+
+        <!-- Blue Lock Card -->
+        <div class="anime-card" onclick="openAnime('blue_lock')">
+            <img class="anime-img" src="https://m.media-amazon.com/images/M/MV5BODkyODg0NWItZWE1MS00Yjk2LTgwMDAtZTg2NTk1OGJlNTBjXkEyXkFqcGc@._V1_.jpg" alt="Blue Lock">
+            <div class="anime-info">
+                <div class="anime-name">Blue Lock</div>
+                <div class="anime-meta">Sports • Drama | Ep 24</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Redirect Logic -->
+    <script>
+        // Target format redirect logic: solo_leveling_videoplayer.html
+        function openAnime(animeKey) {
+            window.location.href = animeKey + "_videoplayer.html";
+        }
+
+        // Search Redirect Logic (Separated search engine page)
+        function handleSearch(event) {
+            if (event.key === "Enter") {
+                const query = document.getElementById("searchInput").value.trim();
+                if (query !== "") {
+                    window.location.href = "search.html?q=" + encodeURIComponent(query);
+                }
+            }
+        }
+    </script>
 </body>
 </html>
