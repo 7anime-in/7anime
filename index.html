@@ -6,344 +6,8 @@
     <title>7Anime - Watch Your Favorite Anime</title>
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        body {
-            background-color: #0b0c10;
-            color: #ffffff;
-            overflow-x: hidden;
-        }
-
-        a {
-            text-decoration: none;
-            color: inherit;
-        }
-
-        /* --- HEADER & NAVBAR --- */
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 5%;
-            background: rgba(15, 15, 26, 0.95);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .logo {
-            font-size: 26px;
-            font-weight: 800;
-            color: #fff;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            cursor: pointer;
-        }
-
-        .logo span {
-            color: #8a2be2;
-        }
-
-        nav ul {
-            display: flex;
-            list-style: none;
-            gap: 20px;
-        }
-
-        nav ul li a {
-            font-weight: 600;
-            transition: color 0.3s;
-        }
-
-        nav ul li a:hover, nav ul li a.active {
-            color: #8a2be2;
-        }
-
-        /* Search Box */
-        .search-box {
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
-
-        .search-box input {
-            background: #1f1f2e;
-            border: 1px solid #333;
-            padding: 8px 35px 8px 15px;
-            border-radius: 20px;
-            color: #fff;
-            outline: none;
-            width: 200px;
-            transition: all 0.3s ease;
-        }
-
-        .search-box input:focus {
-            width: 240px;
-            border-color: #8a2be2;
-            box-shadow: 0 0 10px rgba(138, 43, 226, 0.4);
-        }
-
-        .search-box i {
-            position: absolute;
-            right: 12px;
-            color: #aaa;
-            cursor: pointer;
-        }
-
-        /* --- HERO BANNER (FIXED IMAGE & HEIGHT) --- */
-        .hero {
-            position: relative;
-            height: 50vh;
-            min-height: 320px;
-            max-height: 450px;
-            background: linear-gradient(to right, rgba(11, 12, 16, 0.95) 35%, rgba(11, 12, 16, 0.3)), 
-                        url('https://lh3.googleusercontent.com/d/1DrYU7Rcf8h1JHkkakd6ks9MAiFYsnj4V') top center / cover no-repeat;
-            display: flex;
-            align-items: center;
-            padding: 0 5%;
-        }
-
-        .hero-content {
-            max-width: 500px;
-            z-index: 2;
-        }
-
-        .badge {
-            background: #ff0055;
-            padding: 4px 10px;
-            border-radius: 5px;
-            font-size: 11px;
-            font-weight: bold;
-            display: inline-block;
-            margin-bottom: 8px;
-        }
-
-        .hero-title {
-            font-size: 36px;
-            font-weight: 800;
-            margin-bottom: 8px;
-            line-height: 1.1;
-        }
-
-        .hero-meta {
-            color: #aaa;
-            font-size: 13px;
-            margin-bottom: 12px;
-        }
-
-        .hero-desc {
-            color: #ccc;
-            margin-bottom: 18px;
-            font-size: 13px;
-            line-height: 1.4;
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-
-        .hero-buttons {
-            display: flex;
-            gap: 12px;
-        }
-
-        .btn {
-            padding: 10px 20px;
-            border-radius: 20px;
-            font-weight: bold;
-            cursor: pointer;
-            border: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 13px;
-            transition: all 0.2s ease-in-out;
-        }
-
-        .btn-primary {
-            background: #8a2be2;
-            color: #fff;
-        }
-
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.15);
-            color: #fff;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            filter: brightness(1.2);
-        }
-
-        /* --- MAIN ANIME GRID (FIXED POSTER RATIO) --- */
-        .container {
-            padding: 25px 5%;
-        }
-
-        .section-title {
-            font-size: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .section-title i {
-            color: #ff0055;
-        }
-
-        .grid-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-            gap: 16px;
-        }
-
-        .anime-card {
-            background: #151522;
-            border-radius: 10px;
-            overflow: hidden;
-            cursor: pointer;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            position: relative;
-        }
-
-        .anime-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(138, 43, 226, 0.4);
-        }
-
-        /* Aspect Ratio 2:3 for Perfect Posters */
-        .card-img-container {
-            position: relative;
-            width: 100%;
-            aspect-ratio: 2 / 3;
-            background-color: #1a1a2e;
-            overflow: hidden;
-        }
-
-        .card-img-container img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            object-position: center;
-            display: block;
-        }
-
-        .rating-badge {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            background: rgba(0, 0, 0, 0.85);
-            color: #ffcc00;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-size: 11px;
-            font-weight: bold;
-        }
-
-        .card-info {
-            padding: 10px;
-        }
-
-        .card-title {
-            font-size: 14px;
-            font-weight: 700;
-            margin-bottom: 4px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .card-tags {
-            font-size: 11px;
-            color: #888;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .no-results {
-            display: none;
-            text-align: center;
-            grid-column: 1 / -1;
-            padding: 30px;
-            color: #888;
-        }
-
-        /* --- FOOTER --- */
-        footer {
-            background: #07070a;
-            padding: 25px 5%;
-            text-align: center;
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
-            margin-top: 40px;
-        }
-
-        .footer-links {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 18px;
-            margin: 12px 0;
-            font-size: 13px;
-            color: #aaa;
-        }
-
-        /* --- MOBILE LAYOUT FIXES --- */
-        @media (max-width: 768px) {
-            header {
-                flex-direction: column;
-                gap: 10px;
-                padding: 10px 4%;
-            }
-
-            .logo {
-                font-size: 22px;
-            }
-
-            nav ul {
-                gap: 15px;
-                font-size: 13px;
-            }
-
-            .search-box {
-                width: 100%;
-            }
-
-            .search-box input {
-                width: 100%;
-            }
-
-            .search-box input:focus {
-                width: 100%;
-            }
-
-            .hero {
-                height: auto;
-                min-height: 280px;
-                padding: 30px 4%;
-                background-position: center top;
-            }
-
-            .hero-title {
-                font-size: 26px;
-            }
-
-            .grid-container {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 12px;
-            }
-        }
-    </style>
+    <!-- External CSS -->
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
@@ -372,7 +36,6 @@
             <div class="hero-meta">Action • Fantasy • Sci-Fi | Ep 12 Available</div>
             <p class="hero-desc">Sung Jin-Woo continues his journey to become the strongest hunter in a world full of monsters and hidden secrets.</p>
             <div class="hero-buttons">
-                <!-- Redirects to solo_leveling_videoplayer.html -->
                 <button class="btn btn-primary" onclick="openAnimePage('solo_leveling')">
                     <i class="fa-solid fa-play"></i> Watch Now
                 </button>
@@ -447,6 +110,18 @@
                 </div>
             </div>
 
+            <!-- Dr. Stone Card (NEW ADDED) -->
+            <div class="anime-card" onclick="openAnimePage('dr_stone')">
+                <div class="card-img-container">
+                    <img src="https://drive.google.com/thumbnail?id=1lHwUC54qEv2FANAnBjQA4q8hIkoA_qON&sz=w1000" alt="Dr. Stone" loading="lazy">
+                    <span class="rating-badge"><i class="fa-solid fa-star"></i> 8.9</span>
+                </div>
+                <div class="card-info">
+                    <div class="card-title">Dr. Stone</div>
+                    <div class="card-tags">Sci-Fi, Adventure, Comedy</div>
+                </div>
+            </div>
+
             <div id="noResults" class="no-results">No anime found matching your search.</div>
         </div>
     </main>
@@ -463,42 +138,7 @@
         <p style="color: #666; font-size: 12px;">© 7Anime. All rights reserved.</p>
     </footer>
 
-    <!-- --- JAVASCRIPT LOGIC --- -->
-    <script>
-        // 1. Target URL Dynamic Navigation
-        function openAnimePage(animeSlug) {
-            if(!animeSlug) return;
-            const targetPage = animeSlug.toLowerCase() + '_videoplayer.html';
-            window.location.href = targetPage;
-        }
-
-        // 2. Real-time Live Search Engine Logic
-        const searchInput = document.getElementById('searchInput');
-        const noResults = document.getElementById('noResults');
-
-        function executeSearch() {
-            const query = searchInput.value.trim().toLowerCase();
-            const cards = document.querySelectorAll('.anime-card');
-            let matchCount = 0;
-
-            cards.forEach(card => {
-                const title = card.querySelector('.card-title').innerText.toLowerCase();
-                if (title.includes(query)) {
-                    card.style.display = "block";
-                    matchCount++;
-                } else {
-                    card.style.display = "none";
-                }
-            });
-
-            if (matchCount === 0 && query !== "") {
-                noResults.style.display = "block";
-            } else {
-                noResults.style.display = "none";
-            }
-        }
-
-        searchInput.addEventListener('input', executeSearch);
-    </script>
+    <!-- External JS -->
+    <script src="script.js"></script>
 </body>
 </html>
