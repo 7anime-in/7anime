@@ -30,7 +30,7 @@
             padding-bottom: 40px;
         }
 
-        /* Top Header */
+        /* Navbar Header */
         .header {
             display: flex;
             align-items: center;
@@ -123,7 +123,7 @@
             padding: 0 15px;
         }
 
-        /* Anime Info Card */
+        /* Anime Info Hero Card */
         .anime-details-card {
             display: flex;
             gap: 25px;
@@ -224,15 +224,13 @@
             border: 1px solid var(--border-color);
         }
 
-        /* Player Main Block */
+        /* Video Player Block */
         .player-wrapper {
             background: #000;
             border-radius: 12px;
             overflow: hidden;
             border: 1px solid var(--border-color);
             margin-bottom: 25px;
-            display: flex;
-            flex-direction: column;
         }
 
         .player-topbar {
@@ -243,7 +241,6 @@
             align-items: center;
             font-size: 14px;
             border-bottom: 1px solid var(--border-color);
-            flex-shrink: 0;
         }
 
         .auto-next-toggle {
@@ -288,9 +285,8 @@
         .iframe-container {
             position: relative;
             width: 100%;
-            padding-top: 56.25%; /* 16:9 Aspect Ratio Standard */
+            padding-top: 56.25%; /* 16:9 Aspect Ratio */
             background: #000;
-            flex-grow: 1;
         }
 
         .iframe-container iframe {
@@ -302,7 +298,7 @@
             border: none;
         }
 
-        /* Control Bar */
+        /* Video Controls Strip */
         .player-controls-bar {
             background: #121422;
             padding: 12px 20px;
@@ -312,7 +308,6 @@
             border-top: 1px solid var(--border-color);
             flex-wrap: wrap;
             gap: 10px;
-            flex-shrink: 0;
         }
 
         .control-group {
@@ -337,25 +332,6 @@
 
         .ctrl-btn:hover, .ctrl-select:hover {
             background: var(--border-color);
-        }
-
-        /* FULLSCREEN FIX CSS RULES */
-        .player-wrapper:fullscreen,
-        .player-wrapper:-webkit-full-screen,
-        .player-wrapper:-moz-full-screen {
-            width: 100vw !important;
-            height: 100vh !important;
-            border-radius: 0 !important;
-            border: none !important;
-            background: #000 !important;
-        }
-
-        .player-wrapper:fullscreen .iframe-container,
-        .player-wrapper:-webkit-full-screen .iframe-container,
-        .player-wrapper:-moz-full-screen .iframe-container {
-            padding-top: 0 !important;
-            height: 100% !important;
-            width: 100% !important;
         }
 
         /* Lower Layout Grid */
@@ -404,7 +380,7 @@
             width: 180px;
         }
 
-        /* Episode Buttons */
+        /* EP Buttons Grid */
         .episodes-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(65px, 1fr));
@@ -439,7 +415,7 @@
             box-shadow: 0 2px 8px rgba(108, 92, 231, 0.4);
         }
 
-        /* Download Section */
+        /* Download Widget */
         .download-card h3 {
             font-size: 16px;
             margin-bottom: 15px;
@@ -491,7 +467,7 @@
             background: var(--accent-purple-hover);
         }
 
-        /* Mobile Responsive */
+        /* Mobile View Responsive Adjustments */
         @media (max-width: 850px) {
             .header {
                 padding: 12px 15px;
@@ -504,10 +480,11 @@
             }
             .anime-details-card {
                 flex-direction: column;
+                position: relative;
             }
             .poster-img {
                 width: 100%;
-                height: 220px;
+                height: 240px;
             }
             .hero-actions {
                 position: relative;
@@ -528,7 +505,7 @@
 </head>
 <body>
 
-    <!-- Header Navigation -->
+    <!-- Top Header -->
     <header class="header">
         <div class="logo-container">
             <a href="#" class="logo">7<span>anime</span></a>
@@ -549,7 +526,7 @@
     </header>
 
     <div class="container">
-        <!-- Anime Banner -->
+        <!-- Anime Details Card -->
         <div class="anime-details-card">
             <img src="https://lh3.googleusercontent.com/d/1J0za-zSCfOStt-bs8dzV7j4YlmVBOHuF=w1000" 
                  alt="Classroom of the Elite" 
@@ -582,8 +559,8 @@
             </div>
         </div>
 
-        <!-- Video Player Section -->
-        <div class="player-wrapper" id="player-wrapper">
+        <!-- Video Player Block -->
+        <div class="player-wrapper">
             <div class="player-topbar">
                 <div id="player-title" style="font-weight: 600;">Season 1 - Episode 1</div>
                 <div class="auto-next-toggle">
@@ -600,7 +577,7 @@
                 <iframe id="anime-player" src="" allow="autoplay; fullscreen" allowfullscreen></iframe>
             </div>
 
-            <!-- Controls Strip -->
+            <!-- Player Control Strip -->
             <div class="player-controls-bar">
                 <div class="control-group">
                     <button class="ctrl-btn" onclick="prevEpisode()"><i class="fa-solid fa-backward-step"></i> Prev</button>
@@ -625,7 +602,28 @@
             </div>
         </div>
 
-                    <!-- Download Button Section -->
+        <!-- Lower Section: Season + Episode Buttons & Download -->
+        <div class="content-grid">
+            <!-- Episode Selector Card -->
+            <div class="episodes-card">
+                <div class="episodes-header">
+                    <!-- Season Switch Button / Dropdown -->
+                    <select class="season-dropdown" id="season-select" onchange="switchSeason(this.value)">
+                        <option value="s1">Season 1</option>
+                        <option value="s2">Season 2</option>
+                        <option value="s3">Season 3</option>
+                        <option value="s4">Season 4</option>
+                    </select>
+                    <input type="text" class="ep-search" placeholder="Search EP..." onkeyup="filterEpisodes(this.value)">
+                </div>
+
+                <!-- EP Buttons Grid -->
+                <div class="episodes-grid" id="episodes-grid-container">
+                    <!-- Dynamic EP 1, EP 2... Buttons will render here -->
+                </div>
+            </div>
+
+            <!-- Download Button Section -->
             <div class="download-card">
                 <h3><i class="fa-solid fa-circle-down" style="color: var(--accent-purple);"></i> Download Episode</h3>
                 <div class="dl-select-group">
@@ -644,6 +642,7 @@
     </div>
 
     <script>
+        // Season & Episode Database
         const animeSeasons = {
             s1: [
                 "https://drive.google.com/file/d/1mLI2Q7uNC23G1rilqnzmW2dz52pg_aVC/preview",
@@ -705,10 +704,12 @@
         const playerTitle = document.getElementById('player-title');
         const epGridContainer = document.getElementById('episodes-grid-container');
 
+        // Page Load Init
         window.onload = () => {
             switchSeason('s1');
         };
 
+        // Switch Season & Render Episode Buttons Grid
         function switchSeason(seasonKey) {
             currentSeasonKey = seasonKey;
             currentEpisodeIdx = 0;
@@ -728,15 +729,18 @@
             playEpisode(0);
         }
 
+        // Play Selected Episode
         function playEpisode(index) {
             currentEpisodeIdx = index;
             const episodeUrl = animeSeasons[currentSeasonKey][index];
             const seasonSelect = document.getElementById('season-select');
             const seasonText = seasonSelect.options[seasonSelect.selectedIndex].text;
 
+            // Load iframe video
             iframePlayer.src = episodeUrl;
             playerTitle.innerText = `${seasonText} - Episode ${index + 1}`;
 
+            // Highlight Active Episode Button
             document.querySelectorAll('.ep-btn').forEach(btn => btn.classList.remove('active'));
             const activeBtn = document.getElementById(`ep-btn-${index}`);
             if (activeBtn) {
@@ -744,11 +748,13 @@
             }
         }
 
+        // Next Episode Button Control
         function nextEpisode() {
             const currentSeasonList = animeSeasons[currentSeasonKey];
             if (currentEpisodeIdx < currentSeasonList.length - 1) {
                 playEpisode(currentEpisodeIdx + 1);
             } else {
+                // Auto Switch to Next Season
                 if (currentSeasonKey === 's1') {
                     document.getElementById('season-select').value = 's2';
                     switchSeason('s2');
@@ -764,12 +770,14 @@
             }
         }
 
+        // Previous Episode Button Control
         function prevEpisode() {
             if (currentEpisodeIdx > 0) {
                 playEpisode(currentEpisodeIdx - 1);
             }
         }
 
+        // Filter EP Buttons via Search Bar
         function filterEpisodes(text) {
             const buttons = epGridContainer.getElementsByTagName('button');
             const query = text.toLowerCase().trim();
@@ -783,27 +791,14 @@
             }
         }
 
-        // FIXED FULLSCREEN FUNCTION FOR MOBILE AND DESKTOP
+        // Fullscreen Toggle
         function toggleFullscreen() {
-            const iframe = document.getElementById('anime-player');
-            const wrapper = document.getElementById('player-wrapper');
-
-            // Mobile specific native video full screen fallback
-            if (window.innerWidth <= 768) {
-                if (iframe.requestFullscreen) {
-                    iframe.requestFullscreen();
-                } else if (iframe.webkitRequestFullscreen) {
-                    iframe.webkitRequestFullscreen();
-                }
+            const wrapper = document.querySelector('.player-wrapper');
+            if (!document.fullscreenElement) {
+                if (wrapper.requestFullscreen) wrapper.requestFullscreen();
+                else if (wrapper.webkitRequestFullscreen) wrapper.webkitRequestFullscreen();
             } else {
-                // Desktop full screen mode
-                if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-                    if (wrapper.requestFullscreen) wrapper.requestFullscreen();
-                    else if (wrapper.webkitRequestFullscreen) wrapper.webkitRequestFullscreen();
-                } else {
-                    if (document.exitFullscreen) document.exitFullscreen();
-                    else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
-                }
+                if (document.exitFullscreen) document.exitFullscreen();
             }
         }
     </script>
