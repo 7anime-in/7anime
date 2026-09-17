@@ -167,7 +167,7 @@
             border: 1px solid var(--border-color);
         }
 
-        .poster-box iframe, .poster-box img {
+        .poster-box img {
             width: 100%;
             height: 100%;
             object-fit: cover;
@@ -318,17 +318,14 @@
         .video-container {
             position: relative;
             width: 100%;
-            padding-top: 50%; /* 16:9 Aspect Ratio */
             background: #000;
         }
 
-        .video-container iframe {
-            position: absolute;
-            top: 0;
-            left: 0;
+        .video-container video {
             width: 100%;
-            height: 100%;
-            border: none;
+            max-height: 520px;
+            display: block;
+            outline: none;
         }
 
         /* Custom Player Control Bar */
@@ -422,8 +419,7 @@
 
         /* Episode Grid Buttons */
         .ep-grid {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
+            display: flex;
             gap: 10px;
         }
 
@@ -431,7 +427,7 @@
             background: #1c2038;
             border: 1px solid var(--border-color);
             color: var(--text-main);
-            padding: 12px;
+            padding: 12px 20px;
             border-radius: 8px;
             cursor: pointer;
             font-weight: 600;
@@ -518,10 +514,6 @@
                 grid-template-columns: 1fr;
             }
 
-            .ep-grid {
-                grid-template-columns: repeat(5, 1fr);
-            }
-
             .nav-links {
                 display: none;
             }
@@ -531,12 +523,6 @@
             }
             .search-box input:focus {
                 width: 150px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .ep-grid {
-                grid-template-columns: repeat(4, 1fr);
             }
         }
     </style>
@@ -569,8 +555,7 @@
         <!-- 1. Starting Anime Poster & Details Section -->
         <section class="details-card">
             <div class="poster-box">
-                <!-- Telegram Poster Embed -->
-                <iframe src="https://t.me/sevenanimehaintai/4?embed=1" scrolling="no"></iframe>
+                <img src="https://lh3.googleusercontent.com/d/1DrYU7Rcf8h1JHkkakd6ks9MAiFYsnj4V" alt="Hell Mode Poster">
             </div>
             <div class="details-info">
                 <h1 class="anime-title">✅ Hell Mode: The Hardcore Gamer Dominates in Another World with Garbage Balancing</h1>
@@ -591,7 +576,7 @@
                 </div>
 
                 <div class="details-meta">
-                    <p>🟡 <strong>Episode:</strong> Ongoing</p>
+                    <p>🟡 <strong>Episode:</strong> Ongoing (Episode 1 Available)</p>
                     <p>📣 <strong>Audio:</strong> Hindi [ Official Dub ]</p>
                     <p>📀 <strong>Quality:</strong> 480p | 720p | 1080p</p>
                     <p>⚙️ <strong>Hashtags:</strong> #Official #Added</p>
@@ -620,9 +605,12 @@
                 </div>
             </div>
 
-            <!-- Telegram Video Player Container -->
+            <!-- HTML5 Video Player Container (Direct Video Link) -->
             <div class="video-container">
-                <iframe id="videoIframe" src="https://t.me/sevenanimehaintai/3?embed=1" allowfullscreen></iframe>
+                <video id="mainVideoPlayer" controls controlsList="nodownload" poster="https://lh3.googleusercontent.com/d/1DrYU7Rcf8h1JHkkakd6ks9MAiFYsnj4V">
+                    <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
+                    Your browser does not support HTML5 video.
+                </video>
             </div>
 
             <!-- Fully Functional Video Controls Bar -->
@@ -630,7 +618,7 @@
                 <div class="controls-left">
                     <button class="ctrl-btn" onclick="togglePlay()"><i class="fa-solid fa-play"></i></button>
                     <button class="ctrl-btn"><i class="fa-solid fa-volume-high"></i></button>
-                    <span class="time-display">12:34 / 23:45</span>
+                    <span class="time-display">00:00 / 23:45</span>
                 </div>
                 <div class="controls-right">
                     <select class="select-btn" id="qualitySelect">
@@ -660,9 +648,8 @@
             <div class="episodes-section">
                 <div class="episodes-header">
                     <!-- Season Switch Button -->
-                    <select class="season-dropdown" onchange="switchSeason(this.value)">
+                  <select class="season-dropdown" onchange="switchSeason(this.value)">
                         <option value="1">Season 1 ▾</option>
-                        <option value="2">Season 2 (Coming Soon)</option>
                     </select>
 
                     <div class="ep-search">
@@ -670,20 +657,9 @@
                     </div>
                 </div>
 
-                <!-- Functional Episode List Buttons -->
+                <!-- Only Episode 1 Button -->
                 <div class="ep-grid" id="episodeGrid">
-                    <button class="ep-btn active" onclick="playEpisode(1, 'https://t.me/sevenanimehaintai/3')">1</button>
-                    <button class="ep-btn" onclick="playEpisode(2, 'https://t.me/sevenanimehaintai/3')">2</button>
-                    <button class="ep-btn" onclick="playEpisode(3, 'https://t.me/sevenanimehaintai/3')">3</button>
-                    <button class="ep-btn" onclick="playEpisode(4, 'https://t.me/sevenanimehaintai/3')">4</button>
-                    <button class="ep-btn" onclick="playEpisode(5, 'https://t.me/sevenanimehaintai/3')">5</button>
-                    <button class="ep-btn" onclick="playEpisode(6, 'https://t.me/sevenanimehaintai/3')">6</button>
-                    <button class="ep-btn" onclick="playEpisode(7, 'https://t.me/sevenanimehaintai/3')">7</button>
-                    <button class="ep-btn" onclick="playEpisode(8, 'https://t.me/sevenanimehaintai/3')">8</button>
-                    <button class="ep-btn" onclick="playEpisode(9, 'https://t.me/sevenanimehaintai/3')">9</button>
-                    <button class="ep-btn" onclick="playEpisode(10, 'https://t.me/sevenanimehaintai/3')">10</button>
-                    <button class="ep-btn" onclick="playEpisode(11, 'https://t.me/sevenanimehaintai/3')">11</button>
-                    <button class="ep-btn" onclick="playEpisode(12, 'https://t.me/sevenanimehaintai/3')">12</button>
+                    <button class="ep-btn active" onclick="playEpisode(1)">1</button>
                 </div>
             </div>
 
@@ -704,7 +680,7 @@
 
                 <div class="sidebar-box">
                     <h4><i class="fa-solid fa-forward"></i> Next Episode</h4>
-                    <p style="font-size: 12px; color: var(--text-sub); margin-bottom: 10px;">Episode 2 - Coming Up Next</p>
+                    <p style="font-size: 12px; color: var(--text-sub); margin-bottom: 10px;">Episode 2 - Coming Soon</p>
                     <button class="dl-submit-btn" style="background: #1c2038; border: 1px solid var(--border-color);" onclick="nextEpisode()">
                         <i class="fa-solid fa-play"></i> Watch Next
                     </button>
@@ -717,63 +693,37 @@
 
     <!-- JavaScript logic -->
     <script>
-        let currentEpNum = 1;
+        const video = document.getElementById('mainVideoPlayer');
 
-        // Function to load and play selected episode seamlessly via Telegram embed
-        function playEpisode(epNum, telegramUrl) {
-            currentEpNum = epNum;
-            const iframe = document.getElementById('videoIframe');
-            
-            // Format URL with Telegram embed flag
-            iframe.src = telegramUrl + '?embed=1';
-
-            // Update Header Display
+        function playEpisode(epNum) {
             document.getElementById('currentEpTitle').innerHTML = 
                 `<i class="fa-solid fa-circle-play" style="color: var(--accent-purple);"></i> Episode ${epNum} - The Hardcore Gamer Dominates`;
-
-            // Highlight Active Episode Button
-            const buttons = document.querySelectorAll('.ep-btn');
-            buttons.forEach(btn => {
-                btn.classList.remove('active');
-                if (parseInt(btn.innerText) === epNum) {
-                    btn.classList.add('active');
-                }
-            });
         }
 
-        // Function to Switch Season
-        function switchSeason(seasonNum) {
-            alert('Switched to Season ' + seasonNum);
-        }
-
-        // Switch to Next Episode
-        function nextEpisode() {
-            let nextEp = currentEpNum + 1;
-            if (nextEp <= 12) {
-                playEpisode(nextEp, 'https://t.me/sevenanimehaintai/3');
+        function togglePlay() {
+            if (video.paused) {
+                video.play();
             } else {
-                alert('You are on the latest episode!');
+                video.pause();
             }
         }
 
-        // Redirect to Download Step Page
+        function changeSpeed(val) {
+            video.playbackRate = parseFloat(val);
+        }
+
+        function switchSeason(seasonNum) {
+            alert('Season ' + seasonNum + ' selected');
+        }
+
+        function nextEpisode() {
+            alert('Episode 2 abhi release nahi hua hai!');
+        }
+
         function openDownloadStep() {
             window.location.href = 'download_step1.html';
         }
 
-        // Search episodes inside grid
-        function filterEpisodes(query) {
-            const buttons = document.querySelectorAll('.ep-btn');
-            buttons.forEach(btn => {
-                if (btn.innerText.includes(query)) {
-                    btn.style.display = 'block';
-                } else {
-                    btn.style.display = 'none';
-                }
-            });
-        }
-
-        // Main Search Engine Function
         function executeSearch() {
             let val = document.getElementById('searchInput').value;
             if (val) {
@@ -781,13 +731,11 @@
             }
         }
 
-        // Fullscreen Toggle
         function toggleFullScreen() {
-            const iframe = document.getElementById('videoIframe');
-            if (iframe.requestFullscreen) {
-                iframe.requestFullscreen();
-            } else if (iframe.webkitRequestFullscreen) {
-                iframe.webkitRequestFullscreen();
+            if (video.requestFullscreen) {
+                video.requestFullscreen();
+            } else if (video.webkitRequestFullscreen) {
+                video.webkitRequestFullscreen();
             }
         }
     </script>
