@@ -1,3 +1,6 @@
+// Private Consumet API Endpoint (Vercel)
+const API_BASE_URL = 'https://api-consumet-org-tau-five.vercel.app';
+
 // 1. Target URL Dynamic Navigation
 function openAnimePage(animeSlug) {
     if(!animeSlug) return;
@@ -35,3 +38,13 @@ if(searchInput) {
     searchInput.addEventListener('input', executeSearch);
 }
 
+// 3. API Fetch Helper Example (Future use ke liye)
+async function fetchAnimeData(animeQuery) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/anime/gogoanime/${animeQuery}`);
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('API Error:', error);
+    }
+}
