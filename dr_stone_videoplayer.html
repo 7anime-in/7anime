@@ -434,7 +434,6 @@
             gap: 25px;
         }
 
-        /* 3 & 4. SEASON & EPISODE SECTION */
         .episodes-card {
             background: var(--card-bg);
             border-radius: var(--radius-lg);
@@ -520,7 +519,7 @@
             box-shadow: 0 0 12px rgba(124, 58, 237, 0.5);
         }
 
-        /* 5. DOWNLOAD & SIDEBAR SECTION */
+        /* SIDEBAR */
         .sidebar {
             display: flex;
             flex-direction: column;
@@ -628,54 +627,20 @@
             background: rgba(124, 58, 237, 0.1);
         }
 
-        /* RESPONSIVE DESIGN (MOBILE & TABLET) */
         @media (max-width: 900px) {
-            .content-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .anime-card {
-                flex-direction: column;
-                align-items: center;
-                text-align: center;
-            }
-
-            .poster-wrapper img {
-                width: 140px;
-                height: 200px;
-            }
-
-            .badge-row, .genre-tags, .anime-meta {
-                justify-content: center;
-            }
-
-            .anime-title-row {
-                flex-direction: column;
-                align-items: center;
-                gap: 10px;
-            }
-
-            .search-box {
-                width: 150px;
-            }
-
-            .nav-links {
-                display: none; /* Hide top links on small mobile */
-            }
+            .content-grid { grid-template-columns: 1fr; }
+            .anime-card { flex-direction: column; align-items: center; text-align: center; }
+            .poster-wrapper img { width: 140px; height: 200px; }
+            .badge-row, .genre-tags, .anime-meta { justify-content: center; }
+            .anime-title-row { flex-direction: column; align-items: center; gap: 10px; }
+            .search-box { width: 150px; }
+            .nav-links { display: none; }
         }
 
         @media (max-width: 500px) {
-            header {
-                padding: 10px 15px;
-            }
-
-            .search-box {
-                width: 120px;
-            }
-
-            .player-controls-bar {
-                justify-content: center;
-            }
+            header { padding: 10px 15px; }
+            .search-box { width: 120px; }
+            .player-controls-bar { justify-content: center; }
         }
     </style>
 </head>
@@ -684,9 +649,9 @@
     <!-- HEADER / NAVIGATION BAR -->
     <header>
         <div class="nav-left">
-            <a href="#" class="logo">7<span>anime</span></a>
+            <a href="index.html" class="logo">7<span>anime</span></a>
             <ul class="nav-links">
-                <li><a href="#" class="active"><i class="fa-solid fa-house"></i> Home</a></li>
+                <li><a href="index.html" class="active"><i class="fa-solid fa-house"></i> Home</a></li>
                 <li><a href="#"><i class="fa-solid fa-compass"></i> Explore</a></li>
             </ul>
         </div>
@@ -695,7 +660,7 @@
         <div class="nav-right">
             <div class="search-box">
                 <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="text" placeholder="Search anime, movies...">
+                <input type="text" id="searchInput" placeholder="Search anime, movies...">
             </div>
             <button class="icon-btn" title="Notifications"><i class="fa-regular fa-bell"></i></button>
             <button class="icon-btn" title="Toggle Theme"><i class="fa-regular fa-moon"></i></button>
@@ -734,7 +699,6 @@
                         <span class="genre-tag">Shounen</span>
                     </div>
 
-                    <!-- Classroom of the Elite / Anime details integrated as requested -->
                     <p class="synopsis">
                         Several thousand years after a mysterious phenomenon turns all of humanity to stone, the extraordinarily intelligent, science-driven boy, Senku Ishigami, awakens. Facing a stone world and the total collapse of civilization, Senku decides to use science to rebuild the world!
                     </p>
@@ -748,7 +712,7 @@
             </div>
         </div>
 
-        <!-- 2. VIDEO PLAYER SECTION WITH FUNCTIONAL CONTROLS -->
+        <!-- 2. VIDEO PLAYER SECTION -->
         <div class="player-wrapper">
             <div class="player-header">
                 <span class="current-ep-title" id="player-ep-title">Episode 1 - Stone World</span>
@@ -764,12 +728,10 @@
                 </div>
             </div>
 
-            <!-- Video Player Iframe -->
             <div class="video-box" id="videoBox">
                 <iframe id="main-player" src="https://drive.google.com/file/d/1UwCubKviH8Y1aowsDk1t_Nhma9mRFXJY/preview" allowfullscreen></iframe>
             </div>
 
-            <!-- Custom Controls Bar -->
             <div class="player-controls-bar">
                 <div class="controls-left">
                     <button class="ctrl-btn" onclick="reloadPlayer()"><i class="fa-solid fa-rotate-right"></i> Refresh</button>
@@ -794,13 +756,11 @@
             </div>
         </div>
 
-        <!-- MAIN CONTENT GRID (EPISODES & DOWNLOAD SIDEBAR) -->
+        <!-- MAIN CONTENT GRID -->
         <div class="content-grid">
             
-            <!-- LEFT BOX: SEASON SWITCH & EPISODE LIST GRID -->
             <div class="episodes-card">
                 <div class="episodes-header">
-                    <!-- 3. SEASON SWITCH BUTTON -->
                     <select class="season-dropdown-btn" id="seasonSelect" onchange="switchSeason(this.value)">
                         <option value="1">Season 1</option>
                         <option value="2">Season 2</option>
@@ -813,16 +773,10 @@
                     </div>
                 </div>
 
-                <!-- 4. EPISODE LIST BUTTONS -->
-                <div class="ep-grid" id="epGrid">
-                    <!-- Dynamic Buttons generated by JavaScript -->
-                </div>
+                <div class="ep-grid" id="epGrid"></div>
             </div>
 
-            <!-- RIGHT BOX: DOWNLOAD & NEXT EPISODE SIDEBAR -->
             <div class="sidebar">
-                
-                <!-- 5. DOWNLOAD BUTTON CARD -->
                 <div class="side-card">
                     <div class="side-title"><i class="fa-solid fa-download" style="color: var(--accent-purple);"></i> Download Episode</div>
                     <div class="download-box">
@@ -836,13 +790,11 @@
                         </button>
                     </div>
 
-                    <!-- Batch Folder Link -->
                     <button class="batch-btn" onclick="openBatchDownload()">
                         <i class="fa-regular fa-folder-open"></i> Full Season Batch (Drive)
                     </button>
                 </div>
 
-                <!-- NEXT EPISODE PREVIEW CARD -->
                 <div class="side-card">
                     <div class="side-title"><i class="fa-solid fa-circle-play" style="color: var(--accent-purple);"></i> Up Next</div>
                     <div class="next-ep-card" id="nextEpCard">
@@ -862,9 +814,11 @@
 
     </div>
 
-    <!-- JAVASCRIPT LOGIC -->
+    <!-- LINK SCRIPT.JS FIRST -->
+    <script src="script.js"></script>
+
+    <!-- INLINE PAGE SCRIPT -->
     <script>
-        // Season 1 Episode List (Provided Google Drive File IDs)
         const season1Episodes = [
             { ep: 1, title: "Stone World", id: "1UwCubKviH8Y1aowsDk1t_Nhma9mRFXJY" },
             { ep: 2, title: "King of the Stone World", id: "1Vli1TjgNTEr1a9H8xBvrQHG9BUCUtG1O" },
@@ -896,13 +850,11 @@
         let currentEpIndex = 0;
         const batchFolderUrl = "https://drive.google.com/drive/folders/1Q1XE_Ki5A-a9TRVMgn-atOzBEANCjmAH";
 
-        // Initialize Page
         window.onload = function() {
             renderEpisodeGrid();
             loadEpisode(0);
         };
 
-        // Render Episodes List Grid
         function renderEpisodeGrid() {
             const grid = document.getElementById("epGrid");
             grid.innerHTML = "";
@@ -921,27 +873,33 @@
             }
         }
 
-        // Load Episode into Video Player
-        function loadEpisode(index) {
+        // Integrated Consumet API Load with Fallback to Google Drive
+        async function loadEpisode(index) {
             if (currentSeason !== 1) return;
 
             currentEpIndex = index;
             const episode = season1Episodes[index];
-
-            // Set Video Source
             const player = document.getElementById("main-player");
-            player.src = `https://drive.google.com/file/d/${episode.id}/preview`;
 
-            // Update Title
             document.getElementById("player-ep-title").innerText = `Episode ${episode.ep} - ${episode.title}`;
 
-            // Highlight Active Button in Grid
+            // Try Consumet API Stream First
+            const apiEpisodeSlug = `dr-stone-episode-${episode.ep}`;
+            const apiData = await fetchEpisodeStream(apiEpisodeSlug);
+
+            if (apiData && apiData.sources && apiData.sources.length > 0) {
+                // If Consumet API returns a valid link
+                player.src = apiData.sources[0].url;
+            } else {
+                // Fallback to Google Drive IFRAME
+                player.src = `https://drive.google.com/file/d/${episode.id}/preview`;
+            }
+
             const buttons = document.querySelectorAll(".ep-btn");
             buttons.forEach((btn, idx) => {
                 btn.classList.toggle("active", idx === index);
             });
 
-            // Update Next Episode Card
             if (index + 1 < season1Episodes.length) {
                 const nextEp = season1Episodes[index + 1];
                 document.getElementById("nextEpTitle").innerText = `Ep ${nextEp.ep} - ${nextEp.title}`;
@@ -950,7 +908,6 @@
             }
         }
 
-        // Play Next Episode Function
         function playNextEpisode() {
             if (currentEpIndex < season1Episodes.length - 1) {
                 loadEpisode(currentEpIndex + 1);
@@ -959,7 +916,6 @@
             }
         }
 
-        // Switch Season Function
         function switchSeason(seasonNum) {
             currentSeason = parseInt(seasonNum);
             currentEpIndex = 0;
@@ -972,7 +928,6 @@
             }
         }
 
-        // Reload Player
         function reloadPlayer() {
             const player = document.getElementById("main-player");
             const currentSrc = player.src;
@@ -980,7 +935,6 @@
             player.src = currentSrc;
         }
 
-        // Toggle Fullscreen
         function toggleFullscreen() {
             const videoBox = document.getElementById("videoBox");
             if (!document.fullscreenElement) {
@@ -992,7 +946,6 @@
             }
         }
 
-        // Filter Episodes Live Search
         function filterEpisodes() {
             const input = document.getElementById("epSearchInput").value.toLowerCase();
             const buttons = document.querySelectorAll(".ep-btn");
@@ -1007,20 +960,14 @@
             });
         }
 
-        // 5. Download Button Action (Opens download_step1.html)
         function triggerDownload() {
             if (currentSeason !== 1) return;
             const currentEp = season1Episodes[currentEpIndex];
             const quality = document.getElementById("downloadQuality").value;
-
-            // Constructs download_step1.html target link with URL parameters
             const downloadUrl = `download_step1.html?id=${currentEp.id}&ep=${currentEp.ep}&quality=${quality}`;
-            
-            // Open in new tab
             window.open(downloadUrl, "_blank");
         }
 
-        // Open Batch Folder Link
         function openBatchDownload() {
             window.open(batchFolderUrl, "_blank");
         }
