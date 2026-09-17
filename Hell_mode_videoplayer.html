@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>7anime - Hell Mode: The Hardcore Gamer Dominates</title>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-dark: #090C15;
+            --card-bg: #111625;
+            --card-border: rgba(124, 58, 237, 0.18);
+            --primary: #7C3AED;
+            --primary-hover: #6D28D9;
+            --primary-glow: rgba(124, 58, 237, 0.4);
+            --text-main: #F8FAFC;
+            --text-muted: #94A3B8;
+            --accent-blue: #38BDF8;
+            --badge-yellow: #F59E0B;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding-bottom: 40px;
+        }
+
+        /* --- NAVBAR --- */
+        .navbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 40px;
+            background: rgba(17, 22, 37, 0.8);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .logo {
+            font-size: 26px;
+            font-weight: 800;
+            color: #fff;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .logo span {
+            color: var(--primary);
+            font-style: italic;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: 0.3s;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            color: #fff;
+        }
+
+        .search-container {
+            position: relative;
+            width: 320px;
+        }
+
+        .search-container input {
+            width: 100%;
+            padding: 10px 16px 10px 38px;
+            background: #1A2035;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            color: #fff;
+            font-size: 13px;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        .search-container input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 10px var(--primary-glow);
+        }
+
+        .search-container i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .icon-btn {
+            background: #1A2035;
+            border: none;
+            color: var(--text-muted);
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.3s;
+            text-decoration: none;
+        }
+
+        .icon-btn:hover {
+            color: #fff;
+            background: var(--primary);
+        }
+
+        .mobile-search-icon {
+            display: none;
+        }
+
+        /* --- MAIN CONTAINER --- */
+        .container {
+            max-width: 1300px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+
+        /* --- ANIME HEADER CARD --- */
+        .anime-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 24px;
+            display: flex;
+            gap: 25px;
+            position: relative;
+            margin-bottom: 25px;
+        }
+
+        .anime-poster {
+            width: 180px;
+            height: 250px;
+            object-fit: cover;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+            flex-shrink: 0;
+        }
+
+        .anime-info {
+            flex-grow: 1;
+        }
+
+        .anime-title {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            line-height: 1.3;
+        }
+
+        .badges-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-type { background: var(--primary); color: #fff; }
+        .badge-rating { background: rgba(245, 158, 11, 0.15); color: var(--badge-yellow); border: 1px solid var(--badge-yellow); }
+        .badge-rank { color: var(--text-muted); font-size: 13px; }
+
+        .genres-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+
+        .genre-tag {
+            background: #1A2035;
+            padding: 4px 12px;
+            border-radius: 14px;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .anime-details-list {
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.8;
+            margin-bottom: 12px;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 3px solid var(--primary);
+        }
+
+        .anime-details-list span {
+            color: #fff;
+            font-weight: 500;
+        }
+
+        .credit-tag {
+            font-size: 12px;
+            color: var(--accent-blue);
+            font-weight: 600;
+        }
+
+        .card-actions {
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-action {
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .btn-action:hover {
+            background: var(--primary-hover);
+        }
+
+        .btn-icon-only {
+            background: #1A2035;
+            color: #fff;
+            padding: 8px 12px;
+        }
+
+        /* --- VIDEO PLAYER SECTION --- */
+        .player-wrapper {
+            background: #000;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid var(--card-border);
+            position: relative;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+        }
+
+        .video-box {
+            width: 100%;
+            aspect-ratio: 16/9;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        /* Overlay Controls */
+        .player-header-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 15px 20px;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .current-ep-title {
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .auto-next-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 36px;
+            height: 20px;
+        }
+
+        .switch input { opacity: 0; width: 0; height: 0; }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #334155;
+            transition: .4s;
+            border-radius: 20px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 14px;
+            width: 14px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider { background-color: var(--primary); }
+        input:checked + .slider:before { transform: translateX(16px); }
+
+        .custom-controls {
+            background: rgba(17, 22, 37, 0.95);
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            flex-wrap: wrap;
+        }
+
+        .controls-left, .controls-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .ctrl-btn {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .ctrl-btn:hover { color: var(--primary); }
+
+        .time-display {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-family: monospace;
+        }
+
+        .select-dropdown {
+            background: #1A2035;
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        /* --- CONTENT GRID (EPISODES & DOWNLOAD) --- */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 25px;
+        }
+
+        .section-box {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 20px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+        }
+
+        .ep-search {
+            position: relative;
+            width: 180px;
+        }
+
+        .ep-search input {
+            width: 100%;
+            padding: 6px 10px 6px 30px;
+            background: #1A2035;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 12px;
+            outline: none;
+        }
+
+        .ep-search i {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 11px;
+        }
+
+        /* Episode Buttons Grid */
+        .episode-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+            gap: 10px;
+            max-height: 300px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .ep-btn {
+            background: #1A2035;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            color: var(--text-muted);
+            padding: 10px 0;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+
+        .ep-btn:hover {
+            background: rgba(124, 58, 237, 0.3);
+            color: #fff;
+        }
+
+        .ep-btn.active {
+            background: var(--primary);
+            color: #fff;
+            box-shadow: 0 0 12px var(--primary-glow);
+        }
+
+        .ep-btn i {
+            font-size: 10px;
+        }
+
+        /* Download Card Right Side */
+        .download-card-title {
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .dl-select-group {
+            margin-bottom: 15px;
+        }
+
+        .dl-select-group label {
+            display: block;
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+
+        .dl-select {
+            width: 100%;
+            padding: 10px;
+            background: #1A2035;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 13px;
+            outline: none;
+        }
+
+        .btn-download-full {
+            width: 100%;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-decoration: none;
+            transition: 0.3s;
+            box-shadow: 0 4px 15px var(--primary-glow);
+        }
+
+        .btn-download-full:hover {
+            background: var(--primary-hover);
+        }
+
+        .next-ep-box {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .next-ep-card {
+            display: flex;
+            gap: 12px;
+            background: #1A2035;
+            padding: 10px;
+            border-radius: 10px;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .next-ep-img {
+            width: 70px;
+            height: 45px;
+            border-radius: 6px;
+            object-fit: cover;
+        }
+
+        .next-ep-info h4 {
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .next-ep-info p {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        /* --- RESPONSIVE MOBILE STYLING (Matching Mobile Mockup) --- */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 12px 16px;
+            }
+
+            .nav-links, .search-container {
+                display: none;
+            }
+
+            .mobile-search-icon {
+                display: flex;
+            }
+
+            .container {
+                padding: 0 12px;
+            }
+
+            .anime-card {
+                flex-direction: column;
+                padding: 16px;
+                gap: 15px;
+            }
+
+            .anime-poster {
+                width: 100%;
+                height: 220px;
+            }
+
+            .card-actions {
+                position: static;
+                width: 100%;
+                margin-top: 10px;
+            }
+
+            .btn-action {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .episode-grid {
+                grid-template-columns: repeat(5, 1fr);
+            }
+
+            .custom-controls {
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="nav-left">
+            <a href="#" class="logo">7<span>anime</span></a>
+            <ul class="nav-links">
+                <li><a href="#" class="active"><i class="fa-solid fa-house"></i> Home</a></li>
+                <li><a href="#"><i class="fa-solid fa-compass"></i> Explore</a></li>
+            </ul>
+        </div>
+
+        <div class="search-container">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" placeholder="Search anime, movies...">
+        </div>
+
+        <div class="nav-right">
+            <!-- Search Icon near Bell for mobile/quick access (Req #5) -->
+            <button class="icon-btn mobile-search-icon" title="Search"><i class="fa-solid fa-magnifying-glass"></i></button>
+            <button class="icon-btn" title="Notifications"><i class="fa-regular fa-bell"></i></button>
+            <button class="icon-btn" title="Toggle Theme"><i class="fa-regular fa-moon"></i></button>
+            <button class="icon-btn" title="Profile"><i class="fa-regular fa-user"></i></button>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <div class="container">
+        
+        <!-- ANIME DETAILS CARD (Req #1) -->
+        <div class="anime-card">
+            <!-- Poster Image -->
+            <img src="https://t.me/sevenanimehaintai/4" alt="Hell Mode Poster" class="anime-poster" onerror="this.src='https://images.unsplash.com/photo-1578632767115-351597cf2477?w=500&auto=format&fit=crop&q=60';">
+            
+            <div class="anime-info">
+                <h1 class="anime-title">Hell Mode: The Hardcore Gamer Dominates in Another World with Garbage Balancing</h1>
+                
+                <div class="badges-row">
+                    <span class="badge badge-type">Anime</span>
+                    <span class="badge badge-rating"><i class="fa-solid fa-star"></i> 9.4/10</span>
+                    <span class="badge-rank">Rank #1</span>
+                </div>
+
+                <div class="genres-row">
+                    <span class="genre-tag">Comedy</span>
+                    <span class="genre-tag">Drama</span>
+                    <span class="genre-tag">Romance</span>
+                    <span class="genre-tag">Magic</span>
+                    <span class="genre-tag">Isekai</span>
+                    <span class="genre-tag">Reincarnation</span>
+                </div>
+
+                <div class="anime-details-list">
+                    🔴 💬💬💬💬💬💬💬💬💬💬💬<br>
+                    🟡 <b>Episode:</b> <span>ongoing</span><br>
+                    📣 <b>Audio:</b> <span>Hindi [ official dub ]</span><br>
+                    📀 <b>Quality:</b> <span>480p | 720p | 1080p</span><br>
+                    🟣 <b>Genres:</b> <span>Comedy, Drama, Romance, Magic, Isekai, reincarnation</span><br>
+                    ⚙️ <b>Hashtags:</b> <span>#Official #Added</span><br>
+                    🔴 💬💬💬💬💬💬💬💬💬💬💬<br>
+                    <span class="credit-tag">☄️ Power By @ANIME_FAN_DUB</span>
+                </div>
+            </div>
+
+            <div class="card-actions">
+                <a href="download_step1.html" class="btn-action"><i class="fa-solid fa-download"></i> Download</a>
+                <button class="btn-action btn-icon-only"><i class="fa-regular fa-bookmark"></i></button>
+            </div>
+        </div>
+
+        <!-- VIDEO PLAYER SECTION (Req #2 & #6) -->
+        <div class="player-wrapper">
+            <div class="player-header-overlay">
+                <div class="current-ep-title" id="currentEpTitle">
+                    <i class="fa-solid fa-arrow-left"></i> Episode 1 - The Hardcore Gamer
+                </div>
+                <div class="auto-next-toggle">
+                    <span>Auto Next</span>
+                    <label class="switch">
+                        <input type="checkbox" checked>
+                        <span class="slider"></span>
+                    </label>
+                    <i class="fa-solid fa-gear" style="margin-left: 10px; cursor: pointer;"></i>
+                </div>
+            </div>
+
+            <!-- Video Player Box -->
+            <div class="video-box">
+                <video id="mainVideo" poster="https://images.unsplash.com/photo-1578632767115-351597cf2477?w=1200&auto=format&fit=crop&q=80">
+                    <!-- EP 1 Direct Streamable Video Link placeholder -->
+                    <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            </div>
+
+            <!-- Player Controls Bottom Bar -->
+            <div class="custom-controls">
+                <div class="controls-left">
+                    <button class="ctrl-btn" id="playPauseBtn" onclick="togglePlay()"><i class="fa-solid fa-play"></i></button>
+                    <button class="ctrl-btn"><i class="fa-solid fa-volume-high"></i></button>
+                    <span class="time-display" id="timeDisplay">00:00 / 23:45</span>
+                </div>
+
+                <div class="controls-right">
+                    <!-- Quality Selector -->
+                    <select class="select-dropdown" id="qualitySelect">
+                        <option>Quality: 1080p</option>
+                        <option selected>Quality: 720p</option>
+                        <option>Quality: 480p</option>
+                    </select>
+
+                    <!-- Speed Selector -->
+                    <select class="select-dropdown" id="speedSelect" onchange="changeSpeed(this.value)">
+                        <option value="0.5">0.5x</option>
+                        <option value="1.0" selected>Speed: 1.0x</option>
+                        <option value="1.25">1.25x</option>
+                        <option value="1.5">1.5x</option>
+                        <option value="2.0">2.0x</option>
+                    </select>
+
+                    <!-- Next Episode Switch Button -->
+                    <button class="ctrl-btn" onclick="nextEpisode()" style="font-size: 13px; font-weight: 600;">
+                        Next <i class="fa-solid fa-forward-step"></i>
+                    </button>
+
+                    <!-- Fullscreen -->
+                    <button class="ctrl-btn" onclick="toggleFullscreen()"><i class="fa-solid fa-expand"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- LOWER SECTION GRID (Req #3, #4 & #5) -->
+        <div class="main-grid">
+            
+            <!-- Left: Season & Episode List -->
+            <div class="section-box">
+                <div class="section-header">
+                    <!-- Season Switch Button (Req #3) -->
+                    <select class="select-dropdown" style="padding: 8px 14px; font-weight: 600;">
+                        <option value="1">Season 1</option>
+                        <option value="2">Season 2 (Upcoming)</option>
+                    </select>
+
+                    <!-- Episode Search Filter -->
+                    <div class="ep-search">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" id="epSearchInput" placeholder="Search episode..." onkeyup="filterEpisodes()">
+                    </div>
+                </div>
+
+                <!-- Episode Grid Buttons (Req #4) -->
+                <div class="episode-grid" id="episodeGrid">
+                    <button class="ep-btn active" onclick="loadEpisode(1, 'https://t.me/sevenanimehaintai/3', this)">1 <i class="fa-solid fa-check"></i></button>
+                    <button class="ep-btn" onclick="loadEpisode(2, 'https://t.me/sevenanimehaintai/3', this)">2</button>
+                    <button class="ep-btn" onclick="loadEpisode(3, 'https://t.me/sevenanimehaintai/3', this)">3</button>
+                    <button class="ep-btn" onclick="loadEpisode(4, 'https://t.me/sevenanimehaintai/3', this)">4</button>
+                    <button class="ep-btn" onclick="loadEpisode(5, 'https://t.me/sevenanimehaintai/3', this)">5</button>
+                    <button class="ep-btn" onclick="loadEpisode(6, 'https://t.me/sevenanimehaintai/3', this)">6</button>
+                    <button class="ep-btn" onclick="loadEpisode(7, 'https://t.me/sevenanimehaintai/3', this)">7</button>
+                    <button class="ep-btn" onclick="loadEpisode(8, 'https://t.me/sevenanimehaintai/3', this)">8</button>
+                    <button class="ep-btn" onclick="loadEpisode(9, 'https://t.me/sevenanimehaintai/3', this)">9</button>
+                    <button class="ep-btn" onclick="loadEpisode(10, 'https://t.me/sevenanimehaintai/3', this)">10</button>
+                    <button class="ep-btn" onclick="loadEpisode(11, 'https://t.me/sevenanimehaintai/3', this)">11</button>
+                    <button class="ep-btn" onclick="loadEpisode(12, 'https://t.me/sevenanimehaintai/3', this)">12</button>
+                    <button class="ep-btn" onclick="loadEpisode(13, 'https://t.me/sevenanimehaintai/3', this)">13</button>
+                    <button class="ep-btn" onclick="loadEpisode(14, 'https://t.me/sevenanimehaintai/3', this)">14</button>
+                    <button class="ep-btn" onclick="loadEpisode(15, 'https://t.me/sevenanimehaintai/3', this)">15</button>
+                    <button class="ep-btn" onclick="loadEpisode(16, 'https://t.me/sevenanimehaintai/3', this)">16</button>
+                    <button class="ep-btn" onclick="loadEpisode(17, 'https://t.me/sevenanimehaintai/3', this)">17</button>
+                    <button class="ep-btn" onclick="loadEpisode(18, 'https://t.me/sevenanimehaintai/3', this)">18</button>
+                    <button class="ep-btn" onclick="loadEpisode(19, 'https://t.me/sevenanimehaintai/3', this)">19</button>
+                    <button class="ep-btn" onclick="loadEpisode(20, 'https://t.me/sevenanimehaintai/3', this)">20</button>
+                    <button class="ep-btn" onclick="loadEpisode(21, 'https://t.me/sevenanimehaintai/3', this)">21</button>
+                    <button class="ep-btn" onclick="loadEpisode(22, 'https://t.me/sevenanimehaintai/3', this)">22</button>
+                    <button class="ep-btn" onclick="loadEpisode(23, 'https://t.me/sevenanimehaintai/3', this)">23</button>
+                    <button class="ep-btn" onclick="loadEpisode(24, 'https://t.me/sevenanimehaintai/3', this)">24</button>
+                    <button class="ep-btn" onclick="loadEpisode(25, 'https://t.me/sevenanimehaintai/3', this)">25</button>
+                </div>
+            </div>
+
+            <!-- Right: Download Section (Req #4) -->
+            <div class="section-box">
+                <div class="download-card-title">
+                    <i class="fa-solid fa-download" style="color: var(--primary);"></i> Download Episode
+                </div>
+
+                <div class="dl-select-group">
+                    <label>Select Video Quality</label>
+                    <select class="dl-select">
+                        <option>1080p (FHD - High Quality)</option>
+                        <option selected>720p (HD - Recommended)</option>
+                        <option>480p (SD - Data Saver)</option>
+                    </select>
+                </div>
+
+                <!-- Download Link opens download_step1.html (Req #4) -->
+                <a href="download_step1.html" class="btn-download-full">
+                    <i class="fa-solid fa-file-arrow-down"></i> Download Now
+                </a>
+
+                <div class="next-ep-box">
+                    <span style="font-size: 12px; color: var(--text-muted); font-weight: 600;">Up Next</span>
+                    <div class="next-ep-card">
+                        <img src="https://images.unsplash.com/photo-1578632767115-351597cf2477?w=150&auto=format&fit=crop&q=60" class="next-ep-img" alt="Next Ep">
+                        <div class="next-ep-info">
+                            <h4>Ep 2 - The Summoning</h4>
+                            <p>Watch Next Episode</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT FUNCTIONALITY -->
+    <script>
+        const video = document.getElementById('mainVideo');
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const currentEpTitle = document.getElementById('currentEpTitle');
+        let currentEpNum = 1;
+
+        // Toggle Play/Pause
+        function togglePlay() {
+            if (video.paused) {
+                video.play();
+                playPauseBtn.innerHTML = '<i class="fa-solid fa-pause"></i>';
+            } else {
+                video.pause();
+                playPauseBtn.innerHTML = '<i class="fa-solid fa-play"></i>';
+            }
+        }
+
+        // Change Playback Speed
+        function changeSpeed(speed) {
+            video.playbackRate = parseFloat(speed);
+        }
+
+        // Toggle Fullscreen
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                video.requestFullscreen().catch(err => alert(err.message));
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        // Load Episode Function (Req #3 & Req #6 Telegram Stream)
+        function loadEpisode(epNumber, telegramUrl, element) {
+            currentEpNum = epNumber;
+            
+            // Update Title
+            currentEpTitle.innerHTML = `<i class="fa-solid fa-arrow-left"></i> Episode ${epNumber} - Hell Mode Hardcore`;
+
+            // Active Class Toggle
+            let buttons = document.querySelectorAll('.ep-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            element.classList.add('active');
+
+            // Play Video
+            video.play();
+            playPauseBtn.innerHTML = '<i class="fa-solid fa-pause"></i>';
+        }
+
+        // Next Episode Switcher
+        function nextEpisode() {
+            if (currentEpNum < 25) {
+                currentEpNum++;
+                let buttons = document.querySelectorAll('.ep-btn');
+                loadEpisode(currentEpNum, 'https://t.me/sevenanimehaintai/3', buttons[currentEpNum - 1]);
+            }
+        }
+
+        // Episode Filter Engine
+        function filterEpisodes() {
+            let input = document.getElementById('epSearchInput').value.toLowerCase();
+            let buttons = document.querySelectorAll('.ep-btn');
+
+            buttons.forEach(btn => {
+                let text = btn.innerText.toLowerCase();
+                if (text.includes(input)) {
+                    btn.style.display = "flex";
+                } else {
+                    btn.style.display = "none";
+                }
+            });
+        }
+    </script>
+</body>
+</html>
