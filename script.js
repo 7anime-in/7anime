@@ -1,4 +1,4 @@
-// Private Consumet API Endpoint (Vercel)
+// Private Consumet API Endpoint
 const API_BASE_URL = 'https://api-consumet-org-tau-five.vercel.app';
 
 // 1. Target URL Dynamic Navigation
@@ -8,7 +8,69 @@ function openAnimePage(animeSlug) {
     window.location.href = targetPage;
 }
 
-// 2. Real-time Live Search Engine Logic
+// 2. Sidebar Drawer Toggle
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+    sidebar.classList.toggle('active');
+    overlay.classList.toggle('active');
+}
+
+// 3. 18+ Age Limit Modal Logic
+function openAgeModal() {
+    toggleSidebar(); // Close sidebar
+    document.getElementById('ageModal').classList.add('active');
+}
+
+function confirmAge(is18Plus) {
+    const ageModal = document.getElementById('ageModal');
+    ageModal.classList.remove('active');
+
+    if (is18Plus) {
+        loadHentaiPage();
+    } else {
+        alert("Aap is section ko access nahi kar sakte.");
+    }
+}
+
+// 4. Hentai Content Filter Logic
+function loadHentaiPage() {
+    const cards = document.querySelectorAll('.anime-card');
+    const heroSection = document.getElementById('heroSection');
+    const sectionTitle = document.getElementById('sectionTitle');
+
+    // Hero section hide karna
+    if(heroSection) heroSection.style.display = 'none';
+
+    // Title update karna
+    if(sectionTitle) {
+        sectionTitle.innerHTML = '<i class="fa-solid fa-fire" style="color:#ff0055;"></i> 18+ Hentai Collection';
+    }
+
+    let hentaiFound = 0;
+
+    cards.forEach(card => {
+        const tags = card.getAttribute('data-tags') || '';
+        if (tags.toLowerCase().includes('hentai')) {
+            card.style.display = 'flex';
+            hentaiFound++;
+        } else {
+            card.style.display = 'none';
+        }
+    });
+
+    const noResults = document.getElementById('noResults');
+    if (noResults) {
+        if (hentaiFound === 0) {
+            noResults.innerText = "No Hentai content found.";
+            noResults.style.display = 'block';
+        } else {
+            noResults.style.display = 'none';
+        }
+    }
+}
+
+// 5. Search Engine Logic
 const searchInput = document.getElementById('searchInput');
 const noResults = document.getElementById('noResults');
 
@@ -33,6 +95,7 @@ function executeSearch() {
 
     if (noResults) {
         if (matchCount === 0 && query !== "") {
+            noResults.innerText = "No anime found matching your search.";
             noResults.style.display = "block";
         } else {
             noResults.style.display = "none";
@@ -42,27 +105,4 @@ function executeSearch() {
 
 if(searchInput) {
     searchInput.addEventListener('input', executeSearch);
-}
-
-// 3. API Fetch Helper (Anime Info & Episode Stream Links)
-async function fetchAnimeData(animeQuery) {
-    try {
-        const response = await fetch(`${API_BASE_URL}/anime/gogoanime/${animeQuery}`);
-        const data = await response.json();
-        return data;
-    } catch (error) {
-        console.error('API Search Error:', error);
-        return null;
-    }
-}
-
-async function fetchEpisodeStream(episodeId) {
-    try {
-        const response = await fetch(`${API_BASE_URL}/anime/gogoanime/watch/${episodeId}`);
-        const data = await response.json();
-        return data;
-    } catch (error) {
-        console.error('API Stream Error:', error);
-        return null;
-    }
 }
