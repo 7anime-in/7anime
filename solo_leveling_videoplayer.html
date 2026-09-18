@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>7Anime Video Player UI</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-[#0b0f19] text-white font-sans antialiased">
+
+    <!-- Main Container -->
+    <div class="max-w-7xl mx-auto p-4 md:p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        <!-- Left / Main Content Section (Video Player & Details) -->
+        <div class="lg:col-span-2 space-y-6">
+            
+            <!-- Video Player Container -->
+            <div class="relative bg-black rounded-2xl overflow-hidden shadow-2xl group border border-gray-800">
+                <!-- Video Thumbnail / Screen -->
+                <div class="relative aspect-video w-full bg-cover bg-center" style="background-image: url('1000029183.png');">
+                    <div class="absolute inset-0 bg-black/40 flex items-center justify-center">
+                        <!-- Play Button Center -->
+                        <button class="w-16 h-16 bg-purple-600/90 rounded-full flex items-center justify-center text-white text-xl shadow-lg hover:bg-purple-700 transition">
+                            <i class="fa-solid fa-play ml-1"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Video Controls Bar -->
+                <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-4 space-y-2">
+                    <!-- Progress Bar -->
+                    <div class="w-full bg-gray-700 h-1.5 rounded-full overflow-hidden cursor-pointer">
+                        <div class="bg-purple-500 h-full w-1/3 relative"></div>
+                    </div>
+
+                    <!-- Controls Bottom Row -->
+                    <div class="flex items-center justify-between text-sm">
+                        <div class="flex items-center space-x-4">
+                            <button class="hover:text-purple-400 transition"><i class="fa-solid fa-play"></i></button>
+                            <button class="hover:text-purple-400 transition"><i class="fa-solid fa-forward-step"></i></button>
+                            <button class="hover:text-purple-400 transition"><i class="fa-solid fa-volume-high"></i></button>
+                            <span class="text-xs text-gray-300">06:24 / 23:40</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <span class="bg-gray-800 px-2 py-0.5 rounded text-xs border border-gray-700">1x</span>
+                            <span class="bg-gray-800 px-2 py-0.5 rounded text-xs border border-gray-700">1080p</span>
+                            <button class="hover:text-purple-400 transition"><i class="fa-solid fa-expand"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Episode Navigation Bar -->
+            <div class="flex items-center justify-between bg-[#131826] p-4 rounded-xl border border-gray-800">
+                <button class="flex items-center space-x-2 text-sm text-gray-300 hover:text-white transition">
+                    <i class="fa-solid fa-chevron-left text-xs"></i>
+                    <span>Prev Episode</span>
+                </button>
+                <span class="text-sm font-medium text-gray-200">Episode 12: The Beginning</span>
+                <button class="flex items-center space-x-2 text-sm text-gray-300 hover:text-white transition">
+                    <span>Next Episode</span>
+                    <i class="fa-solid fa-chevron-right text-xs"></i>
+                </button>
+            </div>
+
+        </div>
+
+        <!-- Right Sidebar (Episode List) -->
+        <div class="bg-[#131826] p-4 rounded-2xl border border-gray-800 space-y-4 flex flex-col">
+            <!-- Header -->
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                    <i class="fa-solid fa-bars text-purple-400"></i>
+                    <h3 class="font-semibold text-sm">Episode List</h3>
+                </div>
+                <select class="bg-[#1a2235] text-xs border border-gray-700 rounded px-2 py-1 outline-none text-gray-300">
+                    <option>Season 1</option>
+                </select>
+            </div>
+
+            <!-- Episodes Grid -->
+            <div class="grid grid-cols-3 gap-2 overflow-y-auto max-h-[320px] pr-1">
+                <button class="bg-[#1a2235] hover:bg-purple-600/30 border border-gray-700 py-2 rounded-lg text-xs transition">EP 1</button>
+                <button class="bg-[#1a2235] hover:bg-purple-600/30 border border-gray-700 py-2 rounded-lg text-xs transition">EP 2</button>
+                <button class="bg-[#1a2235] hover:bg-purple-600/30 border border-gray-700 py-2 rounded-lg text-xs transition">EP 3</button>
+                <button class="bg-[#1a2235] hover:bg-purple-600/30 border border-gray-700 py-2 rounded-lg text-xs transition">EP 4</button>
+                <button class="bg-[#1a2235] hover:bg-purple-600/30 border border-gray-700 py-2 rounded-lg text-xs transition">EP 5</button>
+                <button class="bg-[#1a2235] hover:bg-purple-600/30 border border-gray-700 py-2 rounded-lg text-xs transition">EP 6</button>
+                <button class="bg-[#1a2235] hover:bg-purple-600/30 border border-gray-700 py-2 rounded-lg text-xs transition">EP 7</button>
+                <button class="bg-[#1a2235] hover:bg-purple-600/30 border border-gray-700 py-2 rounded-lg text-xs transition">EP 8</button>
+                <button class="bg-[#1a2235] hover:bg-purple-600/30 border border-gray-700 py-2 rounded-lg text-xs transition">EP 9</button>
+                <button class="bg-[#1a2235] hover:bg-purple-600/30 border border-gray-700 py-2 rounded-lg text-xs transition">EP 10</button>
+                <button class="bg-[#1a2235] hover:bg-purple-600/30 border border-gray-700 py-2 rounded-lg text-xs transition">EP 11</button>
+                <button class="bg-purple-600 text-white border border-purple-500 py-2 rounded-lg text-xs font-bold shadow">EP 12</button>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>
+
