@@ -3,38 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Solo Leveling - 7ANIME Video Player</title>
+    <title>Solo Leveling - 7ANIME</title>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- External CSS -->
+    <link rel="stylesheet" href="style.css">
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
 </head>
-<body class="bg-[#0b0f19] text-white font-sans antialiased selection:bg-purple-600 selection:text-white">
+<body class="bg-[#0b0c10] text-white font-sans antialiased">
 
-    <!-- Top Navigation Bar / Header -->
-    <header class="main-header sticky top-0 z-50">
-        <div class="header-left flex items-center space-x-3">
+    <!-- Header / Navbar -->
+    <header class="main-header">
+        <div class="header-left">
             <!-- 3 Line Hamburger Menu Icon -->
             <button class="hamburger-btn" id="menuBtn" onclick="toggleSidebar()" aria-label="Toggle Menu">
                 <i class="fa-solid fa-bars"></i>
             </button>
             
             <!-- Fire Style Logo -->
-            <div class="logo fire-logo cursor-pointer" onclick="window.location.href='index.html'">
+            <div class="logo fire-logo" onclick="window.location.href='index.html'">
                 <span class="fire-seven">7</span><span class="fire-text">ANIME 🔥</span>
             </div>
         </div>
 
-        <nav class="desktop-nav hidden md:block">
-            <ul class="flex items-center space-x-6 list-none">
-                <li><a href="index.html" class="flex items-center space-x-1.5"><i class="fa-solid fa-house"></i> <span>Home</span></a></li>
-                <li><a href="#" class="flex items-center space-x-1.5"><i class="fa-solid fa-compass"></i> <span>Explore</span></a></li>
-                <li><a href="#" class="flex items-center space-x-1.5"><i class="fa-solid fa-film"></i> <span>Movies</span></a></li>
-                <li><a href="#" class="flex items-center space-x-1.5"><i class="fa-solid fa-tv"></i> <span>TV Series</span></a></li>
+        <nav class="desktop-nav">
+            <ul>
+                <li><a href="index.html"><i class="fa-solid fa-house"></i> Home</a></li>
+                <li><a href="#"><i class="fa-solid fa-compass"></i> Explore</a></li>
+                <li><a href="#"><i class="fa-solid fa-film"></i> Movies</a></li>
+                <li><a href="#"><i class="fa-solid fa-tv"></i> TV Series</a></li>
             </ul>
         </nav>
 
-        <div class="search-box relative">
+        <div class="search-box">
             <input type="text" id="globalSearchInput" placeholder="Search anime...">
             <i class="fa-solid fa-magnifying-glass" id="globalSearchBtn"></i>
             <!-- Live Search Dropdown Box -->
@@ -42,77 +44,77 @@
         </div>
     </header>
 
-    <!-- Slide-out Sidebar Drawer (Hidden by default) -->
+    <!-- Slide-out Sidebar Drawer -->
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
     <aside class="sidebar" id="sidebar">
-        <div class="sidebar-header flex justify-between items-center p-4 border-b border-gray-800">
-            <h3 class="text-white font-bold flex items-center gap-2"><i class="fa-solid fa-fire" style="color: #ff5500;"></i> Menu</h3>
-            <span class="close-btn text-2xl cursor-pointer text-gray-400 hover:text-white" onclick="toggleSidebar()">&times;</span>
+        <div class="sidebar-header">
+            <h3><i class="fa-solid fa-fire" style="color: #ff5500;"></i> Menu</h3>
+            <span class="close-btn" onclick="toggleSidebar()">&times;</span>
         </div>
-        <ul class="sidebar-links list-none py-2">
-            <li><a href="index.html" class="flex items-center gap-3 px-5 py-3 text-sm text-gray-300 hover:text-[#ff5500]"><i class="fa-solid fa-house"></i> HOME</a></li>
-            <li><a href="javascript:void(0)" onclick="openAgeModal()" class="flex items-center gap-3 px-5 py-3 text-sm text-gray-300 hover:text-[#ff5500]"><i class="fa-solid fa-triangle-exclamation"></i> HENTAI (18+)</a></li>
+        <ul class="sidebar-links">
+            <li><a href="index.html"><i class="fa-solid fa-house"></i> HOME</a></li>
+            <li><a href="javascript:void(0)" onclick="openAgeModal()"><i class="fa-solid fa-triangle-exclamation"></i> HENTAI (18+)</a></li>
             <li>
-                <a href="https://www.instagram.com/7anime_offical?stkn=c3c0aTNjaW9nZWJ3" target="_blank" rel="noopener noreferrer" class="flex items-center gap-3 px-5 py-3 text-sm text-gray-300 hover:text-[#ff5500]">
+                <a href="https://www.instagram.com/7anime_offical?stkn=c3c0aTNjaW9nZWJ3" target="_blank" rel="noopener noreferrer">
                     <i class="fa-solid fa-headset"></i> WEBSITE SUPPORT TEAM CONTACT
                 </a>
             </li>
         </ul>
     </aside>
 
-    <!-- 18+ Age Limit Verification Modal (Hidden by default) -->
+    <!-- 18+ Age Limit Verification Modal -->
     <div class="modal-overlay" id="ageModal">
-        <div class="modal-box bg-[#181928] border border-[#ff0055] p-6 rounded-xl max-w-sm w-[90%] text-center">
-            <i class="fa-solid fa-triangle-exclamation modal-icon text-4xl text-[#ff0055] mb-3"></i>
-            <h2 class="text-lg font-bold text-white mb-2">Age Verification Required</h2>
-            <p class="text-gray-300 text-xs mb-5">Is section ko dekhne ke liye aapki umar 18+ honi chahiye. Kya aap 18 saal ya usse zyada ke hain?</p>
-            <div class="modal-buttons flex justify-center gap-3">
-                <button class="btn btn-primary bg-[#ff5500] text-white px-4 py-2 rounded-lg text-xs font-bold" onclick="confirmAge(true)">I AM 18+</button>
-                <button class="btn btn-secondary bg-gray-700 text-white px-4 py-2 rounded-lg text-xs font-bold" onclick="confirmAge(false)">Exit / Cancel</button>
+        <div class="modal-box">
+            <i class="fa-solid fa-triangle-exclamation modal-icon"></i>
+            <h2>Age Verification Required</h2>
+            <p>Is section ko dekhne ke liye aapki umar 18+ honi chahiye. Kya aap 18 saal ya usse zyada ke hain?</p>
+            <div class="modal-buttons">
+                <button class="btn btn-primary" onclick="confirmAge(true)">I AM 18+</button>
+                <button class="btn btn-secondary" onclick="confirmAge(false)">Exit / Cancel</button>
             </div>
         </div>
     </div>
 
-    <!-- Main Wrapper -->
-    <main class="max-w-7xl mx-auto px-3 md:px-8 py-4 md:py-6 space-y-6">
+    <!-- Main Wrapper Content -->
+    <main class="max-w-7xl mx-auto px-4 py-6 space-y-6">
 
-        <!-- Anime Details Header Section (Classroom of the Elite layout matched) -->
-        <div class="bg-[#131826] border border-gray-800 rounded-2xl p-4 md:p-6 flex flex-col md:flex-row gap-5 items-start shadow-xl">
+        <!-- Anime Details Header Section (Classroom of the Elite Style) -->
+        <div class="bg-[#151522] border border-gray-800 rounded-2xl p-4 md:p-6 flex flex-col md:flex-row gap-6 items-start shadow-xl">
             <!-- Portrait Poster Image -->
-            <div class="w-full md:w-44 lg:w-52 flex-shrink-0 aspect-[3/4] rounded-xl overflow-hidden border border-gray-700 shadow-lg relative mx-auto md:mx-0">
-                <img src="https://lh3.googleusercontent.com/d/1DrYU7Rcf8h1JHkkakd6ks9MAiFYsnj4V" alt="Solo Leveling" class="w-full h-full object-cover">
+            <div class="w-full md:w-48 flex-shrink-0 aspect-[3/4] rounded-xl overflow-hidden border border-gray-700 shadow-lg relative mx-auto md:mx-0">
+                <img src="https://lh3.googleusercontent.com/d/1hZPMLLUNMOVG8DmSd1eGd5Nmdgh6AUYZ" alt="Solo Leveling" class="w-full h-full object-cover">
             </div>
             
             <!-- Details Content -->
             <div class="flex-1 space-y-3 w-full">
                 <div class="flex flex-wrap items-center justify-between gap-2">
-                    <h1 class="text-xl md:text-3xl font-extrabold tracking-tight">Solo Leveling</h1>
+                    <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight">Solo Leveling</h1>
                     <div class="flex items-center space-x-2">
-                        <button class="bg-purple-600 hover:bg-purple-700 text-white px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition">
+                        <button class="bg-[#ff5500] hover:bg-[#e04c00] text-white px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition">
                             <i class="fa-solid fa-download text-[10px]"></i> <span>Download</span>
                         </button>
-                        <button class="bg-[#1a2235] hover:bg-gray-800 text-gray-300 border border-gray-700 p-1.5 rounded-lg text-xs">
+                        <button class="bg-[#1a1a2b] hover:bg-gray-800 text-gray-300 border border-gray-700 p-1.5 rounded-lg text-xs">
                             <i class="fa-solid fa-bookmark"></i>
                         </button>
                     </div>
                 </div>
                 
                 <div class="flex flex-wrap items-center gap-2 text-xs">
-                    <span class="bg-purple-600/30 text-purple-300 border border-purple-500/40 px-2 py-0.5 rounded font-semibold">Anime</span>
-                    <span class="bg-amber-500/20 text-amber-400 border border-amber-500/40 px-2 py-0.5 rounded font-bold flex items-center space-x-1">
+                    <span class="bg-purple-600/30 text-purple-300 border border-purple-500/40 px-2.5 py-0.5 rounded font-semibold">Anime</span>
+                    <span class="bg-amber-500/20 text-amber-400 border border-amber-500/40 px-2.5 py-0.5 rounded font-bold flex items-center space-x-1">
                         <i class="fa-solid fa-star text-[10px]"></i> <span>9.4/10</span>
                     </span>
-                    <span class="bg-[#1a2235] text-gray-300 border border-gray-700 px-2 py-0.5 rounded">Rank #1</span>
-                    <span class="bg-[#1a2235] text-gray-300 border border-gray-700 px-2 py-0.5 rounded">Action</span>
-                    <span class="bg-[#1a2235] text-gray-300 border border-gray-700 px-2 py-0.5 rounded">Fantasy</span>
-                    <span class="bg-[#1a2235] text-gray-300 border border-gray-700 px-2 py-0.5 rounded">Sci-Fi</span>
+                    <span class="bg-[#1a1a2b] text-gray-300 border border-gray-700 px-2.5 py-0.5 rounded">Rank #1</span>
+                    <span class="bg-[#1a1a2b] text-gray-300 border border-gray-700 px-2.5 py-0.5 rounded">Action</span>
+                    <span class="bg-[#1a1a2b] text-gray-300 border border-gray-700 px-2.5 py-0.5 rounded">Fantasy</span>
+                    <span class="bg-[#1a1a2b] text-gray-300 border border-gray-700 px-2.5 py-0.5 rounded">Sci-Fi</span>
                 </div>
 
                 <p class="text-gray-300 text-xs md:text-sm leading-relaxed">
                     Sung Jin-Woo continues his journey to become the strongest hunter in a world full of monsters and hidden secrets.
                 </p>
 
-                <div class="text-xs text-gray-400 pt-1 flex flex-wrap items-center gap-y-1 gap-x-5 border-t border-gray-800/80 pt-3">
+                <div class="text-xs text-gray-400 pt-2 flex flex-wrap items-center gap-y-1 gap-x-6 border-t border-gray-800">
                     <span><strong>Total Episodes:</strong> 12</span>
                     <span><strong>Year:</strong> 2024</span>
                     <span><strong>Status:</strong> Ongoing</span>
@@ -121,10 +123,10 @@
         </div>
 
         <!-- Breadcrumb -->
-        <div class="text-[11px] md:text-xs text-gray-400 flex items-center space-x-2">
+        <div class="text-xs text-gray-400 flex items-center space-x-2">
             <span>Home</span> <i class="fa-solid fa-chevron-right text-[9px]"></i>
             <span>Anime</span> <i class="fa-solid fa-chevron-right text-[9px]"></i>
-            <span class="text-purple-400">Solo Leveling</span>
+            <span class="text-[#ff5500]">Solo Leveling</span>
         </div>
 
         <!-- Video Player & Episode List Grid Section -->
@@ -132,10 +134,10 @@
 
             <!-- Video Player + Navigation -->
             <div class="lg:col-span-2 space-y-4">
-                <div class="relative bg-black rounded-2xl overflow-hidden shadow-2xl border border-gray-800 group">
-                    <div class="relative aspect-video w-full bg-cover bg-center" style="background-image: url('https://lh3.googleusercontent.com/d/1DrYU7Rcf8h1JHkkakd6ks9MAiFYsnj4V');">
-                        <div class="absolute inset-0 bg-black/30 flex items-center justify-center">
-                            <button class="w-14 h-14 md:w-16 md:h-16 bg-purple-600 rounded-full flex items-center justify-center text-white text-lg md:text-xl shadow-xl hover:bg-purple-500 transition">
+                <div class="relative bg-black rounded-2xl overflow-hidden shadow-2xl border border-gray-800">
+                    <div class="relative aspect-video w-full bg-cover bg-center" style="background-image: url('https://lh3.googleusercontent.com/d/1hZPMLLUNMOVG8DmSd1eGd5Nmdgh6AUYZ');">
+                        <div class="absolute inset-0 bg-black/40 flex items-center justify-center">
+                            <button class="w-14 h-14 md:w-16 md:h-16 bg-[#ff5500] rounded-full flex items-center justify-center text-white text-lg shadow-xl hover:scale-105 transition">
                                 <i class="fa-solid fa-play ml-1"></i>
                             </button>
                         </div>
@@ -143,13 +145,13 @@
                 </div>
 
                 <!-- Next/Prev Episode Bar -->
-                <div class="flex items-center justify-between bg-[#131826] px-4 md:px-5 py-3 rounded-xl border border-gray-800">
-                    <button class="flex items-center space-x-1.5 text-xs font-semibold text-gray-300 hover:text-white transition">
+                <div class="flex items-center justify-between bg-[#151522] px-4 py-3 rounded-xl border border-gray-800 text-xs md:text-sm">
+                    <button class="flex items-center space-x-1.5 font-semibold text-gray-300 hover:text-white transition">
                         <i class="fa-solid fa-chevron-left text-[10px]"></i>
                         <span>Prev Episode</span>
                     </button>
-                    <span class="text-xs md:text-sm font-bold text-gray-200">Episode 12</span>
-                    <button class="flex items-center space-x-1.5 text-xs font-semibold text-gray-300 hover:text-white transition">
+                    <span class="font-bold text-gray-200">Episode 12</span>
+                    <button class="flex items-center space-x-1.5 font-semibold text-gray-300 hover:text-white transition">
                         <span>Next Episode</span>
                         <i class="fa-solid fa-chevron-right text-[10px]"></i>
                     </button>
@@ -157,35 +159,33 @@
             </div>
 
             <!-- Episode List Sidebar -->
-            <div class="bg-[#131826] p-4 rounded-2xl border border-gray-800 space-y-4 flex flex-col justify-between">
-                <div>
-                    <div class="flex items-center justify-between mb-4">
-                        <div class="flex items-center space-x-2">
-                            <i class="fa-solid fa-bars text-purple-400 text-sm"></i>
-                            <h3 class="font-bold text-sm">Episode List</h3>
-                        </div>
+            <div class="bg-[#151522] p-4 rounded-2xl border border-gray-800 space-y-4">
+                <div class="flex items-center justify-between mb-2">
+                    <div class="flex items-center space-x-2">
+                        <i class="fa-solid fa-bars text-[#ff5500] text-sm"></i>
+                        <h3 class="font-bold text-sm">Episode List</h3>
                     </div>
+                </div>
 
-                    <!-- Episodes Grid -->
-                    <div class="grid grid-cols-3 gap-2 overflow-y-auto max-h-[290px] pr-1">
-                        <button class="bg-[#1a2235] hover:bg-purple-600/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition">1</button>
-                        <button class="bg-[#1a2235] hover:bg-purple-600/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition">2</button>
-                        <button class="bg-[#1a2235] hover:bg-purple-600/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition">3</button>
-                        <button class="bg-[#1a2235] hover:bg-purple-600/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition">4</button>
-                        <button class="bg-[#1a2235] hover:bg-purple-600/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition">5</button>
-                        <button class="bg-[#1a2235] hover:bg-purple-600/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition">6</button>
-                        <button class="bg-[#1a2235] hover:bg-purple-600/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition">7</button>
-                        <button class="bg-[#1a2235] hover:bg-purple-600/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition">8</button>
-                        <button class="bg-[#1a2235] hover:bg-purple-600/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition">9</button>
-                        <button class="bg-[#1a2235] hover:bg-purple-600/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition">10</button>
-                        <button class="bg-[#1a2235] hover:bg-purple-600/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition">11</button>
-                        <button class="bg-purple-600 text-white border border-purple-500 py-2.5 rounded-lg text-xs font-bold shadow-md shadow-purple-600/30">12</button>
-                    </div>
+                <!-- Episodes Grid -->
+                <div class="grid grid-cols-3 gap-2 overflow-y-auto max-h-[290px] pr-1">
+                    <button class="bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition">1</button>
+                    <button class="bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition">2</button>
+                    <button class="bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition">3</button>
+                    <button class="bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition">4</button>
+                    <button class="bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition">5</button>
+                    <button class="bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition">6</button>
+                    <button class="bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition">7</button>
+                    <button class="bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition">8</button>
+                    <button class="bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition">9</button>
+                    <button class="bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition">10</button>
+                    <button class="bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition">11</button>
+                    <button class="bg-[#ff5500] text-white border border-[#ff5500] py-2.5 rounded-lg text-xs font-bold shadow-md shadow-[#ff5500]/30">12</button>
                 </div>
             </div>
         </div>
 
-        <!-- Hidden Anime Cards container so that `script.js` live search works properly here too -->
+        <!-- Hidden Search Database -->
         <div style="display: none;" id="hiddenSearchDatabase">
             <div class="anime-card" data-tags="Action, Fantasy, Sci-Fi" onclick="openAnimePage('solo_leveling')">
                 <div class="card-title">Solo Leveling</div>
@@ -225,5 +225,17 @@
 
     <!-- External JS -->
     <script src="script.js"></script>
+
+    <!-- Search Button Redirect Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchBtn = document.getElementById('globalSearchBtn');
+            if (searchBtn) {
+                searchBtn.addEventListener('click', function() {
+                    window.location.href = 'index.html';
+                });
+            }
+        });
+    </script>
 </body>
 </html>
