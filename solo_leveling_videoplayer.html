@@ -3,91 +3,112 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>7Anime Complete UI - Desktop & Mobile Responsive</title>
+    <title>7Anime Video Player UI</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css"> <!-- Agar aapki koi apni custom CSS file ho -->
 </head>
 <body class="bg-[#0b0f19] text-white font-sans antialiased selection:bg-purple-600 selection:text-white">
 
     <!-- Top Navigation Bar -->
-    <header class="bg-[#0b0f19]/90 backdrop-blur-md border-b border-gray-800 sticky top-0 z-50 px-4 lg:px-8 py-3 flex items-center justify-between">
-        <div class="flex items-center space-x-6">
-            <button class="text-xl text-gray-300 hover:text-white"><i class="fa-solid fa-bars"></i></button>
-            <div class="flex items-center space-x-2">
-                <span class="text-xl font-black tracking-wider bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">7ANIME</span>
-                <i class="fa-solid fa-fire text-orange-500 text-sm"></i>
+    <header class="bg-[#0b0f19]/95 backdrop-blur-md border-b border-gray-800 sticky top-0 z-50 px-3 md:px-8 py-3 space-y-3 md:space-y-0">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-3 md:space-x-6">
+                <button class="text-lg md:text-xl text-gray-300 hover:text-white"><i class="fa-solid fa-bars"></i></button>
+                <div class="flex items-center space-x-1.5">
+                    <span class="text-lg md:text-xl font-black tracking-wider bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">7ANIME</span>
+                    <i class="fa-solid fa-fire text-orange-500 text-xs md:text-sm"></i>
+                </div>
+                <nav class="hidden md:flex items-center space-x-6 text-sm font-medium text-gray-400">
+                    <a href="#" class="flex items-center space-x-2 text-white bg-purple-600/20 px-3 py-1.5 rounded-full border border-purple-500/30"><i class="fa-solid fa-house text-purple-400"></i><span>Home</span></a>
+                    <a href="#" class="hover:text-white flex items-center space-x-1.5"><i class="fa-solid fa-compass"></i><span>Explore</span></a>
+                    <a href="#" class="hover:text-white flex items-center space-x-1.5"><i class="fa-solid fa-film"></i><span>Genres</span></a>
+                    <a href="#" class="hover:text-white flex items-center space-x-1.5"><i class="fa-solid fa-video"></i><span>Movies</span></a>
+                    <a href="#" class="hover:text-white flex items-center space-x-1.5"><i class="fa-solid fa-tv"></i><span>TV Series</span></a>
+                </nav>
             </div>
-            <nav class="hidden md:flex items-center space-x-6 text-sm font-medium text-gray-400">
-                <a href="#" class="flex items-center space-x-2 text-white bg-purple-600/20 px-3 py-1.5 rounded-full border border-purple-500/30"><i class="fa-solid fa-house text-purple-400"></i><span>Home</span></a>
-                <a href="#" class="hover:text-white flex items-center space-x-1.5"><i class="fa-solid fa-compass"></i><span>Explore</span></a>
-                <a href="#" class="hover:text-white flex items-center space-x-1.5"><i class="fa-solid fa-film"></i><span>Genres</span></a>
-                <a href="#" class="hover:text-white flex items-center space-x-1.5"><i class="fa-solid fa-video"></i><span>Movies</span></a>
-                <a href="#" class="hover:text-white flex items-center space-x-1.5"><i class="fa-solid fa-tv"></i><span>TV Series</span></a>
-            </nav>
+            
+            <div class="flex items-center space-x-3">
+                <!-- Desktop Search Bar -->
+                <div class="hidden md:block relative w-48 lg:w-64">
+                    <div class="flex items-center bg-[#131826] border border-gray-700 rounded-full px-4 py-1.5 text-sm">
+                        <input type="text" id="globalSearchInput" placeholder="Search anime..." class="bg-transparent border-none outline-none text-xs w-full text-gray-200 placeholder-gray-500">
+                        <i class="fa-solid fa-magnifying-glass text-gray-400 text-xs"></i>
+                    </div>
+                    <!-- Dropdown Results Container -->
+                    <div id="searchResultsDropdown" class="search-dropdown"></div>
+                </div>
+                
+                <div class="relative">
+                    <i class="fa-solid fa-bell text-gray-300 text-base md:text-lg cursor-pointer"></i>
+                    <span class="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] md:text-[10px] font-bold w-3.5 h-3.5 md:w-4 md:h-4 rounded-full flex items-center justify-center">2</span>
+                </div>
+                
+                <div class="w-7 h-7 md:w-8 md:h-8 rounded-full overflow-hidden border border-purple-500">
+                    <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80" alt="Profile" class="w-full h-full object-cover">
+                </div>
+            </div>
         </div>
-        <div class="flex items-center space-x-4">
-            <div class="hidden sm:flex items-center bg-[#131826] border border-gray-700 rounded-full px-4 py-1.5 text-sm w-48 lg:w-64">
-                <input type="text" placeholder="Search anime..." class="bg-transparent border-none outline-none text-xs w-full text-gray-200 placeholder-gray-500">
-                <i class="fa-solid fa-magnifying-glass text-gray-400 text-xs"></i>
+
+        <!-- Mobile Search Bar -->
+        <div class="block md:hidden relative w-full">
+            <div class="flex items-center bg-[#131826] border border-gray-700 rounded-xl px-3.5 py-2 text-sm w-full">
+                <i class="fa-solid fa-magnifying-glass text-gray-400 text-xs mr-2"></i>
+                <input type="text" id="mobileSearchInput" placeholder="Search anime..." class="bg-transparent border-none outline-none text-xs w-full text-gray-200 placeholder-gray-500">
             </div>
-            <div class="relative hidden sm:block">
-                <i class="fa-solid fa-bell text-gray-300 text-lg cursor-pointer"></i>
-                <span class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">2</span>
-            </div>
-            <div class="w-8 h-8 rounded-full overflow-hidden border border-purple-500">
-                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80" alt="Profile" class="w-full h-full object-cover">
-            </div>
+            <!-- Mobile Dropdown Results Container -->
+            <div id="mobileSearchDropdown" class="search-dropdown"></div>
         </div>
     </header>
 
     <!-- Main Wrapper -->
-    <main class="max-w-7xl mx-auto px-4 lg:px-8 py-6 space-y-8">
+    <main class="max-w-7xl mx-auto px-3 md:px-8 py-4 md:py-6 space-y-6 md:space-y-8">
 
         <!-- Breadcrumb -->
-        <div class="text-xs text-gray-400 flex items-center space-x-2">
-            <span>Home</span> <i class="fa-solid fa-chevron-right text-[10px]"></i>
-            <span>Anime</span> <i class="fa-solid fa-chevron-right text-[10px]"></i>
-            <span>Solo Leveling</span> <i class="fa-solid fa-chevron-right text-[10px]"></i>
+        <div class="text-[11px] md:text-xs text-gray-400 flex items-center space-x-2">
+            <span>Home</span> <i class="fa-solid fa-chevron-right text-[9px]"></i>
+            <span>Anime</span> <i class="fa-solid fa-chevron-right text-[9px]"></i>
+            <span>Solo Leveling</span> <i class="fa-solid fa-chevron-right text-[9px]"></i>
             <span class="text-purple-400">Watch</span>
         </div>
 
-        <!-- Hero Banner Section (Solo Leveling Details) -->
-        <div class="relative rounded-3xl overflow-hidden bg-[#131826] border border-gray-800 shadow-2xl">
+        <!-- Hero Banner Section -->
+        <div class="relative rounded-2xl md:rounded-3xl overflow-hidden bg-[#131826] border border-gray-800 shadow-2xl">
             <div class="absolute inset-0 bg-cover bg-center opacity-40 mix-blend-overlay" style="background-image: url('1000029183_2.png');"></div>
             <div class="absolute inset-0 bg-gradient-to-r from-[#0b0f19] via-[#0b0f19]/80 to-transparent"></div>
             
-            <div class="relative p-6 md:p-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-                <div class="space-y-4 max-w-2xl">
-                    <div class="inline-flex items-center space-x-2 bg-purple-600/30 border border-purple-500/40 px-3 py-1 rounded-full text-xs font-semibold text-purple-300">
-                        <i class="fa-solid fa-crown text-yellow-400"></i>
+            <div class="relative p-5 md:p-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+                <div class="space-y-3 md:space-y-4 max-w-2xl">
+                    <div class="inline-flex items-center space-x-2 bg-purple-600/30 border border-purple-500/40 px-2.5 py-0.5 rounded-full text-[11px] font-semibold text-purple-300">
+                        <i class="fa-solid fa-crown text-yellow-400 text-[10px]"></i>
                         <span>Trending #1</span>
                     </div>
-                    <div class="flex items-end space-x-4">
-                        <h1 class="text-3xl md:text-5xl font-extrabold tracking-tight">Solo Leveling</h1>
-                        <span class="bg-amber-500/20 border border-amber-500/40 text-amber-400 font-bold px-2.5 py-1 rounded-lg text-sm flex items-center space-x-1 mb-1">
-                            <i class="fa-solid fa-star text-xs"></i> <span>9.4</span>
+                    <div class="flex items-end space-x-3">
+                        <h1 class="text-2xl md:text-5xl font-extrabold tracking-tight">Solo Leveling</h1>
+                        <span class="bg-amber-500/20 border border-amber-500/40 text-amber-400 font-bold px-2 py-0.5 rounded-lg text-xs md:text-sm flex items-center space-x-1 mb-0.5">
+                            <i class="fa-solid fa-star text-[10px]"></i> <span>9.4</span>
                         </span>
                     </div>
-                    <div class="flex flex-wrap items-center gap-2 text-xs font-medium">
-                        <span class="bg-[#1a2235] px-3 py-1 rounded-full border border-gray-700">Action</span>
-                        <span class="bg-[#1a2235] px-3 py-1 rounded-full border border-gray-700">Fantasy</span>
-                        <span class="bg-[#1a2235] px-3 py-1 rounded-full border border-gray-700">Sci-Fi</span>
-                        <span class="text-purple-400 font-semibold ml-2">Ep 12 Available</span>
+                    <div class="flex flex-wrap items-center gap-1.5 text-[11px] md:text-xs font-medium">
+                        <span class="bg-[#1a2235] px-2.5 py-1 rounded-full border border-gray-700">Action</span>
+                        <span class="bg-[#1a2235] px-2.5 py-1 rounded-full border border-gray-700">Fantasy</span>
+                        <span class="bg-[#1a2235] px-2.5 py-1 rounded-full border border-gray-700">Sci-Fi</span>
+                        <span class="text-purple-400 font-semibold ml-1">Ep 12 Available</span>
                     </div>
-                    <p class="text-gray-300 text-sm leading-relaxed line-clamp-2 md:line-clamp-none">
+                    <p class="text-gray-300 text-xs md:text-sm leading-relaxed line-clamp-2">
                         Sung Jin-Woo continues his journey to become the strongest hunter in a world full of monsters and hidden secrets.
                     </p>
-                    <div class="flex flex-wrap items-center gap-3 pt-2">
-                        <button class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-xl font-semibold text-sm flex items-center space-x-2 transition shadow-lg shadow-purple-600/30">
+                    <div class="flex flex-wrap items-center gap-2.5 pt-1">
+                        <button class="bg-purple-600 hover:bg-purple-700 text-white px-4 md:px-6 py-2.5 md:py-3 rounded-xl font-semibold text-xs md:text-sm flex items-center space-x-2 transition shadow-lg shadow-purple-600/30">
                             <i class="fa-solid fa-play"></i>
                             <span>Watch Now</span>
                         </button>
-                        <button class="bg-[#1a2235] hover:bg-gray-800 text-gray-200 border border-gray-700 px-5 py-3 rounded-xl font-semibold text-sm flex items-center space-x-2 transition">
+                        <button class="bg-[#1a2235] hover:bg-gray-800 text-gray-200 border border-gray-700 px-3.5 md:px-5 py-2.5 md:py-3 rounded-xl font-semibold text-xs md:text-sm flex items-center space-x-2 transition">
                             <i class="fa-solid fa-plus"></i>
                             <span>Add to Watchlist</span>
                         </button>
-                        <button class="bg-[#1a2235] hover:bg-gray-800 text-gray-200 border border-gray-700 px-5 py-3 rounded-xl font-semibold text-sm flex items-center space-x-2 transition">
+                        <button class="bg-[#1a2235] hover:bg-gray-800 text-gray-200 border border-gray-700 px-3.5 md:px-5 py-2.5 md:py-3 rounded-xl font-semibold text-xs md:text-sm flex items-center space-x-2 transition">
                             <i class="fa-solid fa-download"></i>
                             <span>Download</span>
                         </button>
@@ -99,46 +120,40 @@
         <!-- Video Player & Episode List Grid Section -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-            <!-- Left 2 Columns: Video Player + Controls + Navigation -->
+            <!-- Video Player + Navigation -->
             <div class="lg:col-span-2 space-y-4">
-                
-                <!-- Video Player Container -->
                 <div class="relative bg-black rounded-2xl overflow-hidden shadow-2xl border border-gray-800 group">
                     <div class="relative aspect-video w-full bg-cover bg-center" style="background-image: url('1000029183_2.png');">
                         <div class="absolute inset-0 bg-black/30 flex items-center justify-center">
-                            <button class="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center text-white text-xl shadow-xl hover:bg-purple-500 transition transform hover:scale-105">
+                            <button class="w-14 h-14 md:w-16 md:h-16 bg-purple-600 rounded-full flex items-center justify-center text-white text-lg md:text-xl shadow-xl hover:bg-purple-500 transition">
                                 <i class="fa-solid fa-play ml-1"></i>
                             </button>
                         </div>
-                        <!-- Top right small buttons on video -->
-                        <div class="absolute top-4 right-4 flex items-center space-x-2">
-                            <button class="bg-black/60 hover:bg-black text-xs px-3 py-1.5 rounded-lg border border-gray-700 flex items-center space-x-1.5 backdrop-blur">
+                        <div class="absolute top-3 right-3 flex items-center space-x-2">
+                            <button class="bg-black/60 hover:bg-black text-[11px] md:text-xs px-2.5 py-1.5 rounded-lg border border-gray-700 flex items-center space-x-1 backdrop-blur">
                                 <i class="fa-solid fa-download"></i> <span>Download</span>
                             </button>
-                            <button class="bg-black/60 hover:bg-black text-xs p-2 rounded-lg border border-gray-700 backdrop-blur">
+                            <button class="bg-black/60 hover:bg-black text-xs p-1.5 md:p-2 rounded-lg border border-gray-700 backdrop-blur">
                                 <i class="fa-solid fa-expand"></i>
                             </button>
                         </div>
                     </div>
 
-                    <!-- Bottom Player Controls Bar -->
-                    <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black via-black/80 to-transparent p-4 space-y-2.5">
-                        <!-- Progress Bar -->
+                    <!-- Bottom Controls Bar -->
+                    <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black via-black/80 to-transparent p-3 md:p-4 space-y-2">
                         <div class="w-full bg-gray-700 h-1.5 rounded-full overflow-hidden cursor-pointer relative">
                             <div class="bg-purple-500 h-full w-[35%] relative"></div>
                         </div>
-
-                        <!-- Controls Actions -->
-                        <div class="flex items-center justify-between text-sm">
-                            <div class="flex items-center space-x-4">
+                        <div class="flex items-center justify-between text-xs md:text-sm">
+                            <div class="flex items-center space-x-3 md:space-x-4">
                                 <button class="hover:text-purple-400 transition"><i class="fa-solid fa-play"></i></button>
                                 <button class="hover:text-purple-400 transition"><i class="fa-solid fa-forward-step"></i></button>
                                 <button class="hover:text-purple-400 transition"><i class="fa-solid fa-volume-high"></i></button>
-                                <span class="text-xs text-gray-300 font-mono">06:24 / 23:40</span>
+                                <span class="text-[10px] md:text-xs text-gray-300 font-mono">06:24 / 23:40</span>
                             </div>
-                            <div class="flex items-center space-x-3">
-                                <button class="bg-gray-800/80 hover:bg-gray-700 px-2.5 py-1 rounded text-xs border border-gray-700 font-semibold">1x</button>
-                                <button class="bg-gray-800/80 hover:bg-gray-700 px-2.5 py-1 rounded text-xs border border-gray-700 font-semibold">1080p</button>
+                            <div class="flex items-center space-x-2 md:space-x-3">
+                                <button class="bg-gray-800/80 px-2 py-0.5 rounded text-[11px] border border-gray-700 font-semibold">1x</button>
+                                <button class="bg-gray-800/80 px-2 py-0.5 rounded text-[11px] border border-gray-700 font-semibold">1080p</button>
                                 <button class="hover:text-purple-400 transition"><i class="fa-solid fa-expand"></i></button>
                             </div>
                         </div>
@@ -146,24 +161,22 @@
                 </div>
 
                 <!-- Next/Prev Episode Bar -->
-                <div class="flex items-center justify-between bg-[#131826] px-5 py-3.5 rounded-xl border border-gray-800">
-                    <button class="flex items-center space-x-2 text-xs font-semibold text-gray-300 hover:text-white transition">
-                        <i class="fa-solid fa-chevron-left"></i>
+                <div class="flex items-center justify-between bg-[#131826] px-4 md:px-5 py-3 rounded-xl border border-gray-800">
+                    <button class="flex items-center space-x-1.5 text-xs font-semibold text-gray-300 hover:text-white transition">
+                        <i class="fa-solid fa-chevron-left text-[10px]"></i>
                         <span>Prev Episode</span>
                     </button>
                     <span class="text-xs md:text-sm font-bold text-gray-200">Episode 12: The Beginning</span>
-                    <button class="flex items-center space-x-2 text-xs font-semibold text-gray-300 hover:text-white transition">
+                    <button class="flex items-center space-x-1.5 text-xs font-semibold text-gray-300 hover:text-white transition">
                         <span>Next Episode</span>
-                        <i class="fa-solid fa-chevron-right"></i>
+                        <i class="fa-solid fa-chevron-right text-[10px]"></i>
                     </button>
                 </div>
-
             </div>
 
-            <!-- Right 1 Column: Episode List Sidebar -->
+            <!-- Episode List Sidebar -->
             <div class="bg-[#131826] p-4 rounded-2xl border border-gray-800 space-y-4 flex flex-col justify-between">
                 <div>
-                    <!-- Header with Season Dropdown & Grid Toggle -->
                     <div class="flex items-center justify-between mb-4">
                         <div class="flex items-center space-x-2">
                             <i class="fa-solid fa-bars text-purple-400 text-sm"></i>
@@ -177,7 +190,7 @@
                         </div>
                     </div>
 
-                    <!-- Episodes Grid Buttons (1 to 24) -->
+                    <!-- Episodes Grid -->
                     <div class="grid grid-cols-3 gap-2 overflow-y-auto max-h-[290px] pr-1">
                         <button class="bg-[#1a2235] hover:bg-purple-600/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition">1</button>
                         <button class="bg-[#1a2235] hover:bg-purple-600/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition">2</button>
@@ -206,48 +219,31 @@
                     </div>
                 </div>
             </div>
-
         </div>
 
-        <!-- More Like This Section -->
-        <div class="space-y-4 pt-4">
+        <!-- More Like This Section (Compatible with script.js selectors) -->
+        <div class="space-y-4 pt-2">
             <div class="flex items-center justify-between">
-                <h2 class="text-xl font-bold">More Like This</h2>
-                <i class="fa-solid fa-chevron-right text-gray-400 cursor-pointer"></i>
+                <h2 class="text-lg md:text-xl font-bold">More Like This</h2>
+                <i class="fa-solid fa-chevron-right text-gray-400 text-sm cursor-pointer"></i>
             </div>
-            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
+                
                 <!-- Card 1 -->
-                <div class="bg-[#131826] rounded-xl overflow-hidden border border-gray-800 group cursor-pointer">
+                <div class="anime-card bg-[#131826] rounded-xl overflow-hidden border border-gray-800 group cursor-pointer" onclick="openAnimePage('One Piece')">
                     <div class="relative aspect-[16/10] overflow-hidden">
                         <img src="https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=400&q=80" alt="One Piece" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
-                        <span class="absolute top-2 right-2 bg-black/60 backdrop-blur text-amber-400 text-xs font-bold px-2 py-0.5 rounded flex items-center space-x-1">
-                            <i class="fa-solid fa-star text-[10px]"></i> <span>9.3</span>
+                        <span class="absolute top-2 right-2 bg-black/60 backdrop-blur text-amber-400 text-[10px] font-bold px-1.5 py-0.5 rounded flex items-center space-x-1">
+                            <i class="fa-solid fa-star text-[9px]"></i> <span>9.3</span>
                         </span>
                     </div>
-                    <div class="p-3 space-y-1">
-                        <h4 class="font-semibold text-sm truncate">One Piece</h4>
-                        <p class="text-[11px] text-gray-400">Action • Adventure</p>
+                    <div class="p-2.5 space-y-0.5">
+                        <h4 class="card-title font-semibold text-xs md:text-sm truncate">One Piece</h4>
+                        <p class="card-tags text-[10px] text-gray-400">Action • Adventure</p>
                     </div>
                 </div>
+
                 <!-- Card 2 -->
-                <div class="bg-[#131826] rounded-xl overflow-hidden border border-gray-800 group cursor-pointer">
+                <div class="anime-card bg-[#131826] rounded-xl overflow-hidden border border-gray-800 group cursor-pointer" onclick="openAnimePage('Demon Slayer')">
                     <div class="relative aspect-[16/10] overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?auto=format&fit=crop&w=400&q=80" alt="Demon Slayer" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
-                        <span class="absolute top-2 right-2 bg-black/60 backdrop-blur text-amber-400 text-xs font-bold px-2 py-0.5 rounded flex items-center space-x-1">
-                            <i class="fa-solid fa-star text-[10px]"></i> <span>9.2</span>
-                        </span>
-                    </div>
-                    <div class="p-3 space-y-1">
-                        <h4 class="font-semibold text-sm truncate">Demon Slayer</h4>
-                        <p class="text-[11px] text-gray-400">Action • Fantasy</p>
-                    </div>
-                </div>
-                <!-- Card 3 -->
-                <div class="bg-[#131826] rounded-xl overflow-hidden border border-gray-800 group cursor-pointer">
-                    <div class="relative aspect-[16/10] overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1618336753974-aae8e04506aa?auto=format&fit=crop&w=400&q=80" alt="Jujutsu Kaisen" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
-                        <span class="absolute top-2 right-2 bg-black/60 backdrop-blur text-amber-400 text-xs font-bold px-2 py-0.5 rounded flex items-center space-x-1">
-                            <i class="fa-solid fa-star text-[10px]"></i> <span>8.7</span>
-                        </span>
-                    </div>
-               
+                        <img src="https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?auto=format&fit=crop&w=400&q=80" alt="Demon Slayer" class="w-full h
