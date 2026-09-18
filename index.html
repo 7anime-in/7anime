@@ -3,15 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Solo Leveling - 7ANIME</title>
+    <title>7Anime - Watch Your Favorite Anime</title>
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- External CSS -->
     <link rel="stylesheet" href="style.css">
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-[#0b0c10] text-white font-sans antialiased">
+<body>
 
     <!-- Header / Navbar -->
     <header class="main-header">
@@ -29,7 +27,7 @@
 
         <nav class="desktop-nav">
             <ul>
-                <li><a href="index.html"><i class="fa-solid fa-house"></i> Home</a></li>
+                <li><a href="index.html" class="active"><i class="fa-solid fa-house"></i> Home</a></li>
                 <li><a href="#"><i class="fa-solid fa-compass"></i> Explore</a></li>
                 <li><a href="#"><i class="fa-solid fa-film"></i> Movies</a></li>
                 <li><a href="#"><i class="fa-solid fa-tv"></i> TV Series</a></li>
@@ -44,7 +42,7 @@
         </div>
     </header>
 
-    <!-- Slide-out Sidebar Drawer -->
+    <!-- Slide-out Sidebar Drawer (Hidden by default) -->
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
@@ -62,7 +60,7 @@
         </ul>
     </aside>
 
-    <!-- 18+ Age Limit Verification Modal -->
+    <!-- 18+ Age Limit Verification Modal (Hidden by default) -->
     <div class="modal-overlay" id="ageModal">
         <div class="modal-box">
             <i class="fa-solid fa-triangle-exclamation modal-icon"></i>
@@ -75,167 +73,131 @@
         </div>
     </div>
 
-    <!-- Main Wrapper Content -->
-    <main class="max-w-7xl mx-auto px-4 py-6 space-y-6">
-
-        <!-- Anime Details Header Section (Classroom of the Elite Style) -->
-        <div class="bg-[#151522] border border-gray-800 rounded-2xl p-4 md:p-6 flex flex-col md:flex-row gap-6 items-start shadow-xl">
-            <!-- Portrait Poster Image -->
-            <div class="w-full md:w-48 flex-shrink-0 aspect-[3/4] rounded-xl overflow-hidden border border-gray-700 shadow-lg relative mx-auto md:mx-0">
-                <img src="https://lh3.googleusercontent.com/d/1hZPMLLUNMOVG8DmSd1eGd5Nmdgh6AUYZ" alt="Solo Leveling" class="w-full h-full object-cover">
+    <!-- Hero Banner -->
+    <section class="hero" id="heroSection">
+        <div class="hero-content">
+            <span class="badge"><i class="fa-solid fa-fire"></i> Trending #1</span>
+            <h1 class="hero-title">Solo Leveling</h1>
+            <div class="hero-meta">Action • Fantasy • Sci-Fi | Ep 12 Available</div>
+            <p class="hero-desc">Sung Jin-Woo continues his journey to become the strongest hunter in a world full of monsters and hidden secrets.</p>
+            <div class="hero-buttons">
+                <button class="btn btn-primary" onclick="openAnimePage('solo_leveling')">
+                    <i class="fa-solid fa-play"></i> Watch Now
+                </button>
+                <button class="btn btn-secondary"><i class="fa-solid fa-plus"></i> Add to Watchlist</button>
             </div>
+        </div>
+    </section>
+
+    <!-- Main Anime Grid -->
+    <main class="container">
+        <h2 class="section-title" id="sectionTitle"><i class="fa-solid fa-fire-flame-curated"></i> Trending This Week</h2>
+
+        <div class="grid-container" id="animeGrid">
             
-            <!-- Details Content -->
-            <div class="flex-1 space-y-3 w-full">
-                <div class="flex flex-wrap items-center justify-between gap-2">
-                    <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight">Solo Leveling</h1>
-                    <div class="flex items-center space-x-2">
-                        <button class="bg-[#ff5500] hover:bg-[#e04c00] text-white px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition">
-                            <i class="fa-solid fa-download text-[10px]"></i> <span>Download</span>
-                        </button>
-                        <button class="bg-[#1a1a2b] hover:bg-gray-800 text-gray-300 border border-gray-700 p-1.5 rounded-lg text-xs">
-                            <i class="fa-solid fa-bookmark"></i>
-                        </button>
-                    </div>
-                </div>
-                
-                <div class="flex flex-wrap items-center gap-2 text-xs">
-                    <span class="bg-purple-600/30 text-purple-300 border border-purple-500/40 px-2.5 py-0.5 rounded font-semibold">Anime</span>
-                    <span class="bg-amber-500/20 text-amber-400 border border-amber-500/40 px-2.5 py-0.5 rounded font-bold flex items-center space-x-1">
-                        <i class="fa-solid fa-star text-[10px]"></i> <span>9.4/10</span>
-                    </span>
-                    <span class="bg-[#1a1a2b] text-gray-300 border border-gray-700 px-2.5 py-0.5 rounded">Rank #1</span>
-                    <span class="bg-[#1a1a2b] text-gray-300 border border-gray-700 px-2.5 py-0.5 rounded">Action</span>
-                    <span class="bg-[#1a1a2b] text-gray-300 border border-gray-700 px-2.5 py-0.5 rounded">Fantasy</span>
-                    <span class="bg-[#1a1a2b] text-gray-300 border border-gray-700 px-2.5 py-0.5 rounded">Sci-Fi</span>
-                </div>
-
-                <p class="text-gray-300 text-xs md:text-sm leading-relaxed">
-                    Sung Jin-Woo continues his journey to become the strongest hunter in a world full of monsters and hidden secrets.
-                </p>
-
-                <div class="text-xs text-gray-400 pt-2 flex flex-wrap items-center gap-y-1 gap-x-6 border-t border-gray-800">
-                    <span><strong>Total Episodes:</strong> 12</span>
-                    <span><strong>Year:</strong> 2024</span>
-                    <span><strong>Status:</strong> Ongoing</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Breadcrumb -->
-        <div class="text-xs text-gray-400 flex items-center space-x-2">
-            <span>Home</span> <i class="fa-solid fa-chevron-right text-[9px]"></i>
-            <span>Anime</span> <i class="fa-solid fa-chevron-right text-[9px]"></i>
-            <span class="text-[#ff5500]">Solo Leveling</span>
-        </div>
-
-        <!-- Video Player & Episode List Grid Section -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-            <!-- Video Player + Navigation -->
-            <div class="lg:col-span-2 space-y-4">
-                <div class="relative bg-black rounded-2xl overflow-hidden shadow-2xl border border-gray-800">
-                    <div class="relative aspect-video w-full bg-cover bg-center" style="background-image: url('https://lh3.googleusercontent.com/d/1hZPMLLUNMOVG8DmSd1eGd5Nmdgh6AUYZ');">
-                        <div class="absolute inset-0 bg-black/40 flex items-center justify-center">
-                            <button class="w-14 h-14 md:w-16 md:h-16 bg-[#ff5500] rounded-full flex items-center justify-center text-white text-lg shadow-xl hover:scale-105 transition">
-                                <i class="fa-solid fa-play ml-1"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Next/Prev Episode Bar -->
-                <div class="flex items-center justify-between bg-[#151522] px-4 py-3 rounded-xl border border-gray-800 text-xs md:text-sm">
-                    <button class="flex items-center space-x-1.5 font-semibold text-gray-300 hover:text-white transition">
-                        <i class="fa-solid fa-chevron-left text-[10px]"></i>
-                        <span>Prev Episode</span>
-                    </button>
-                    <span class="font-bold text-gray-200">Episode 12</span>
-                    <button class="flex items-center space-x-1.5 font-semibold text-gray-300 hover:text-white transition">
-                        <span>Next Episode</span>
-                        <i class="fa-solid fa-chevron-right text-[10px]"></i>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Episode List Sidebar -->
-            <div class="bg-[#151522] p-4 rounded-2xl border border-gray-800 space-y-4">
-                <div class="flex items-center justify-between mb-2">
-                    <div class="flex items-center space-x-2">
-                        <i class="fa-solid fa-bars text-[#ff5500] text-sm"></i>
-                        <h3 class="font-bold text-sm">Episode List</h3>
-                    </div>
-                </div>
-
-                <!-- Episodes Grid -->
-                <div class="grid grid-cols-3 gap-2 overflow-y-auto max-h-[290px] pr-1">
-                    <button class="bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition">1</button>
-                    <button class="bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition">2</button>
-                    <button class="bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition">3</button>
-                    <button class="bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition">4</button>
-                    <button class="bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition">5</button>
-                    <button class="bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition">6</button>
-                    <button class="bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition">7</button>
-                    <button class="bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition">8</button>
-                    <button class="bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition">9</button>
-                    <button class="bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition">10</button>
-                    <button class="bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition">11</button>
-                    <button class="bg-[#ff5500] text-white border border-[#ff5500] py-2.5 rounded-lg text-xs font-bold shadow-md shadow-[#ff5500]/30">12</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Hidden Search Database -->
-        <div style="display: none;" id="hiddenSearchDatabase">
+            <!-- Solo Leveling Card -->
             <div class="anime-card" data-tags="Action, Fantasy, Sci-Fi" onclick="openAnimePage('solo_leveling')">
-                <div class="card-title">Solo Leveling</div>
-                <div class="card-tags">Action, Fantasy, Sci-Fi</div>
+                <div class="card-img-container">
+                    <img src="https://lh3.googleusercontent.com/d/1DrYU7Rcf8h1JHkkakd6ks9MAiFYsnj4V" alt="Solo Leveling" loading="lazy">
+                    <span class="rating-badge"><i class="fa-solid fa-star"></i> 9.4</span>
+                </div>
+                <div class="card-info">
+                    <div class="card-title">Solo Leveling</div>
+                    <div class="card-tags">Action, Fantasy, Sci-Fi</div>
+                </div>
             </div>
-            <div class="anime-card" data-tags="Action, Adventure, Comedy" onclick="openAnimePage('one_piece')">
-                <div class="card-title">One Piece</div>
-                <div class="card-tags">Action, Adventure, Comedy</div>
-            </div>
-            <div class="anime-card" data-tags="Action, Fantasy, Supernatural" onclick="openAnimePage('demon_slayer')">
-                <div class="card-title">Demon Slayer</div>
-                <div class="card-tags">Action, Fantasy, Supernatural</div>
-            </div>
-            <div class="anime-card" data-tags="Action, Supernatural, Fantasy" onclick="openAnimePage('jujutsu_kaisen')">
-                <div class="card-title">Jujutsu Kaisen</div>
-                <div class="card-tags">Action, Supernatural, Fantasy</div>
-            </div>
-            <div class="anime-card" data-tags="Drama, Psychological, School" onclick="openAnimePage('classroom_of_the_elite')">
-                <div class="card-title">Classroom of the Elite</div>
-                <div class="card-tags">Drama, Psychological, School</div>
-            </div>
-            <div class="anime-card" data-tags="Sci-Fi, Adventure, Comedy" onclick="openAnimePage('dr_stone')">
-                <div class="card-title">Dr. Stone</div>
-                <div class="card-tags">Sci-Fi, Adventure, Comedy</div>
-            </div>
-        </div>
 
+            <!-- One Piece Card -->
+            <div class="anime-card" data-tags="Action, Adventure, Comedy" onclick="openAnimePage('one_piece')">
+                <div class="card-img-container">
+                    <img src="https://lh3.googleusercontent.com/d/1wkSteRmquT7BZezkr-HJ9evPLioapODU" alt="One Piece" loading="lazy">
+                    <span class="rating-badge"><i class="fa-solid fa-star"></i> 9.3</span>
+                </div>
+                <div class="card-info">
+                    <div class="card-title">One Piece</div>
+                    <div class="card-tags">Action, Adventure, Comedy</div>
+                </div>
+            </div>
+
+            <!-- Demon Slayer Card -->
+            <div class="anime-card" data-tags="Action, Fantasy, Supernatural" onclick="openAnimePage('demon_slayer')">
+                <div class="card-img-container">
+                    <img src="https://lh3.googleusercontent.com/d/1TYC722ZdHTuVgsF_1aOmDA3sV3awwQ2b" alt="Demon Slayer" loading="lazy">
+                    <span class="rating-badge"><i class="fa-solid fa-star"></i> 9.1</span>
+                </div>
+                <div class="card-info">
+                    <div class="card-title">Demon Slayer</div>
+                    <div class="card-tags">Action, Fantasy, Supernatural</div>
+                </div>
+            </div>
+
+            <!-- Jujutsu Kaisen Card -->
+            <div class="anime-card" data-tags="Action, Supernatural, Fantasy" onclick="openAnimePage('jujutsu_kaisen')">
+                <div class="card-img-container">
+                    <img src="https://lh3.googleusercontent.com/d/1ji9UpculbqZoreDoLGxqG4WAIf1h-gv0" alt="Jujutsu Kaisen" loading="lazy">
+                    <span class="rating-badge"><i class="fa-solid fa-star"></i> 9.2</span>
+                </div>
+                <div class="card-info">
+                    <div class="card-title">Jujutsu Kaisen</div>
+                    <div class="card-tags">Action, Supernatural, Fantasy</div>
+                </div>
+            </div>
+
+            <!-- Classroom of the Elite Card -->
+            <div class="anime-card" data-tags="Drama, Psychological, School" onclick="openAnimePage('classroom_of_the_elite')">
+                <div class="card-img-container">
+                    <img src="https://lh3.googleusercontent.com/d/1J0za-zSCfOStt-bs8dzV7j4YlmVBOHuF" alt="Classroom of the Elite" loading="lazy">
+                    <span class="rating-badge"><i class="fa-solid fa-star"></i> 9.0</span>
+                </div>
+                <div class="card-info">
+                    <div class="card-title">Classroom of the Elite</div>
+                    <div class="card-tags">Drama, Psychological, School</div>
+                </div>
+            </div>
+
+            <!-- Dr. Stone Card -->
+            <div class="anime-card" data-tags="Sci-Fi, Adventure, Comedy" onclick="openAnimePage('dr_stone')">
+                <div class="card-img-container">
+                    <img src="https://drive.google.com/thumbnail?id=1lHwUC54qEv2FANAnBjQA4q8hIkoA_qON&sz=w1000" alt="Dr. Stone" loading="lazy">
+                    <span class="rating-badge"><i class="fa-solid fa-star"></i> 8.9</span>
+                </div>
+                <div class="card-info">
+                    <div class="card-title">Dr. Stone</div>
+                    <div class="card-tags">Sci-Fi, Adventure, Comedy</div>
+                </div>
+            </div>
+
+            <!-- Hell Mode (Hentai Tagged Card) -->
+            <div class="anime-card hentai-card" data-tags="Hentai, Fantasy, Isekai" onclick="window.location.href='Hell_mode_videoplayer.html'">
+                <div class="card-img-container">
+                    <img src="https://t.me/sevenanimehaintai/4" alt="Hell Mode" loading="lazy">
+                    <span class="rating-badge"><i class="fa-solid fa-star"></i> 8.8</span>
+                </div>
+                <div class="card-info">
+                    <div class="card-title">Hell Mode: Hentai Special</div>
+                    <div class="card-tags">Hentai, Fantasy, Isekai</div>
+                </div>
+            </div>
+
+            <div id="noResults" class="no-results">No anime found matching your search.</div>
+        </div>
     </main>
 
     <!-- Footer -->
     <footer>
-        <div class="logo fire-logo justify-center cursor-pointer mb-2" onclick="window.location.href='index.html'">
+        <div class="logo fire-logo" onclick="window.location.href='index.html'">
             <span class="fire-seven">7</span><span class="fire-text">ANIME 🔥</span>
         </div>
-        <p style="color: #666; font-size: 12px;">© 7Anime. All rights reserved.</p>
+        <div class="footer-links">
+            <a href="index.html">Home</a>
+            <a href="#">Explore</a>
+            <a href="#">Terms & Conditions</a>
+            <a href="https://www.instagram.com/7anime_offical?stkn=c3c0aTNjaW9nZWJ3" target="_blank">Contact Support</a>
+        </div>
+        <p style="color: #666; font-size: 12px; margin-top: 10px;">© 7Anime. All rights reserved.</p>
     </footer>
 
     <!-- External JS -->
     <script src="script.js"></script>
-
-    <!-- Search Button Redirect Script -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const searchBtn = document.getElementById('globalSearchBtn');
-            if (searchBtn) {
-                searchBtn.addEventListener('click', function() {
-                    window.location.href = 'index.html';
-                });
-            }
-        });
-    </script>
 </body>
 </html>
