@@ -135,20 +135,27 @@
             <!-- Video Player + Navigation -->
             <div class="lg:col-span-2 space-y-4">
                 <div class="relative bg-black rounded-2xl overflow-hidden shadow-2xl border border-gray-800">
-                    <div class="relative aspect-video w-full bg-black">
-                        <!-- Iframe Player displaying active episode link -->
-                        <iframe id="animeVideoPlayer" src="https://vidhidepro.com/v/ctymcjwnsyvm" class="w-full h-full border-0 absolute inset-0" allowfullscreen scrolling="no"></iframe>
+                    <div class="relative aspect-video w-full bg-black" id="playerContainer">
+                        <!-- Click-to-Play Poster Placeholder -->
+                        <div id="playerPoster" class="absolute inset-0 bg-cover bg-center cursor-pointer flex items-center justify-center" style="background-image: url('https://lh3.googleusercontent.com/d/1hZPMLLUNMOVG8DmSd1eGd5Nmdgh6AUYZ');" onclick="loadAndPlayVideo()">
+                            <div class="absolute inset-0 bg-black/50"></div>
+                            <button class="relative z-10 w-16 h-16 bg-[#ff5500] rounded-full flex items-center justify-center text-white text-xl shadow-2xl hover:scale-110 transition">
+                                <i class="fa-solid fa-play ml-1"></i>
+                            </button>
+                        </div>
+                        <!-- Actual Iframe Player (Loaded on demand) -->
+                        <iframe id="animeVideoPlayer" src="" class="w-full h-full border-0 absolute inset-0" allowfullscreen scrolling="no"></iframe>
                     </div>
                 </div>
 
                 <!-- Next/Prev Episode Bar & Current Playing Title -->
                 <div class="flex items-center justify-between bg-[#151522] px-4 py-3 rounded-xl border border-gray-800 text-xs md:text-sm">
-                    <button onclick="changeEpisode('prev')" class="flex items-center space-x-1.5 font-semibold text-gray-300 hover:text-white transition">
+                    <button onclick="changeEpisode('prev')" class="flex items-center space-x-1.5 font-semibold text-gray-300 hover:text-white transition cursor-pointer">
                         <i class="fa-solid fa-chevron-left text-[10px]"></i>
                         <span>Prev Episode</span>
                     </button>
                     <span id="currentPlayingText" class="font-bold text-gray-200">Episode 1</span>
-                    <button onclick="changeEpisode('next')" class="flex items-center space-x-1.5 font-semibold text-gray-300 hover:text-white transition">
+                    <button onclick="changeEpisode('next')" class="flex items-center space-x-1.5 font-semibold text-gray-300 hover:text-white transition cursor-pointer">
                         <span>Next Episode</span>
                         <i class="fa-solid fa-chevron-right text-[10px]"></i>
                     </button>
@@ -172,18 +179,18 @@
 
                 <!-- Episodes Grid (1 to 12) -->
                 <div class="grid grid-cols-3 gap-2 overflow-y-auto max-h-[250px] pr-1" id="episodeGridButtons">
-                    <button onclick="playEpisode(1, 'https://vidhidepro.com/v/ctymcjwnsyvm')" class="ep-btn bg-[#ff5500] text-white border border-[#ff5500] py-2.5 rounded-lg text-xs font-bold shadow-md transition" data-ep="1">1</button>
-                    <button onclick="playEpisode(2, 'https://vidhidepro.com/v/hlt9fthmy03k')" class="ep-btn bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition" data-ep="2">2</button>
-                    <button onclick="playEpisode(3, 'https://vidhidepro.com/v/8nd3o2ub9mge')" class="ep-btn bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition" data-ep="3">3</button>
-                    <button onclick="playEpisode(4, 'https://vidhidepro.com/v/llo8cbz3vi83')" class="ep-btn bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition" data-ep="4">4</button>
-                    <button onclick="playEpisode(5, 'https://vidhidepro.com/v/b5rkepvh66q8')" class="ep-btn bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition" data-ep="5">5</button>
-                    <button onclick="playEpisode(6, 'https://vidhidepro.com/v/1g2gg0xu3j57')" class="ep-btn bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition" data-ep="6">6</button>
-                    <button onclick="playEpisode(7, 'https://vidhidepro.com/v/63umkeakk4ql')" class="ep-btn bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition" data-ep="7">7</button>
-                    <button onclick="playEpisode(8, 'https://vidhidepro.com/v/rbzdmu1tnby2')" class="ep-btn bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition" data-ep="8">8</button>
-                    <button onclick="playEpisode(9, 'https://vidhidepro.com/v/ot0emcyiq2di')" class="ep-btn bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition" data-ep="9">9</button>
-                    <button onclick="playEpisode(10, 'https://vidhidepro.com/v/jz0lettaf3od')" class="ep-btn bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition" data-ep="10">10</button>
-                    <button onclick="playEpisode(11, 'https://vidhidepro.com/v/3845ic0opjl8')" class="ep-btn bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition" data-ep="11">11</button>
-                    <button onclick="playEpisode(12, 'https://vidhidepro.com/v/a1gfhtn6e9y1')" class="ep-btn bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition" data-ep="12">12</button>
+                    <button onclick="selectEpisode(1)" class="ep-btn bg-[#ff5500] text-white border border-[#ff5500] py-2.5 rounded-lg text-xs font-bold shadow-md transition" data-ep="1">1</button>
+                    <button onclick="selectEpisode(2)" class="ep-btn bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition" data-ep="2">2</button>
+                    <button onclick="selectEpisode(3)" class="ep-btn bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition" data-ep="3">3</button>
+                    <button onclick="selectEpisode(4)" class="ep-btn bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition" data-ep="4">4</button>
+                    <button onclick="selectEpisode(5)" class="ep-btn bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition" data-ep="5">5</button>
+                    <button onclick="selectEpisode(6)" class="ep-btn bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition" data-ep="6">6</button>
+                    <button onclick="selectEpisode(7)" class="ep-btn bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition" data-ep="7">7</button>
+                    <button onclick="selectEpisode(8)" class="ep-btn bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition" data-ep="8">8</button>
+                    <button onclick="selectEpisode(9)" class="ep-btn bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition" data-ep="9">9</button>
+                    <button onclick="selectEpisode(10)" class="ep-btn bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition" data-ep="10">10</button>
+                    <button onclick="selectEpisode(11)" class="ep-btn bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition" data-ep="11">11</button>
+                    <button onclick="selectEpisode(12)" class="ep-btn bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition" data-ep="12">12</button>
                 </div>
             </div>
         </div>
@@ -229,9 +236,8 @@
     <!-- External JS -->
     <script src="script.js"></script>
 
-    <!-- Player Script & Search Redirection -->
+    <!-- Player & Navigation Script -->
     <script>
-        // Episode Mapping Data
         const episodesData = {
             1: 'https://vidhidepro.com/v/ctymcjwnsyvm',
             2: 'https://vidhidepro.com/v/hlt9fthmy03k',
@@ -248,14 +254,33 @@
         };
 
         let currentEpisode = 1;
+        let isPlayerLoaded = false;
 
-        function playEpisode(epNum, embedUrl) {
+        function loadAndPlayVideo() {
+            const poster = document.getElementById('playerPoster');
+            const iframe = document.getElementById('animeVideoPlayer');
+            
+            if (poster) poster.style.display = 'none';
+            if (iframe) {
+                iframe.src = episodesData[currentEpisode];
+            }
+            isPlayerLoaded = true;
+        }
+
+        function selectEpisode(epNum) {
             currentEpisode = epNum;
             const iframe = document.getElementById('animeVideoPlayer');
             const titleText = document.getElementById('currentPlayingText');
-            
-            if (iframe) iframe.src = embedUrl;
+            const poster = document.getElementById('playerPoster');
+
             if (titleText) titleText.innerText = "Episode " + epNum;
+
+            // If poster is active, hide it and load video directly upon episode change
+            if (poster) poster.style.display = 'none';
+            if (iframe) {
+                iframe.src = episodesData[epNum];
+            }
+            isPlayerLoaded = true;
 
             // Update active states on buttons
             const buttons = document.querySelectorAll('.ep-btn');
@@ -273,16 +298,16 @@
                 if (currentEpisode < 12) {
                     currentEpisode++;
                 } else {
-                    currentEpisode = 1; // Loop back to 1 if at end
+                    currentEpisode = 1; // Loop back to 1
                 }
             } else if (direction === 'prev') {
                 if (currentEpisode > 1) {
                     currentEpisode--;
                 } else {
-                    currentEpisode = 12; // Loop to 12 if at start
+                    currentEpisode = 12; // Loop to 12
                 }
             }
-            playEpisode(currentEpisode, episodesData[currentEpisode]);
+            selectEpisode(currentEpisode);
         }
 
         // Search Button Redirect Script
@@ -296,4 +321,5 @@
         });
     </script>
 </body>
-</html>
+            </html>
+            
