@@ -78,7 +78,7 @@
     <!-- Main Wrapper Content -->
     <main class="max-w-7xl mx-auto px-4 py-6 space-y-6">
 
-        <!-- Anime Details Header Section (Classroom of the Elite Style) -->
+        <!-- Anime Details Header Section -->
         <div class="bg-[#151522] border border-gray-800 rounded-2xl p-4 md:p-6 flex flex-col md:flex-row gap-6 items-start shadow-xl">
             <!-- Portrait Poster Image -->
             <div class="w-full md:w-48 flex-shrink-0 aspect-[3/4] rounded-xl overflow-hidden border border-gray-700 shadow-lg relative mx-auto md:mx-0">
@@ -135,30 +135,27 @@
             <!-- Video Player + Navigation -->
             <div class="lg:col-span-2 space-y-4">
                 <div class="relative bg-black rounded-2xl overflow-hidden shadow-2xl border border-gray-800">
-                    <div class="relative aspect-video w-full bg-cover bg-center" style="background-image: url('https://lh3.googleusercontent.com/d/1hZPMLLUNMOVG8DmSd1eGd5Nmdgh6AUYZ');">
-                        <div class="absolute inset-0 bg-black/40 flex items-center justify-center">
-                            <button class="w-14 h-14 md:w-16 md:h-16 bg-[#ff5500] rounded-full flex items-center justify-center text-white text-lg shadow-xl hover:scale-105 transition">
-                                <i class="fa-solid fa-play ml-1"></i>
-                            </button>
-                        </div>
+                    <div class="relative aspect-video w-full bg-black">
+                        <!-- Iframe Player displaying active episode link -->
+                        <iframe id="animeVideoPlayer" src="https://vidhidepro.com/v/ctymcjwnsyvm" class="w-full h-full border-0 absolute inset-0" allowfullscreen scrolling="no"></iframe>
                     </div>
                 </div>
 
-                <!-- Next/Prev Episode Bar -->
+                <!-- Next/Prev Episode Bar & Current Playing Title -->
                 <div class="flex items-center justify-between bg-[#151522] px-4 py-3 rounded-xl border border-gray-800 text-xs md:text-sm">
-                    <button class="flex items-center space-x-1.5 font-semibold text-gray-300 hover:text-white transition">
+                    <button onclick="changeEpisode('prev')" class="flex items-center space-x-1.5 font-semibold text-gray-300 hover:text-white transition">
                         <i class="fa-solid fa-chevron-left text-[10px]"></i>
                         <span>Prev Episode</span>
                     </button>
-                    <span class="font-bold text-gray-200">Episode 12</span>
-                    <button class="flex items-center space-x-1.5 font-semibold text-gray-300 hover:text-white transition">
+                    <span id="currentPlayingText" class="font-bold text-gray-200">Episode 1</span>
+                    <button onclick="changeEpisode('next')" class="flex items-center space-x-1.5 font-semibold text-gray-300 hover:text-white transition">
                         <span>Next Episode</span>
                         <i class="fa-solid fa-chevron-right text-[10px]"></i>
                     </button>
                 </div>
             </div>
 
-            <!-- Episode List Sidebar -->
+            <!-- Episode List Sidebar with Season Selector -->
             <div class="bg-[#151522] p-4 rounded-2xl border border-gray-800 space-y-4">
                 <div class="flex items-center justify-between mb-2">
                     <div class="flex items-center space-x-2">
@@ -167,20 +164,26 @@
                     </div>
                 </div>
 
-                <!-- Episodes Grid -->
-                <div class="grid grid-cols-3 gap-2 overflow-y-auto max-h-[290px] pr-1">
-                    <button class="bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition">1</button>
-                    <button class="bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition">2</button>
-                    <button class="bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition">3</button>
-                    <button class="bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition">4</button>
-                    <button class="bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition">5</button>
-                    <button class="bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition">6</button>
-                    <button class="bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition">7</button>
-                    <button class="bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition">8</button>
-                    <button class="bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition">9</button>
-                    <button class="bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition">10</button>
-                    <button class="bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition">11</button>
-                    <button class="bg-[#ff5500] text-white border border-[#ff5500] py-2.5 rounded-lg text-xs font-bold shadow-md shadow-[#ff5500]/30">12</button>
+                <!-- Season Selection Buttons -->
+                <div class="flex items-center space-x-2 pb-2 border-b border-gray-800">
+                    <button class="bg-[#ff5500] text-white px-3 py-1.5 rounded-lg text-xs font-bold transition shadow-md shadow-[#ff5500]/20">Season 1</button>
+                    <button onclick="alert('Season 2 coming soon!')" class="bg-[#1a1a2b] hover:bg-gray-800 text-gray-300 border border-gray-700 px-3 py-1.5 rounded-lg text-xs font-semibold transition">Season 2</button>
+                </div>
+
+                <!-- Episodes Grid (1 to 12) -->
+                <div class="grid grid-cols-3 gap-2 overflow-y-auto max-h-[250px] pr-1" id="episodeGridButtons">
+                    <button onclick="playEpisode(1, 'https://vidhidepro.com/v/ctymcjwnsyvm')" class="ep-btn bg-[#ff5500] text-white border border-[#ff5500] py-2.5 rounded-lg text-xs font-bold shadow-md transition" data-ep="1">1</button>
+                    <button onclick="playEpisode(2, 'https://vidhidepro.com/v/hlt9fthmy03k')" class="ep-btn bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition" data-ep="2">2</button>
+                    <button onclick="playEpisode(3, 'https://vidhidepro.com/v/8nd3o2ub9mge')" class="ep-btn bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition" data-ep="3">3</button>
+                    <button onclick="playEpisode(4, 'https://vidhidepro.com/v/llo8cbz3vi83')" class="ep-btn bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition" data-ep="4">4</button>
+                    <button onclick="playEpisode(5, 'https://vidhidepro.com/v/b5rkepvh66q8')" class="ep-btn bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition" data-ep="5">5</button>
+                    <button onclick="playEpisode(6, 'https://vidhidepro.com/v/1g2gg0xu3j57')" class="ep-btn bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition" data-ep="6">6</button>
+                    <button onclick="playEpisode(7, 'https://vidhidepro.com/v/63umkeakk4ql')" class="ep-btn bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition" data-ep="7">7</button>
+                    <button onclick="playEpisode(8, 'https://vidhidepro.com/v/rbzdmu1tnby2')" class="ep-btn bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition" data-ep="8">8</button>
+                    <button onclick="playEpisode(9, 'https://vidhidepro.com/v/ot0emcyiq2di')" class="ep-btn bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition" data-ep="9">9</button>
+                    <button onclick="playEpisode(10, 'https://vidhidepro.com/v/jz0lettaf3od')" class="ep-btn bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition" data-ep="10">10</button>
+                    <button onclick="playEpisode(11, 'https://vidhidepro.com/v/3845ic0opjl8')" class="ep-btn bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition" data-ep="11">11</button>
+                    <button onclick="playEpisode(12, 'https://vidhidepro.com/v/a1gfhtn6e9y1')" class="ep-btn bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition" data-ep="12">12</button>
                 </div>
             </div>
         </div>
@@ -226,8 +229,63 @@
     <!-- External JS -->
     <script src="script.js"></script>
 
-    <!-- Search Button Redirect Script -->
+    <!-- Player Script & Search Redirection -->
     <script>
+        // Episode Mapping Data
+        const episodesData = {
+            1: 'https://vidhidepro.com/v/ctymcjwnsyvm',
+            2: 'https://vidhidepro.com/v/hlt9fthmy03k',
+            3: 'https://vidhidepro.com/v/8nd3o2ub9mge',
+            4: 'https://vidhidepro.com/v/llo8cbz3vi83',
+            5: 'https://vidhidepro.com/v/b5rkepvh66q8',
+            6: 'https://vidhidepro.com/v/1g2gg0xu3j57',
+            7: 'https://vidhidepro.com/v/63umkeakk4ql',
+            8: 'https://vidhidepro.com/v/rbzdmu1tnby2',
+            9: 'https://vidhidepro.com/v/ot0emcyiq2di',
+            10: 'https://vidhidepro.com/v/jz0lettaf3od',
+            11: 'https://vidhidepro.com/v/3845ic0opjl8',
+            12: 'https://vidhidepro.com/v/a1gfhtn6e9y1'
+        };
+
+        let currentEpisode = 1;
+
+        function playEpisode(epNum, embedUrl) {
+            currentEpisode = epNum;
+            const iframe = document.getElementById('animeVideoPlayer');
+            const titleText = document.getElementById('currentPlayingText');
+            
+            if (iframe) iframe.src = embedUrl;
+            if (titleText) titleText.innerText = "Episode " + epNum;
+
+            // Update active states on buttons
+            const buttons = document.querySelectorAll('.ep-btn');
+            buttons.forEach(btn => {
+                if (parseInt(btn.getAttribute('data-ep')) === epNum) {
+                    btn.className = "ep-btn bg-[#ff5500] text-white border border-[#ff5500] py-2.5 rounded-lg text-xs font-bold shadow-md transition";
+                } else {
+                    btn.className = "ep-btn bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition";
+                }
+            });
+        }
+
+        function changeEpisode(direction) {
+            if (direction === 'next') {
+                if (currentEpisode < 12) {
+                    currentEpisode++;
+                } else {
+                    currentEpisode = 1; // Loop back to 1 if at end
+                }
+            } else if (direction === 'prev') {
+                if (currentEpisode > 1) {
+                    currentEpisode--;
+                } else {
+                    currentEpisode = 12; // Loop to 12 if at start
+                }
+            }
+            playEpisode(currentEpisode, episodesData[currentEpisode]);
+        }
+
+        // Search Button Redirect Script
         document.addEventListener('DOMContentLoaded', function() {
             const searchBtn = document.getElementById('globalSearchBtn');
             if (searchBtn) {
