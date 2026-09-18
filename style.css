@@ -101,7 +101,7 @@ a {
     color: #ff5500;
 }
 
-/* Search Box & Dropdown */
+/* Search Box */
 .search-box {
     position: relative;
     display: flex;
@@ -134,43 +134,60 @@ a {
     font-size: 14px;
 }
 
-/* --- LIVE SEARCH DROPDOWN STYLES --- */
+/* --- IMPROVED LIVE SEARCH DROPDOWN STYLES --- */
 .search-dropdown {
     position: absolute;
-    top: 100%;
-    left: 0;
+    top: calc(100% + 10px);
     right: 0;
-    background: #1a1528;
-    border: 1px solid #332b4d;
-    border-radius: 8px;
-    margin-top: 5px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-    z-index: 1000;
-    max-height: 300px;
+    left: auto;
+    width: 270px;
+    background: #14141f;
+    border: 1px solid rgba(255, 85, 0, 0.35);
+    border-radius: 12px;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.85);
+    z-index: 9999;
+    max-height: 320px;
     overflow-y: auto;
+    backdrop-filter: blur(12px);
+}
+
+.search-dropdown::-webkit-scrollbar {
+    width: 5px;
+}
+
+.search-dropdown::-webkit-scrollbar-thumb {
+    background: #2a2245;
+    border-radius: 3px;
 }
 
 .search-item {
-    padding: 10px 15px;
+    padding: 11px 14px;
     display: flex;
     align-items: center;
     gap: 10px;
     color: #fff;
     cursor: pointer;
-    border-bottom: 1px solid #261f3d;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     font-size: 13px;
+    transition: background 0.2s ease;
+}
+
+.search-item:last-child {
+    border-bottom: none;
 }
 
 .search-item:hover {
-    background: #2a2245;
+    background: rgba(255, 85, 0, 0.18);
 }
 
 .search-badge-movie, .search-badge-series {
     font-size: 9px;
-    padding: 2px 6px;
+    padding: 3px 6px;
     border-radius: 4px;
-    font-weight: bold;
+    font-weight: 700;
     text-transform: uppercase;
+    letter-spacing: 0.5px;
+    flex-shrink: 0;
 }
 
 .search-badge-movie { 
@@ -183,15 +200,22 @@ a {
     color: #fff; 
 }
 
+.search-item span:not([class*="badge"]) {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 .more-results-item, .no-match-item {
     justify-content: center;
-    color: #aaa;
+    color: #999;
     font-size: 12px;
     cursor: default;
+    background: #0e0e16;
 }
 
 .more-results-item:hover, .no-match-item:hover {
-    background: transparent;
+    background: #0e0e16;
 }
 
 /* --- SIDEBAR DRAWER (STRICTLY HIDDEN BY DEFAULT) --- */
@@ -567,4 +591,4 @@ footer {
         grid-template-columns: repeat(2, 1fr);
         gap: 12px;
     }
-    }
+}
