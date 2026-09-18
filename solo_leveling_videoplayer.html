@@ -3,25 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>7Anime Video Player UI</title>
+    <title>Solo Leveling - 7ANIME Video Player</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css"> <!-- Agar aapki koi apni custom CSS file ho -->
+    <link rel="stylesheet" href="style.css">
 </head>
 <body class="bg-[#0b0f19] text-white font-sans antialiased selection:bg-purple-600 selection:text-white">
 
     <!-- Top Navigation Bar -->
-    <header class="bg-[#0b0f19]/95 backdrop-blur-md border-b border-gray-800 sticky top-0 z-50 px-3 md:px-8 py-3 space-y-3 md:space-y-0">
+    <header class="bg-[#0b0f19]/95 backdrop-blur-md border-b border-gray-800 sticky top-0 z-50 px-4 md:px-8 py-3">
         <div class="flex items-center justify-between">
             <div class="flex items-center space-x-3 md:space-x-6">
                 <button class="text-lg md:text-xl text-gray-300 hover:text-white"><i class="fa-solid fa-bars"></i></button>
-                <div class="flex items-center space-x-1.5">
+                <div class="flex items-center space-x-1.5 cursor-pointer" onclick="window.location.href='index.html'">
                     <span class="text-lg md:text-xl font-black tracking-wider bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">7ANIME</span>
                     <i class="fa-solid fa-fire text-orange-500 text-xs md:text-sm"></i>
                 </div>
                 <nav class="hidden md:flex items-center space-x-6 text-sm font-medium text-gray-400">
-                    <a href="#" class="flex items-center space-x-2 text-white bg-purple-600/20 px-3 py-1.5 rounded-full border border-purple-500/30"><i class="fa-solid fa-house text-purple-400"></i><span>Home</span></a>
+                    <a href="index.html" class="flex items-center space-x-2 text-white bg-purple-600/20 px-3 py-1.5 rounded-full border border-purple-500/30"><i class="fa-solid fa-house text-purple-400"></i><span>Home</span></a>
                     <a href="#" class="hover:text-white flex items-center space-x-1.5"><i class="fa-solid fa-compass"></i><span>Explore</span></a>
                     <a href="#" class="hover:text-white flex items-center space-x-1.5"><i class="fa-solid fa-film"></i><span>Genres</span></a>
                     <a href="#" class="hover:text-white flex items-center space-x-1.5"><i class="fa-solid fa-video"></i><span>Movies</span></a>
@@ -31,13 +31,12 @@
             
             <div class="flex items-center space-x-3">
                 <!-- Desktop Search Bar -->
-                <div class="hidden md:block relative w-48 lg:w-64">
+                <div class="hidden md:block relative w-48 lg:w-64 search-box">
                     <div class="flex items-center bg-[#131826] border border-gray-700 rounded-full px-4 py-1.5 text-sm">
                         <input type="text" id="globalSearchInput" placeholder="Search anime..." class="bg-transparent border-none outline-none text-xs w-full text-gray-200 placeholder-gray-500">
                         <i class="fa-solid fa-magnifying-glass text-gray-400 text-xs"></i>
                     </div>
-                    <!-- Dropdown Results Container -->
-                    <div id="searchResultsDropdown" class="search-dropdown"></div>
+                    <div id="searchResultsDropdown" class="search-dropdown" style="display: none;"></div>
                 </div>
                 
                 <div class="relative">
@@ -52,18 +51,17 @@
         </div>
 
         <!-- Mobile Search Bar -->
-        <div class="block md:hidden relative w-full">
+        <div class="block md:hidden relative w-full mt-3 search-box">
             <div class="flex items-center bg-[#131826] border border-gray-700 rounded-xl px-3.5 py-2 text-sm w-full">
                 <i class="fa-solid fa-magnifying-glass text-gray-400 text-xs mr-2"></i>
                 <input type="text" id="mobileSearchInput" placeholder="Search anime..." class="bg-transparent border-none outline-none text-xs w-full text-gray-200 placeholder-gray-500">
             </div>
-            <!-- Mobile Dropdown Results Container -->
-            <div id="mobileSearchDropdown" class="search-dropdown"></div>
+            <div id="mobileSearchDropdown" class="search-dropdown" style="display: none;"></div>
         </div>
     </header>
 
     <!-- Main Wrapper -->
-    <main class="max-w-7xl mx-auto px-3 md:px-8 py-4 md:py-6 space-y-6 md:space-y-8">
+    <main class="max-w-7xl mx-auto px-3 md:px-8 py-4 md:py-6 space-y-6">
 
         <!-- Breadcrumb -->
         <div class="text-[11px] md:text-xs text-gray-400 flex items-center space-x-2">
@@ -75,7 +73,7 @@
 
         <!-- Hero Banner Section -->
         <div class="relative rounded-2xl md:rounded-3xl overflow-hidden bg-[#131826] border border-gray-800 shadow-2xl">
-            <div class="absolute inset-0 bg-cover bg-center opacity-40 mix-blend-overlay" style="background-image: url('1000029183_2.png');"></div>
+            <div class="absolute inset-0 bg-cover bg-center opacity-40 mix-blend-overlay" style="background-image: url('https://lh3.googleusercontent.com/d/1hZPMLLUNMOVG8DmSd1eGd5Nmdgh6AUYZ');"></div>
             <div class="absolute inset-0 bg-gradient-to-r from-[#0b0f19] via-[#0b0f19]/80 to-transparent"></div>
             
             <div class="relative p-5 md:p-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
@@ -123,7 +121,7 @@
             <!-- Video Player + Navigation -->
             <div class="lg:col-span-2 space-y-4">
                 <div class="relative bg-black rounded-2xl overflow-hidden shadow-2xl border border-gray-800 group">
-                    <div class="relative aspect-video w-full bg-cover bg-center" style="background-image: url('1000029183_2.png');">
+                    <div class="relative aspect-video w-full bg-cover bg-center" style="background-image: url('https://lh3.googleusercontent.com/d/1hZPMLLUNMOVG8DmSd1eGd5Nmdgh6AUYZ');">
                         <div class="absolute inset-0 bg-black/30 flex items-center justify-center">
                             <button class="w-14 h-14 md:w-16 md:h-16 bg-purple-600 rounded-full flex items-center justify-center text-white text-lg md:text-xl shadow-xl hover:bg-purple-500 transition">
                                 <i class="fa-solid fa-play ml-1"></i>
@@ -185,6 +183,7 @@
                         <div class="flex items-center space-x-2">
                             <select class="bg-[#1a2235] text-xs border border-gray-700 rounded-lg px-2.5 py-1.5 outline-none text-gray-300 font-medium">
                                 <option>Season 1</option>
+                                <option>Season 2</option>
                             </select>
                             <button class="bg-[#1a2235] p-1.5 rounded-lg border border-gray-700 text-gray-300 text-xs"><i class="fa-solid fa-table-cells"></i></button>
                         </div>
@@ -221,7 +220,7 @@
             </div>
         </div>
 
-        <!-- More Like This Section (Compatible with script.js selectors) -->
+        <!-- More Like This Section -->
         <div class="space-y-4 pt-2">
             <div class="flex items-center justify-between">
                 <h2 class="text-lg md:text-xl font-bold">More Like This</h2>
@@ -230,7 +229,7 @@
             <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
                 
                 <!-- Card 1 -->
-                <div class="anime-card bg-[#131826] rounded-xl overflow-hidden border border-gray-800 group cursor-pointer" onclick="openAnimePage('One Piece')">
+                <div class="anime-card bg-[#131826] rounded-xl overflow-hidden border border-gray-800 group cursor-pointer" onclick="window.location.href='one_piece_videoplayer.html'">
                     <div class="relative aspect-[16/10] overflow-hidden">
                         <img src="https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=400&q=80" alt="One Piece" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
                         <span class="absolute top-2 right-2 bg-black/60 backdrop-blur text-amber-400 text-[10px] font-bold px-1.5 py-0.5 rounded flex items-center space-x-1">
@@ -244,6 +243,6 @@
                 </div>
 
                 <!-- Card 2 -->
-                <div class="anime-card bg-[#131826] rounded-xl overflow-hidden border border-gray-800 group cursor-pointer" onclick="openAnimePage('Demon Slayer')">
+                <div class="anime-card bg-[#131826] rounded-xl overflow-hidden border border-gray-800 group cursor-pointer" onclick="window.location.href='demon_slayer_videoplayer.html'">
                     <div class="relative aspect-[16/10] overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?auto=format&fit=crop&w=400&q=80" alt="Demon Slayer" class="w-full h
+                        <img sr
