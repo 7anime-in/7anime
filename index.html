@@ -12,10 +12,10 @@
 <body>
 
     <!-- Header / Navbar -->
-    <header>
+    <header class="main-header">
         <div class="header-left">
             <!-- 3 Line Hamburger Menu Icon -->
-            <button class="hamburger-btn" id="menuBtn" onclick="toggleSidebar()">
+            <button class="hamburger-btn" id="menuBtn" onclick="toggleSidebar()" aria-label="Toggle Menu">
                 <i class="fa-solid fa-bars"></i>
             </button>
             
@@ -25,7 +25,7 @@
             </div>
         </div>
 
-        <nav>
+        <nav class="desktop-nav">
             <ul>
                 <li><a href="index.html" class="active"><i class="fa-solid fa-house"></i> Home</a></li>
                 <li><a href="#"><i class="fa-solid fa-compass"></i> Explore</a></li>
@@ -33,31 +33,32 @@
                 <li><a href="#"><i class="fa-solid fa-tv"></i> TV Series</a></li>
             </ul>
         </nav>
+
         <div class="search-box">
             <input type="text" id="searchInput" placeholder="Search anime...">
             <i class="fa-solid fa-magnifying-glass" onclick="executeSearch()"></i>
         </div>
     </header>
 
-    <!-- Slide-out Sidebar Drawer -->
+    <!-- Slide-out Sidebar Drawer (Hidden by default) -->
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
-    <div class="sidebar" id="sidebar">
+    <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <h3>Menu</h3>
+            <h3><i class="fa-solid fa-fire" style="color: #ff5500;"></i> Menu</h3>
             <span class="close-btn" onclick="toggleSidebar()">&times;</span>
         </div>
         <ul class="sidebar-links">
             <li><a href="index.html"><i class="fa-solid fa-house"></i> HOME</a></li>
-            <li><a href="javascript:void(0)" onclick="openAgeModal()"><i class="fa-solid fa-fire"></i> HENTAI</a></li>
+            <li><a href="javascript:void(0)" onclick="openAgeModal()"><i class="fa-solid fa-triangle-exclamation"></i> HENTAI (18+)</a></li>
             <li>
                 <a href="https://www.instagram.com/7anime_offical?stkn=c3c0aTNjaW9nZWJ3" target="_blank" rel="noopener noreferrer">
                     <i class="fa-solid fa-headset"></i> WEBSITE SUPPORT TEAM CONTACT
                 </a>
             </li>
         </ul>
-    </div>
+    </aside>
 
-    <!-- 18+ Age Limit Verification Modal -->
+    <!-- 18+ Age Limit Verification Modal (Hidden by default) -->
     <div class="modal-overlay" id="ageModal">
         <div class="modal-box">
             <i class="fa-solid fa-triangle-exclamation modal-icon"></i>
@@ -164,15 +165,15 @@
                 </div>
             </div>
 
-            <!-- Hentai Card Example 1 -->
-            <div class="anime-card hentai-card" data-tags="Hentai, Romance, 18+" onclick="window.location.href='Hell_mode_videoplayer.html'">
+            <!-- Hell Mode (Hentai Tagged Card) -->
+            <div class="anime-card hentai-card" data-tags="Hentai, Fantasy, Isekai" onclick="window.location.href='Hell_mode_videoplayer.html'">
                 <div class="card-img-container">
                     <img src="https://t.me/sevenanimehaintai/4" alt="Hell Mode" loading="lazy">
                     <span class="rating-badge"><i class="fa-solid fa-star"></i> 8.8</span>
                 </div>
                 <div class="card-info">
                     <div class="card-title">Hell Mode: Hentai Special</div>
-                    <div class="card-tags">Hentai, Fantasy, 18+</div>
+                    <div class="card-tags">Hentai, Fantasy, Isekai</div>
                 </div>
             </div>
 
@@ -182,14 +183,16 @@
 
     <!-- Footer -->
     <footer>
-        <div class="logo fire-logo"><span>7</span>ANIME 🔥</div>
+        <div class="logo fire-logo" onclick="window.location.href='index.html'">
+            <span class="fire-seven">7</span><span class="fire-text">ANIME 🔥</span>
+        </div>
         <div class="footer-links">
             <a href="index.html">Home</a>
             <a href="#">Explore</a>
             <a href="#">Terms & Conditions</a>
-            <a href="https://www.instagram.com/7anime_offical?stkn=c3c0aTNjaW9nZWJ3" target="_blank">Contact</a>
+            <a href="https://www.instagram.com/7anime_offical?stkn=c3c0aTNjaW9nZWJ3" target="_blank">Contact Support</a>
         </div>
-        <p style="color: #666; font-size: 12px;">© 7Anime. All rights reserved.</p>
+        <p style="color: #666; font-size: 12px; margin-top: 10px;">© 7Anime. All rights reserved.</p>
     </footer>
 
     <!-- External JS -->
