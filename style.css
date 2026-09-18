@@ -2,7 +2,7 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 }
 
 body {
@@ -16,18 +16,18 @@ a {
     color: inherit;
 }
 
-/* --- HEADER & NAVBAR --- */
-header {
+/* --- HEADER / NAVBAR --- */
+.main-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 5%;
-    background: rgba(15, 15, 26, 0.95);
+    padding: 12px 4%;
+    background: rgba(15, 15, 26, 0.98);
     position: sticky;
     top: 0;
     z-index: 1000;
-    backdrop-filter: blur(10px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .header-left {
@@ -36,35 +36,40 @@ header {
     gap: 15px;
 }
 
-/* Hamburger Button */
+/* 3 Line Hamburger Button */
 .hamburger-btn {
     background: transparent;
     border: none;
-    color: #fff;
+    color: #ffffff;
     font-size: 22px;
     cursor: pointer;
-    transition: color 0.3s ease;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.3s ease, transform 0.2s ease;
 }
 
 .hamburger-btn:hover {
     color: #ff5500;
+    transform: scale(1.1);
 }
 
-/* --- FIRE LOGO STYLE --- */
+/* 🔥 Fire Logo Style 🔥 */
 .fire-logo {
-    font-size: 26px;
+    font-size: 22px;
     font-weight: 900;
     cursor: pointer;
     display: flex;
     align-items: center;
-    letter-spacing: 1px;
     user-select: none;
+    letter-spacing: 0.5px;
 }
 
 .fire-seven {
     color: #ff3300;
-    text-shadow: 0 0 10px #ff3300, 0 0 20px #ff0055;
-    font-size: 32px;
+    text-shadow: 0 0 10px #ff3300, 0 0 18px #ff0055;
+    font-size: 28px;
     font-style: italic;
     margin-right: 2px;
 }
@@ -73,22 +78,26 @@ header {
     background: linear-gradient(180deg, #fff700 0%, #ff5500 50%, #ff0000 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 0 8px rgba(255, 85, 0, 0.8));
+    filter: drop-shadow(0 0 6px rgba(255, 85, 0, 0.8));
     font-weight: 900;
 }
 
-nav ul {
+/* Desktop Nav Links */
+.desktop-nav ul {
     display: flex;
     list-style: none;
-    gap: 20px;
+    gap: 22px;
 }
 
-nav ul li a {
+.desktop-nav ul li a {
     font-weight: 600;
-    transition: color 0.3s;
+    font-size: 14px;
+    color: #ccc;
+    transition: color 0.3s ease;
 }
 
-nav ul li a:hover, nav ul li a.active {
+.desktop-nav ul li a:hover, 
+.desktop-nav ul li a.active {
     color: #ff5500;
 }
 
@@ -100,18 +109,19 @@ nav ul li a:hover, nav ul li a.active {
 }
 
 .search-box input {
-    background: #1f1f2e;
+    background: #1a1a2b;
     border: 1px solid #333;
-    padding: 8px 35px 8px 15px;
+    padding: 8px 38px 8px 14px;
     border-radius: 20px;
     color: #fff;
     outline: none;
-    width: 200px;
+    width: 180px;
+    font-size: 13px;
     transition: all 0.3s ease;
 }
 
 .search-box input:focus {
-    width: 240px;
+    width: 220px;
     border-color: #ff5500;
     box-shadow: 0 0 10px rgba(255, 85, 0, 0.4);
 }
@@ -119,18 +129,19 @@ nav ul li a:hover, nav ul li a.active {
 .search-box i {
     position: absolute;
     right: 12px;
-    color: #aaa;
+    color: #888;
     cursor: pointer;
+    font-size: 14px;
 }
 
-/* --- SIDEBAR DRAWER --- */
+/* --- SIDEBAR DRAWER (STRICTLY HIDDEN BY DEFAULT) --- */
 .sidebar-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.7);
+    background: rgba(0, 0, 0, 0.75);
     z-index: 2000;
     display: none;
     backdrop-filter: blur(4px);
@@ -139,23 +150,23 @@ nav ul li a:hover, nav ul li a.active {
 .sidebar {
     position: fixed;
     top: 0;
-    left: -280px;
+    left: -300px;
     width: 280px;
     height: 100%;
-    background: #12131c;
+    background: #12131f;
     z-index: 2001;
     transition: left 0.3s ease;
-    box-shadow: 5px 0 15px rgba(0, 0, 0, 0.5);
+    box-shadow: 5px 0 20px rgba(0, 0, 0, 0.7);
     display: flex;
     flex-direction: column;
 }
 
 .sidebar.active {
-    left: 0;
+    left: 0 !important;
 }
 
 .sidebar-overlay.active {
-    display: block;
+    display: block !important;
 }
 
 .sidebar-header {
@@ -167,42 +178,48 @@ nav ul li a:hover, nav ul li a.active {
 }
 
 .sidebar-header h3 {
-    color: #ff5500;
+    color: #fff;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .close-btn {
     font-size: 28px;
     cursor: pointer;
     color: #aaa;
+    line-height: 1;
 }
 
 .close-btn:hover {
-    color: #fff;
+    color: #ff5500;
 }
 
 .sidebar-links {
     list-style: none;
-    padding: 20px 0;
+    padding: 15px 0;
 }
 
 .sidebar-links li a {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 15px 20px;
+    gap: 14px;
+    padding: 14px 20px;
     font-weight: 600;
+    font-size: 13px;
     color: #ddd;
     transition: all 0.2s ease;
     border-left: 3px solid transparent;
 }
 
 .sidebar-links li a:hover {
-    background: rgba(255, 85, 0, 0.1);
+    background: rgba(255, 85, 0, 0.12);
     color: #ff5500;
     border-left-color: #ff5500;
 }
 
-/* --- AGE VERIFICATION MODAL --- */
+/* --- 18+ MODAL (STRICTLY HIDDEN BY DEFAULT) --- */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -211,43 +228,44 @@ nav ul li a:hover, nav ul li a.active {
     height: 100%;
     background: rgba(0, 0, 0, 0.85);
     z-index: 3000;
-    display: none;
+    display: none; /* Hidden on load */
     align-items: center;
     justify-content: center;
     backdrop-filter: blur(8px);
 }
 
 .modal-overlay.active {
-    display: flex;
+    display: flex !important;
 }
 
 .modal-box {
-    background: #181926;
+    background: #181928;
     border: 1px solid #ff0055;
-    padding: 30px;
-    border-radius: 12px;
-    max-width: 400px;
+    padding: 28px 24px;
+    border-radius: 14px;
+    max-width: 380px;
     width: 90%;
     text-align: center;
-    box-shadow: 0 0 20px rgba(255, 0, 85, 0.4);
+    box-shadow: 0 0 25px rgba(255, 0, 85, 0.35);
 }
 
 .modal-icon {
-    font-size: 45px;
+    font-size: 42px;
     color: #ff0055;
-    margin-bottom: 15px;
+    margin-bottom: 12px;
 }
 
 .modal-box h2 {
     margin-bottom: 10px;
-    font-size: 22px;
+    font-size: 20px;
+    color: #fff;
 }
 
 .modal-box p {
     color: #ccc;
-    font-size: 14px;
-    margin-bottom: 25px;
-    line-height: 1.4;
+    font-size: 13px;
+    margin-bottom: 22px;
+    line-height: 1.5;
 }
 
 .modal-buttons {
@@ -259,9 +277,9 @@ nav ul li a:hover, nav ul li a.active {
 /* --- HERO BANNER --- */
 .hero {
     position: relative;
-    height: 50vh;
-    min-height: 320px;
-    max-height: 450px;
+    height: 48vh;
+    min-height: 300px;
+    max-height: 420px;
     background: linear-gradient(to right, rgba(11, 12, 16, 0.95) 35%, rgba(11, 12, 16, 0.3)), 
                 url('https://lh3.googleusercontent.com/d/1DrYU7Rcf8h1JHkkakd6ks9MAiFYsnj4V') top center / cover no-repeat;
     display: flex;
@@ -270,7 +288,7 @@ nav ul li a:hover, nav ul li a.active {
 }
 
 .hero-content {
-    max-width: 500px;
+    max-width: 480px;
     z-index: 2;
 }
 
@@ -285,7 +303,7 @@ nav ul li a:hover, nav ul li a.active {
 }
 
 .hero-title {
-    font-size: 36px;
+    font-size: 34px;
     font-weight: 800;
     margin-bottom: 8px;
     line-height: 1.1;
@@ -293,13 +311,13 @@ nav ul li a:hover, nav ul li a.active {
 
 .hero-meta {
     color: #aaa;
-    font-size: 13px;
-    margin-bottom: 12px;
+    font-size: 12px;
+    margin-bottom: 10px;
 }
 
 .hero-desc {
     color: #ccc;
-    margin-bottom: 18px;
+    margin-bottom: 16px;
     font-size: 13px;
     line-height: 1.4;
     display: -webkit-box;
@@ -314,7 +332,7 @@ nav ul li a:hover, nav ul li a.active {
 }
 
 .btn {
-    padding: 10px 20px;
+    padding: 10px 18px;
     border-radius: 20px;
     font-weight: bold;
     cursor: pointer;
@@ -322,7 +340,7 @@ nav ul li a:hover, nav ul li a.active {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    font-size: 13px;
+    font-size: 12px;
     transition: all 0.2s ease-in-out;
 }
 
@@ -343,15 +361,15 @@ nav ul li a:hover, nav ul li a.active {
 
 /* --- MAIN ANIME GRID --- */
 .container {
-    padding: 25px 5%;
+    padding: 25px 4%;
 }
 
 .section-title {
-    font-size: 20px;
+    font-size: 18px;
     display: flex;
     align-items: center;
     gap: 10px;
-    margin-bottom: 20px;
+    margin-bottom: 18px;
 }
 
 .section-title i {
@@ -413,7 +431,7 @@ nav ul li a:hover, nav ul li a.active {
 }
 
 .card-title {
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 700;
     margin-bottom: 4px;
     white-space: nowrap;
@@ -440,7 +458,7 @@ nav ul li a:hover, nav ul li a.active {
 /* --- FOOTER --- */
 footer {
     background: #07070a;
-    padding: 25px 5%;
+    padding: 25px 4%;
     text-align: center;
     border-top: 1px solid rgba(255, 255, 255, 0.05);
     margin-top: 40px;
@@ -452,41 +470,37 @@ footer {
     flex-wrap: wrap;
     gap: 18px;
     margin: 12px 0;
-    font-size: 13px;
+    font-size: 12px;
     color: #aaa;
 }
 
-/* --- MOBILE LAYOUT FIXES --- */
+/* --- MOBILE RESPONSIVE DESIGN --- */
 @media (max-width: 768px) {
-    header {
+    .main-header {
         padding: 10px 4%;
     }
 
-    nav {
-        display: none; /* Hide main nav on mobile, use sidebar */
-    }
-
-    .fire-logo {
-        font-size: 20px;
+    .desktop-nav {
+        display: none; /* Mobile par desktop navbar hide rahega */
     }
 
     .search-box input {
-        width: 140px;
+        width: 130px;
+        font-size: 12px;
     }
 
     .search-box input:focus {
-        width: 170px;
+        width: 160px;
     }
 
     .hero {
         height: auto;
-        min-height: 280px;
-        padding: 30px 4%;
-        background-position: center top;
+        min-height: 260px;
+        padding: 25px 4%;
     }
 
     .hero-title {
-        font-size: 26px;
+        font-size: 24px;
     }
 
     .grid-container {
