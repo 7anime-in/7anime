@@ -78,39 +78,87 @@ function loadHentaiPage() {
     }
 }
 
-// 6. Real-time Live Search Engine
-const searchInput = document.getElementById('searchInput');
-const noResults = document.getElementById('noResults');
+// 6. Universal Cross-Page Search Engine Logic
+const globalSearchInput = document.getElementById('globalSearchInput');
+const globalSearchBtn = document.getElementById('globalSearchBtn');
 
-function executeSearch() {
-    if (!searchInput) return;
-    const query = searchInput.value.trim().toLowerCase();
-    const cards = document.querySelectorAll('.anime-card');
-    let matchCount = 0;
+function performSearch() {
+    if (!globalSearchInput) return;
+    const query = globalSearchInput.value.trim().toLowerCase();
+    
+    if (query === "") return;
 
-    cards.forEach(card => {
-        const titleElement = card.querySelector('.card-title');
-        if (titleElement) {
-            const title = titleElement.innerText.toLowerCase();
-            if (title.includes(query)) {
-                card.style.display = "flex";
-                matchCount++;
-            } else {
-                card.style.display = "none";
+    // Check karein ki user index.html par hai ya kisi video player page par
+    const isMainPage = document.getElementById('animeGrid') !== null;
+
+    if (isMainPage) {
+        // Agar user main page par hai, toh wahi par cards filter kar do
+        const cards = document.querySelectorAll('.anime-card');
+        let matchCount = 0;
+
+        cards.forEach(card => {
+            const titleElement = card.querySelector('.card-title');
+            if (titleElement) {
+                const title = titleElement.innerText.toLowerCase();
+                if (title.includes(query)) {
+                    card.style.display = "flex";
+                    matchCount++;
+                } else {
+                    card.style.display = "none";
+                }
             }
-        }
-    });
+        });
 
-    if (noResults) {
-        if (matchCount === 0 && query !== "") {
-            noResults.innerText = "No anime found matching your search.";
-            noResults.style.display = "block";
-        } else {
-            noResults.style.display = "none";
+        const noResults = document.getElementById('noResults');
+        if (noResults) {
+            noResults.style.display = (matchCount === 0) ? "block" : "none";
         }
+    } else {
+        // Agar user kisi video player page par hai, toh search query ke sath main page par redirect kar do
+        window.location.href = `index.html?search=${encodeURIComponent(query)}`;
     }
 }
 
-if(searchInput) {
-    searchInput.addEventListener('input', executeSearch);
+// Event Listeners for Input (Enter key) and Magnifying Glass Click
+if (globalSearchInput) {
+    globalSearchInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            performSearch();
+        }
+    });
 }
+
+if (globalSearchBtn) {
+    globalSearchBtn.addEventListener('click', performSearch);
+}
+
+// Auto-handle search query if redirected from another page with URL parameters
+window.addEventListener('DOMContentLoaded', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const searchQuery = urlParams.get('search');
+    
+    if (searchQuery && globalSearchInput) {
+        globalSearchInput.value = searchQuery;
+        
+        const cards = document.querySelectorAll('.anime-card');
+        let matchCount = 0;
+        
+        cards.forEach(card => {
+            const titleElement = card.querySelector('.card-title');
+            if (titleElement) {
+                const title = titleElement.innerText.toLowerCase();
+                if (title.includes(searchQuery.toLowerCase())) {
+                    card.style.display = "flex";
+                    matchCount++;
+                } else {
+                    card.style.display = "none";
+                }
+            }
+        });
+
+        const noResults = document.getElementById('noResults');
+        if (noResults) {
+            noResults.style.display = (matchCount === 0) ? "block" : "none";
+        }
+    }
+});
