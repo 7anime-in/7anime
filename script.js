@@ -20,7 +20,7 @@ function toggleSidebar() {
 
 // 3. Open Age Limit Modal
 function openAgeModal() {
-    toggleSidebar(); // Pehle sidebar close karenge
+    toggleSidebar(); 
     const modal = document.getElementById('ageModal');
     if (modal) {
         modal.classList.add('active');
@@ -47,10 +47,8 @@ function loadHentaiPage() {
     const heroSection = document.getElementById('heroSection');
     const sectionTitle = document.getElementById('sectionTitle');
 
-    // Hero section hide karna
     if(heroSection) heroSection.style.display = 'none';
 
-    // Title change karna
     if(sectionTitle) {
         sectionTitle.innerHTML = '<i class="fa-solid fa-fire" style="color:#ff0055;"></i> 18+ Hentai Collection';
     }
@@ -78,87 +76,71 @@ function loadHentaiPage() {
     }
 }
 
-// 6. Universal Cross-Page Search Engine Logic
+// 6. Naya Live Dropdown Search Engine Logic
 const globalSearchInput = document.getElementById('globalSearchInput');
-const globalSearchBtn = document.getElementById('globalSearchBtn');
+const searchDropdown = document.getElementById('searchResultsDropdown');
 
-function performSearch() {
-    if (!globalSearchInput) return;
-    const query = globalSearchInput.value.trim().toLowerCase();
-    
-    if (query === "") return;
+if (globalSearchInput && searchDropdown) {
+    globalSearchInput.addEventListener('input', function() {
+        const query = this.value.trim().toLowerCase();
+        
+        if (query.length === 0) {
+            searchDropdown.style.display = 'none';
+            searchDropdown.innerHTML = '';
+            return;
+        }
 
-    // Check karein ki user index.html par hai ya kisi video player page par
-    const isMainPage = document.getElementById('animeGrid') !== null;
-
-    if (isMainPage) {
-        // Agar user main page par hai, toh wahi par cards filter kar do
         const cards = document.querySelectorAll('.anime-card');
-        let matchCount = 0;
+        let resultsHTML = '';
+        let count = 0;
 
         cards.forEach(card => {
-            const titleElement = card.querySelector('.card-title');
-            if (titleElement) {
-                const title = titleElement.innerText.toLowerCase();
-                if (title.includes(query)) {
-                    card.style.display = "flex";
-                    matchCount++;
-                } else {
-                    card.style.display = "none";
+            const titleEl = card.querySelector('.card-title');
+            const tagsEl = card.querySelector('.card-tags');
+            if (titleEl) {
+                const title = titleEl.innerText;
+                if (title.toLowerCase().includes(query) && count < 5) {
+                    // Movie ya Series identify karne ke liye tags check karein
+                    const tagsText = tagsEl ? tagsEl.innerText.toLowerCase() : '';
+                    const isMovie = tagsText.includes('movie') || title.toLowerCase().includes('movie');
+                    const badgeClass = isMovie ? 'search-badge-movie' : 'search-badge-series';
+                    const badgeText = isMovie ? 'MOVIE' : 'SERIES';
+                    
+                    // Card ka onclick action nikalna
+                    const onclickAttr = card.getAttribute('onclick');
+                    let targetUrl = '#';
+                    if (onclickAttr && onclickAttr.includes('openAnimePage')) {
+                        const match = onclickAttr.match(/'([^']+)'/);
+                        if (match) targetUrl = match[1].toLowerCase() + '_videoplayer.html';
+                    } else if (onclickAttr) {
+                        const match = onclickAttr.match(/'([^']+)'/);
+                        if (match) targetUrl = match[1];
+                    }
+
+                    resultsHTML += `
+                        <div class="search-item" onclick="window.location.href='${targetUrl}'">
+                            <span class="${badgeClass}">${badgeText}</span>
+                            <span>${title}</span>
+                        </div>
+                    `;
+                    count++;
                 }
             }
         });
 
-        const noResults = document.getElementById('noResults');
-        if (noResults) {
-            noResults.style.display = (matchCount === 0) ? "block" : "none";
+        if (resultsHTML !== '') {
+            searchDropdown.innerHTML = resultsHTML + `<div class="search-item more-results-item">More results</div>`;
+            searchDropdown.style.display = 'block';
+        } else {
+            searchDropdown.innerHTML = `<div class="search-item no-match-item">No results found</div>`;
+            searchDropdown.style.display = 'block';
         }
-    } else {
-        // Agar user kisi video player page par hai, toh search query ke sath main page par redirect kar do
-        window.location.href = `index.html?search=${encodeURIComponent(query)}`;
-    }
-}
+    });
 
-// Event Listeners for Input (Enter key) and Magnifying Glass Click
-if (globalSearchInput) {
-    globalSearchInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            performSearch();
+    // Input ke baahar click karne par dropdown hide ho jaye
+    document.addEventListener('click', function(e) {
+        if (!globalSearchInput.contains(e.target) && !searchDropdown.contains(e.target)) {
+            searchDropdown.style.display = 'none';
         }
     });
 }
-
-if (globalSearchBtn) {
-    globalSearchBtn.addEventListener('click', performSearch);
-}
-
-// Auto-handle search query if redirected from another page with URL parameters
-window.addEventListener('DOMContentLoaded', () => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const searchQuery = urlParams.get('search');
-    
-    if (searchQuery && globalSearchInput) {
-        globalSearchInput.value = searchQuery;
-        
-        const cards = document.querySelectorAll('.anime-card');
-        let matchCount = 0;
-        
-        cards.forEach(card => {
-            const titleElement = card.querySelector('.card-title');
-            if (titleElement) {
-                const title = titleElement.innerText.toLowerCase();
-                if (title.includes(searchQuery.toLowerCase())) {
-                    card.style.display = "flex";
-                    matchCount++;
-                } else {
-                    card.style.display = "none";
-                }
-            }
-        });
-
-        const noResults = document.getElementById('noResults');
-        if (noResults) {
-            noResults.style.display = (matchCount === 0) ? "block" : "none";
-        }
-    }
-});
