@@ -30,18 +30,51 @@ header {
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.logo {
-    font-size: 26px;
-    font-weight: 800;
-    color: #fff;
+.header-left {
     display: flex;
     align-items: center;
-    gap: 5px;
-    cursor: pointer;
+    gap: 15px;
 }
 
-.logo span {
-    color: #8a2be2;
+/* Hamburger Button */
+.hamburger-btn {
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-size: 22px;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.hamburger-btn:hover {
+    color: #ff5500;
+}
+
+/* --- FIRE LOGO STYLE --- */
+.fire-logo {
+    font-size: 26px;
+    font-weight: 900;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    letter-spacing: 1px;
+    user-select: none;
+}
+
+.fire-seven {
+    color: #ff3300;
+    text-shadow: 0 0 10px #ff3300, 0 0 20px #ff0055;
+    font-size: 32px;
+    font-style: italic;
+    margin-right: 2px;
+}
+
+.fire-text {
+    background: linear-gradient(180deg, #fff700 0%, #ff5500 50%, #ff0000 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 8px rgba(255, 85, 0, 0.8));
+    font-weight: 900;
 }
 
 nav ul {
@@ -56,7 +89,7 @@ nav ul li a {
 }
 
 nav ul li a:hover, nav ul li a.active {
-    color: #8a2be2;
+    color: #ff5500;
 }
 
 /* Search Box */
@@ -79,8 +112,8 @@ nav ul li a:hover, nav ul li a.active {
 
 .search-box input:focus {
     width: 240px;
-    border-color: #8a2be2;
-    box-shadow: 0 0 10px rgba(138, 43, 226, 0.4);
+    border-color: #ff5500;
+    box-shadow: 0 0 10px rgba(255, 85, 0, 0.4);
 }
 
 .search-box i {
@@ -88,6 +121,139 @@ nav ul li a:hover, nav ul li a.active {
     right: 12px;
     color: #aaa;
     cursor: pointer;
+}
+
+/* --- SIDEBAR DRAWER --- */
+.sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 2000;
+    display: none;
+    backdrop-filter: blur(4px);
+}
+
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: -280px;
+    width: 280px;
+    height: 100%;
+    background: #12131c;
+    z-index: 2001;
+    transition: left 0.3s ease;
+    box-shadow: 5px 0 15px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar.active {
+    left: 0;
+}
+
+.sidebar-overlay.active {
+    display: block;
+}
+
+.sidebar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-header h3 {
+    color: #ff5500;
+}
+
+.close-btn {
+    font-size: 28px;
+    cursor: pointer;
+    color: #aaa;
+}
+
+.close-btn:hover {
+    color: #fff;
+}
+
+.sidebar-links {
+    list-style: none;
+    padding: 20px 0;
+}
+
+.sidebar-links li a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 15px 20px;
+    font-weight: 600;
+    color: #ddd;
+    transition: all 0.2s ease;
+    border-left: 3px solid transparent;
+}
+
+.sidebar-links li a:hover {
+    background: rgba(255, 85, 0, 0.1);
+    color: #ff5500;
+    border-left-color: #ff5500;
+}
+
+/* --- AGE VERIFICATION MODAL --- */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 3000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(8px);
+}
+
+.modal-overlay.active {
+    display: flex;
+}
+
+.modal-box {
+    background: #181926;
+    border: 1px solid #ff0055;
+    padding: 30px;
+    border-radius: 12px;
+    max-width: 400px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 0 20px rgba(255, 0, 85, 0.4);
+}
+
+.modal-icon {
+    font-size: 45px;
+    color: #ff0055;
+    margin-bottom: 15px;
+}
+
+.modal-box h2 {
+    margin-bottom: 10px;
+    font-size: 22px;
+}
+
+.modal-box p {
+    color: #ccc;
+    font-size: 14px;
+    margin-bottom: 25px;
+    line-height: 1.4;
+}
+
+.modal-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
 }
 
 /* --- HERO BANNER --- */
@@ -161,7 +327,7 @@ nav ul li a:hover, nav ul li a.active {
 }
 
 .btn-primary {
-    background: #8a2be2;
+    background: #ff5500;
     color: #fff;
 }
 
@@ -205,11 +371,13 @@ nav ul li a:hover, nav ul li a.active {
     cursor: pointer;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     position: relative;
+    display: flex;
+    flex-direction: column;
 }
 
 .anime-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 8px 20px rgba(138, 43, 226, 0.4);
+    box-shadow: 0 8px 20px rgba(255, 85, 0, 0.4);
 }
 
 .card-img-container {
@@ -291,30 +459,23 @@ footer {
 /* --- MOBILE LAYOUT FIXES --- */
 @media (max-width: 768px) {
     header {
-        flex-direction: column;
-        gap: 10px;
         padding: 10px 4%;
     }
 
-    .logo {
-        font-size: 22px;
+    nav {
+        display: none; /* Hide main nav on mobile, use sidebar */
     }
 
-    nav ul {
-        gap: 15px;
-        font-size: 13px;
-    }
-
-    .search-box {
-        width: 100%;
+    .fire-logo {
+        font-size: 20px;
     }
 
     .search-box input {
-        width: 100%;
+        width: 140px;
     }
 
     .search-box input:focus {
-        width: 100%;
+        width: 170px;
     }
 
     .hero {
