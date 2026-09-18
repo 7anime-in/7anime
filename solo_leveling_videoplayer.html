@@ -6,149 +6,95 @@
     <title>Solo Leveling - 7ANIME</title>
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- External CSS -->
-    <link rel="stylesheet" href="style.css">
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom Spinner Animation for Fast Loading Feedback */
+        .spinner {
+            width: 45px;
+            height: 45px;
+            border: 4px solid rgba(255, 85, 0, 0.2);
+            border-top: 4px solid #ff5500;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
 </head>
 <body class="bg-[#0b0c10] text-white font-sans antialiased">
 
     <!-- Header / Navbar -->
-    <header class="main-header">
-        <div class="header-left">
-            <!-- 3 Line Hamburger Menu Icon -->
-            <button class="hamburger-btn" id="menuBtn" onclick="toggleSidebar()" aria-label="Toggle Menu">
+    <header class="main-header flex items-center justify-between px-4 py-3 bg-[#151522] border-b border-gray-800">
+        <div class="flex items-center space-x-3">
+            <button class="text-white text-lg focus:outline-none" id="menuBtn" onclick="toggleSidebar()">
                 <i class="fa-solid fa-bars"></i>
             </button>
-            
-            <!-- Fire Style Logo -->
-            <div class="logo fire-logo" onclick="window.location.href='index.html'">
-                <span class="fire-seven">7</span><span class="fire-text">ANIME 🔥</span>
+            <div class="cursor-pointer font-extrabold text-lg" onclick="window.location.href='index.html'">
+                <span class="text-[#ff5500]">7</span><span class="text-white">ANIME 🔥</span>
             </div>
         </div>
-
-        <nav class="desktop-nav">
-            <ul>
-                <li><a href="index.html"><i class="fa-solid fa-house"></i> Home</a></li>
-                <li><a href="#"><i class="fa-solid fa-compass"></i> Explore</a></li>
-                <li><a href="#"><i class="fa-solid fa-film"></i> Movies</a></li>
-                <li><a href="#"><i class="fa-solid fa-tv"></i> TV Series</a></li>
-            </ul>
-        </nav>
-
-        <div class="search-box">
-            <input type="text" id="globalSearchInput" placeholder="Search anime...">
-            <i class="fa-solid fa-magnifying-glass" id="globalSearchBtn"></i>
-            <!-- Live Search Dropdown Box -->
-            <div id="searchResultsDropdown" class="search-dropdown" style="display: none;"></div>
+        <div class="flex items-center space-x-3">
+            <input type="text" id="globalSearchInput" placeholder="Search anime..." class="bg-[#1a1a2b] text-xs px-3 py-1.5 rounded-lg border border-gray-700 text-white focus:outline-none">
         </div>
     </header>
-
-    <!-- Slide-out Sidebar Drawer -->
-    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
-    <aside class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <h3><i class="fa-solid fa-fire" style="color: #ff5500;"></i> Menu</h3>
-            <span class="close-btn" onclick="toggleSidebar()">&times;</span>
-        </div>
-        <ul class="sidebar-links">
-            <li><a href="index.html"><i class="fa-solid fa-house"></i> HOME</a></li>
-            <li><a href="javascript:void(0)" onclick="openAgeModal()"><i class="fa-solid fa-triangle-exclamation"></i> HENTAI (18+)</a></li>
-            <li>
-                <a href="https://www.instagram.com/7anime_offical?stkn=c3c0aTNjaW9nZWJ3" target="_blank" rel="noopener noreferrer">
-                    <i class="fa-solid fa-headset"></i> WEBSITE SUPPORT TEAM CONTACT
-                </a>
-            </li>
-        </ul>
-    </aside>
-
-    <!-- 18+ Age Limit Verification Modal -->
-    <div class="modal-overlay" id="ageModal">
-        <div class="modal-box">
-            <i class="fa-solid fa-triangle-exclamation modal-icon"></i>
-            <h2>Age Verification Required</h2>
-            <p>Is section ko dekhne ke liye aapki umar 18+ honi chahiye. Kya aap 18 saal ya usse zyada ke hain?</p>
-            <div class="modal-buttons">
-                <button class="btn btn-primary" onclick="confirmAge(true)">I AM 18+</button>
-                <button class="btn btn-secondary" onclick="confirmAge(false)">Exit / Cancel</button>
-            </div>
-        </div>
-    </div>
 
     <!-- Main Wrapper Content -->
     <main class="max-w-7xl mx-auto px-4 py-6 space-y-6">
 
         <!-- Anime Details Header Section -->
         <div class="bg-[#151522] border border-gray-800 rounded-2xl p-4 md:p-6 flex flex-col md:flex-row gap-6 items-start shadow-xl">
-            <!-- Portrait Poster Image -->
             <div class="w-full md:w-48 flex-shrink-0 aspect-[3/4] rounded-xl overflow-hidden border border-gray-700 shadow-lg relative mx-auto md:mx-0">
                 <img src="https://lh3.googleusercontent.com/d/1hZPMLLUNMOVG8DmSd1eGd5Nmdgh6AUYZ" alt="Solo Leveling" class="w-full h-full object-cover">
             </div>
-            
-            <!-- Details Content -->
             <div class="flex-1 space-y-3 w-full">
                 <div class="flex flex-wrap items-center justify-between gap-2">
                     <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight">Solo Leveling</h1>
-                    <div class="flex items-center space-x-2">
-                        <button class="bg-[#ff5500] hover:bg-[#e04c00] text-white px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition">
-                            <i class="fa-solid fa-download text-[10px]"></i> <span>Download</span>
-                        </button>
-                        <button class="bg-[#1a1a2b] hover:bg-gray-800 text-gray-300 border border-gray-700 p-1.5 rounded-lg text-xs">
-                            <i class="fa-solid fa-bookmark"></i>
-                        </button>
-                    </div>
                 </div>
-                
                 <div class="flex flex-wrap items-center gap-2 text-xs">
                     <span class="bg-purple-600/30 text-purple-300 border border-purple-500/40 px-2.5 py-0.5 rounded font-semibold">Anime</span>
                     <span class="bg-amber-500/20 text-amber-400 border border-amber-500/40 px-2.5 py-0.5 rounded font-bold flex items-center space-x-1">
                         <i class="fa-solid fa-star text-[10px]"></i> <span>9.4/10</span>
                     </span>
                     <span class="bg-[#1a1a2b] text-gray-300 border border-gray-700 px-2.5 py-0.5 rounded">Rank #1</span>
-                    <span class="bg-[#1a1a2b] text-gray-300 border border-gray-700 px-2.5 py-0.5 rounded">Action</span>
-                    <span class="bg-[#1a1a2b] text-gray-300 border border-gray-700 px-2.5 py-0.5 rounded">Fantasy</span>
-                    <span class="bg-[#1a1a2b] text-gray-300 border border-gray-700 px-2.5 py-0.5 rounded">Sci-Fi</span>
                 </div>
-
                 <p class="text-gray-300 text-xs md:text-sm leading-relaxed">
                     Sung Jin-Woo continues his journey to become the strongest hunter in a world full of monsters and hidden secrets.
                 </p>
-
-                <div class="text-xs text-gray-400 pt-2 flex flex-wrap items-center gap-y-1 gap-x-6 border-t border-gray-800">
-                    <span><strong>Total Episodes:</strong> 12</span>
-                    <span><strong>Year:</strong> 2024</span>
-                    <span><strong>Status:</strong> Ongoing</span>
-                </div>
             </div>
-        </div>
-
-        <!-- Breadcrumb -->
-        <div class="text-xs text-gray-400 flex items-center space-x-2">
-            <span>Home</span> <i class="fa-solid fa-chevron-right text-[9px]"></i>
-            <span>Anime</span> <i class="fa-solid fa-chevron-right text-[9px]"></i>
-            <span class="text-[#ff5500]">Solo Leveling</span>
         </div>
 
         <!-- Video Player & Episode List Grid Section -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-            <!-- Video Player + Navigation -->
+            <!-- Video Player + Server Switcher -->
             <div class="lg:col-span-2 space-y-4">
-                <div class="relative bg-black rounded-2xl overflow-hidden shadow-2xl border border-gray-800">
-                    <div class="relative aspect-video w-full bg-black" id="playerContainer">
-                        <!-- Click-to-Play Poster Placeholder -->
-                        <div id="playerPoster" class="absolute inset-0 bg-cover bg-center cursor-pointer flex items-center justify-center" style="background-image: url('https://lh3.googleusercontent.com/d/1hZPMLLUNMOVG8DmSd1eGd5Nmdgh6AUYZ');" onclick="loadAndPlayVideo()">
-                            <div class="absolute inset-0 bg-black/50"></div>
-                            <button class="relative z-10 w-16 h-16 bg-[#ff5500] rounded-full flex items-center justify-center text-white text-xl shadow-2xl hover:scale-110 transition">
-                                <i class="fa-solid fa-play ml-1"></i>
-                            </button>
-                        </div>
-                        <!-- Actual Iframe Player (Loaded on demand) -->
-                        <iframe id="animeVideoPlayer" src="" class="w-full h-full border-0 absolute inset-0" allowfullscreen scrolling="no"></iframe>
+                
+                <!-- Server Switcher Tabs -->
+                <div class="flex items-center justify-between bg-[#151522] px-4 py-2.5 rounded-xl border border-gray-800">
+                    <span class="text-xs text-gray-400 font-semibold"><i class="fa-solid fa-server text-[#ff5500]"></i> Choose Server:</span>
+                    <div class="flex items-center space-x-2">
+                        <button onclick="switchServer('vidhide')" id="serverBtn1" class="bg-[#ff5500] text-white px-3 py-1 rounded-lg text-xs font-bold transition shadow">Server 1 (Vidhide)</button>
+                        <button onclick="switchServer('streamwish')" id="serverBtn2" class="bg-[#1a1a2b] hover:bg-gray-800 text-gray-300 border border-gray-700 px-3 py-1 rounded-lg text-xs font-semibold transition">Server 2 (Streamwish)</button>
                     </div>
                 </div>
 
-                <!-- Next/Prev Episode Bar & Current Playing Title -->
+                <!-- Player Box with Spinner -->
+                <div class="relative bg-black rounded-2xl overflow-hidden shadow-2xl border border-gray-800">
+                    <div class="relative aspect-video w-full bg-black flex items-center justify-center" id="playerContainer">
+                        <!-- Loading Spinner Overlay -->
+                        <div id="loadingSpinner" class="absolute inset-0 bg-[#0b0c10] flex flex-col items-center justify-center z-20">
+                            <div class="spinner mb-3"></div>
+                            <p class="text-xs text-gray-400 font-medium tracking-wide">Loading video fast...</p>
+                        </div>
+                        <!-- Actual Iframe Player -->
+                        <iframe id="animeVideoPlayer" src="" class="w-full h-full border-0 absolute inset-0 z-10" allowfullscreen scrolling="no" onload="hideSpinner()"></iframe>
+                    </div>
+                </div>
+
+                <!-- Next/Prev Episode Bar -->
                 <div class="flex items-center justify-between bg-[#151522] px-4 py-3 rounded-xl border border-gray-800 text-xs md:text-sm">
                     <button onclick="changeEpisode('prev')" class="flex items-center space-x-1.5 font-semibold text-gray-300 hover:text-white transition cursor-pointer">
                         <i class="fa-solid fa-chevron-left text-[10px]"></i>
@@ -162,7 +108,7 @@
                 </div>
             </div>
 
-            <!-- Episode List Sidebar with Season Selector -->
+            <!-- Episode List Sidebar -->
             <div class="bg-[#151522] p-4 rounded-2xl border border-gray-800 space-y-4">
                 <div class="flex items-center justify-between mb-2">
                     <div class="flex items-center space-x-2">
@@ -170,16 +116,9 @@
                         <h3 class="font-bold text-sm">Episode List</h3>
                     </div>
                 </div>
-
-                <!-- Season Selection Buttons -->
-                <div class="flex items-center space-x-2 pb-2 border-b border-gray-800">
-                    <button class="bg-[#ff5500] text-white px-3 py-1.5 rounded-lg text-xs font-bold transition shadow-md shadow-[#ff5500]/20">Season 1</button>
-                    <button onclick="alert('Season 2 coming soon!')" class="bg-[#1a1a2b] hover:bg-gray-800 text-gray-300 border border-gray-700 px-3 py-1.5 rounded-lg text-xs font-semibold transition">Season 2</button>
-                </div>
-
-                <!-- Episodes Grid (1 to 12) -->
-                <div class="grid grid-cols-3 gap-2 overflow-y-auto max-h-[250px] pr-1" id="episodeGridButtons">
-                    <button onclick="selectEpisode(1)" class="ep-btn bg-[#ff5500] text-white border border-[#ff5500] py-2.5 rounded-lg text-xs font-bold shadow-md transition" data-ep="1">1</button>
+                <div class="grid grid-cols-3 gap-2 overflow-y-auto max-h-[300px] pr-1" id="episodeGridButtons">
+                    <!-- Episode Buttons 1 to 12 -->
+                    <button onclick="selectEpisode(1)" class="ep-btn bg-[#ff5500] text-white border border-[#ff5500] py-2.5 rounded-lg text-xs font-bold transition" data-ep="1">1</button>
                     <button onclick="selectEpisode(2)" class="ep-btn bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition" data-ep="2">2</button>
                     <button onclick="selectEpisode(3)" class="ep-btn bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition" data-ep="3">3</button>
                     <button onclick="selectEpisode(4)" class="ep-btn bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition" data-ep="4">4</button>
@@ -194,51 +133,12 @@
                 </div>
             </div>
         </div>
-
-        <!-- Hidden Search Database -->
-        <div style="display: none;" id="hiddenSearchDatabase">
-            <div class="anime-card" data-tags="Action, Fantasy, Sci-Fi" onclick="openAnimePage('solo_leveling')">
-                <div class="card-title">Solo Leveling</div>
-                <div class="card-tags">Action, Fantasy, Sci-Fi</div>
-            </div>
-            <div class="anime-card" data-tags="Action, Adventure, Comedy" onclick="openAnimePage('one_piece')">
-                <div class="card-title">One Piece</div>
-                <div class="card-tags">Action, Adventure, Comedy</div>
-            </div>
-            <div class="anime-card" data-tags="Action, Fantasy, Supernatural" onclick="openAnimePage('demon_slayer')">
-                <div class="card-title">Demon Slayer</div>
-                <div class="card-tags">Action, Fantasy, Supernatural</div>
-            </div>
-            <div class="anime-card" data-tags="Action, Supernatural, Fantasy" onclick="openAnimePage('jujutsu_kaisen')">
-                <div class="card-title">Jujutsu Kaisen</div>
-                <div class="card-tags">Action, Supernatural, Fantasy</div>
-            </div>
-            <div class="anime-card" data-tags="Drama, Psychological, School" onclick="openAnimePage('classroom_of_the_elite')">
-                <div class="card-title">Classroom of the Elite</div>
-                <div class="card-tags">Drama, Psychological, School</div>
-            </div>
-            <div class="anime-card" data-tags="Sci-Fi, Adventure, Comedy" onclick="openAnimePage('dr_stone')">
-                <div class="card-title">Dr. Stone</div>
-                <div class="card-tags">Sci-Fi, Adventure, Comedy</div>
-            </div>
-        </div>
-
     </main>
 
-    <!-- Footer -->
-    <footer>
-        <div class="logo fire-logo justify-center cursor-pointer mb-2" onclick="window.location.href='index.html'">
-            <span class="fire-seven">7</span><span class="fire-text">ANIME 🔥</span>
-        </div>
-        <p style="color: #666; font-size: 12px;">© 7Anime. All rights reserved.</p>
-    </footer>
-
-    <!-- External JS -->
-    <script src="script.js"></script>
-
-    <!-- Player & Navigation Script -->
+    <!-- Script Section -->
     <script>
-        const episodesData = {
+        // Server 1 Links (Vidhidepro)
+        const server1Links = {
             1: 'https://vidhidepro.com/v/ctymcjwnsyvm',
             2: 'https://vidhidepro.com/v/hlt9fthmy03k',
             3: 'https://vidhidepro.com/v/8nd3o2ub9mge',
@@ -253,40 +153,54 @@
             12: 'https://vidhidepro.com/v/a1gfhtn6e9y1'
         };
 
-        let currentEpisode = 1;
-        let isPlayerLoaded = false;
+        // Server 2 Alternative Links (Streamwish / Filemoon backup - currently mapped for seamless toggle)
+        const server2Links = {
+            1: 'https://streamwish.to/e/ctymcjwnsyvm',
+            2: 'https://streamwish.to/e/hlt9fthmy03k',
+            3: 'https://streamwish.to/e/8nd3o2ub9mge',
+            4: 'https://streamwish.to/e/llo8cbz3vi83',
+            5: 'https://streamwish.to/e/b5rkepvh66q8',
+            6: 'https://streamwish.to/e/1g2gg0xu3j57',
+            7: 'https://streamwish.to/e/63umkeakk4ql',
+            8: 'https://streamwish.to/e/rbzdmu1tnby2',
+            9: 'https://streamwish.to/e/ot0emcyiq2di',
+            10: 'https://streamwish.to/e/jz0lettaf3od',
+            11: 'https://streamwish.to/e/3845ic0opjl8',
+            12: 'https://streamwish.to/e/a1gfhtn6e9y1'
+        };
 
-        function loadAndPlayVideo() {
-            const poster = document.getElementById('playerPoster');
+        let currentEpisode = 1;
+        let currentServer = 'vidhide';
+
+        function loadEpisode() {
+            const spinner = document.getElementById('loadingSpinner');
             const iframe = document.getElementById('animeVideoPlayer');
             
-            if (poster) poster.style.display = 'none';
+            // Show spinner when loading starts
+            if (spinner) spinner.style.display = 'flex';
+
+            let link = (currentServer === 'vidhide') ? server1Links[currentEpisode] : server2Links[currentEpisode];
             if (iframe) {
-                iframe.src = episodesData[currentEpisode];
+                iframe.src = link;
             }
-            isPlayerLoaded = true;
+        }
+
+        function hideSpinner() {
+            const spinner = document.getElementById('loadingSpinner');
+            if (spinner) spinner.style.display = 'none';
         }
 
         function selectEpisode(epNum) {
             currentEpisode = epNum;
-            const iframe = document.getElementById('animeVideoPlayer');
             const titleText = document.getElementById('currentPlayingText');
-            const poster = document.getElementById('playerPoster');
-
             if (titleText) titleText.innerText = "Episode " + epNum;
 
-            // If poster is active, hide it and load video directly upon episode change
-            if (poster) poster.style.display = 'none';
-            if (iframe) {
-                iframe.src = episodesData[epNum];
-            }
-            isPlayerLoaded = true;
+            loadEpisode();
 
-            // Update active states on buttons
-            const buttons = document.querySelectorAll('.ep-btn');
-            buttons.forEach(btn => {
+            // Update active state of episode buttons
+            document.querySelectorAll('.ep-btn').forEach(btn => {
                 if (parseInt(btn.getAttribute('data-ep')) === epNum) {
-                    btn.className = "ep-btn bg-[#ff5500] text-white border border-[#ff5500] py-2.5 rounded-lg text-xs font-bold shadow-md transition";
+                    btn.className = "ep-btn bg-[#ff5500] text-white border border-[#ff5500] py-2.5 rounded-lg text-xs font-bold transition";
                 } else {
                     btn.className = "ep-btn bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition";
                 }
@@ -295,31 +209,32 @@
 
         function changeEpisode(direction) {
             if (direction === 'next') {
-                if (currentEpisode < 12) {
-                    currentEpisode++;
-                } else {
-                    currentEpisode = 1; // Loop back to 1
-                }
-            } else if (direction === 'prev') {
-                if (currentEpisode > 1) {
-                    currentEpisode--;
-                } else {
-                    currentEpisode = 12; // Loop to 12
-                }
+                currentEpisode = currentEpisode < 12 ? currentEpisode + 1 : 1;
+            } else {
+                currentEpisode = currentEpisode > 1 ? currentEpisode - 1 : 12;
             }
             selectEpisode(currentEpisode);
         }
 
-        // Search Button Redirect Script
-        document.addEventListener('DOMContentLoaded', function() {
-            const searchBtn = document.getElementById('globalSearchBtn');
-            if (searchBtn) {
-                searchBtn.addEventListener('click', function() {
-                    window.location.href = 'index.html';
-                });
+        function switchServer(serverName) {
+            currentServer = serverName;
+            const btn1 = document.getElementById('serverBtn1');
+            const btn2 = document.getElementById('serverBtn2');
+
+            if (serverName === 'vidhide') {
+                btn1.className = "bg-[#ff5500] text-white px-3 py-1 rounded-lg text-xs font-bold transition shadow";
+                btn2.className = "bg-[#1a1a2b] hover:bg-gray-800 text-gray-300 border border-gray-700 px-3 py-1 rounded-lg text-xs font-semibold transition";
+            } else {
+                btn2.className = "bg-[#ff5500] text-white px-3 py-1 rounded-lg text-xs font-bold transition shadow";
+                btn1.className = "bg-[#1a1a2b] hover:bg-gray-800 text-gray-300 border border-gray-700 px-3 py-1 rounded-lg text-xs font-semibold transition";
             }
-        });
+            loadEpisode();
+        }
+
+        // Initial Load on page startup
+        window.onload = function() {
+            loadEpisode();
+        };
     </script>
 </body>
-            </html>
-            
+</html>
