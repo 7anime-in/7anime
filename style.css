@@ -101,7 +101,7 @@ a {
     color: #ff5500;
 }
 
-/* Search Box */
+/* Search Box & Dropdown */
 .search-box {
     position: relative;
     display: flex;
@@ -132,6 +132,66 @@ a {
     color: #888;
     cursor: pointer;
     font-size: 14px;
+}
+
+/* --- LIVE SEARCH DROPDOWN STYLES --- */
+.search-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #1a1528;
+    border: 1px solid #332b4d;
+    border-radius: 8px;
+    margin-top: 5px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    z-index: 1000;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.search-item {
+    padding: 10px 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #fff;
+    cursor: pointer;
+    border-bottom: 1px solid #261f3d;
+    font-size: 13px;
+}
+
+.search-item:hover {
+    background: #2a2245;
+}
+
+.search-badge-movie, .search-badge-series {
+    font-size: 9px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.search-badge-movie { 
+    background: #ff5500; 
+    color: #fff; 
+}
+
+.search-badge-series { 
+    background: #7b2cbf; 
+    color: #fff; 
+}
+
+.more-results-item, .no-match-item {
+    justify-content: center;
+    color: #aaa;
+    font-size: 12px;
+    cursor: default;
+}
+
+.more-results-item:hover, .no-match-item:hover {
+    background: transparent;
 }
 
 /* --- SIDEBAR DRAWER (STRICTLY HIDDEN BY DEFAULT) --- */
@@ -507,4 +567,4 @@ footer {
         grid-template-columns: repeat(2, 1fr);
         gap: 12px;
     }
-}
+    }
