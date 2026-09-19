@@ -1,4 +1,42 @@
-// Live Dropdown Search Engine Logic (Index Cards Synchronized)
+// Automatically inject search dropdown CSS via JavaScript
+const searchStyle = document.createElement('style');
+searchStyle.innerHTML = `
+    .search-box {
+        position: relative !important;
+    }
+    .search-dropdown {
+        position: absolute !important;
+        top: 100% !important;
+        right: 0 !important;
+        width: 260px !important;
+        background-color: #151522 !important;
+        border: 1px solid #2d2d3d !important;
+        border-radius: 8px !important;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.5) !important;
+        z-index: 1000 !important;
+        max-height: 250px !important;
+        overflow-y: auto !important;
+        margin-top: 6px !important;
+        display: none;
+    }
+    .search-item {
+        padding: 10px 14px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        border-bottom: 1px solid #2d2d3d;
+        font-size: 13px;
+        color: #e5e7eb;
+        transition: background 0.2s;
+    }
+    .search-item:hover {
+        background-color: #1a1a2b;
+    }
+`;
+document.head.appendChild(searchStyle);
+
+// Live Dropdown Search Engine Logic
 const globalSearchInput = document.getElementById('globalSearchInput');
 const searchDropdown = document.getElementById('searchResultsDropdown');
 
@@ -27,7 +65,6 @@ if (globalSearchInput && searchDropdown) {
                     const badgeClass = isMovie ? 'search-badge-movie' : 'search-badge-series';
                     const badgeText = isMovie ? 'MOVIE' : 'SERIES';
                     
-                    // Card ke onclick attribute se exact target URL nikalna
                     const onclickAttr = card.getAttribute('onclick');
                     let targetUrl = '#';
                     
@@ -35,17 +72,16 @@ if (globalSearchInput && searchDropdown) {
                         const match = onclickAttr.match(/'([^']+)'/);
                         if (match) {
                             let slug = match[1];
-                            // Agar openAnimePage function hai toh uske format ke mutabiq videoplayer page URL banana
                             if (onclickAttr.includes('openAnimePage')) {
                                 targetUrl = slug.toLowerCase() + '_videoplayer.html';
                             } else {
-                                targetUrl = slug; // Direct link jaise ki hentai card ke liye hai
+                                targetUrl = slug;
                             }
                         }
                     }
 
                     resultsHTML += `
-                        <div class="search-item" onclick="window.location.href='${targetUrl}'" style="padding: 10px 14px; cursor: pointer; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #2d2d3d; font-size: 13px; color: #e5e7eb; transition: background 0.2s;">
+                        <div class="search-item" onclick="window.location.href='${targetUrl}'">
                             <span class="${badgeClass}" style="background: rgba(255,85,0,0.2); color: #ff5500; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 10px;">${badgeText}</span>
                             <span style="font-weight: 500;">${title}</span>
                         </div>
@@ -56,10 +92,10 @@ if (globalSearchInput && searchDropdown) {
         });
 
         if (resultsHTML !== '') {
-            searchDropdown.innerHTML = resultsHTML + `<div class="search-item more-results-item" style="padding: 8px 14px; text-align: center; font-size: 11px; color: #9ca3af; background: #151522;">More results</div>`;
+            searchDropdown.innerHTML = resultsHTML + `<div class="search-item" style="justify-content: center; font-size: 11px; color: #9ca3af; background: #151522;">More results</div>`;
             searchDropdown.style.display = 'block';
         } else {
-            searchDropdown.innerHTML = `<div class="search-item no-match-item" style="padding: 10px 14px; font-size: 12px; color: #9ca3af;">No results found</div>`;
+            searchDropdown.innerHTML = `<div class="search-item" style="color: #9ca3af; cursor: default;">No results found</div>`;
             searchDropdown.style.display = 'block';
         }
     });
