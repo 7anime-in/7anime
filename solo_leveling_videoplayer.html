@@ -9,7 +9,6 @@
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Custom Spinner Animation for Fast Loading Feedback */
         .spinner {
             width: 45px;
             height: 45px;
@@ -123,7 +122,6 @@
                     </div>
                 </div>
                 <div class="grid grid-cols-3 gap-2 overflow-y-auto max-h-[300px] pr-1" id="episodeGridButtons">
-                    <!-- Episode Buttons 1 to 12 -->
                     <button onclick="selectEpisode(1)" class="ep-btn bg-[#ff5500] text-white border border-[#ff5500] py-2.5 rounded-lg text-xs font-bold transition" data-ep="1">1</button>
                     <button onclick="selectEpisode(2)" class="ep-btn bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition" data-ep="2">2</button>
                     <button onclick="selectEpisode(3)" class="ep-btn bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition" data-ep="3">3</button>
@@ -143,7 +141,7 @@
 
     <!-- Script Section -->
     <script>
-        // Server 1 Links (Vidhidepro) - Official Hindi Audio S1
+        // Server 1 Links (Vidhidepro)
         const server1Links = {
             1: 'https://vidhidepro.com/v/enianumkn5s8',
             2: 'https://vidhidepro.com/v/sb7pjd72e1s9',
@@ -159,20 +157,20 @@
             12: 'https://vidhidepro.com/v/zvhhe7ig5duq'
         };
 
-        // Server 2 Links (Streamhg) - Official Hindi Audio S1
+        // Server 2 Links (Streamhg - Corrected to Embed format /e/)
         const server2Links = {
-            1: 'https://streamhg.com/v/ah8mwksej95a',
-            2: 'https://streamhg.com/v/9dkbkic6eqj7',
-            3: 'https://streamhg.com/v/mgu5ordosvyg',
-            4: 'https://streamhg.com/v/82m4hs05k3rn',
-            5: 'https://streamhg.com/v/jtujkg298kw7',
-            6: 'https://streamhg.com/v/g09pjpikcizn',
-            7: 'https://streamhg.com/v/8wlv9zqezrg6',
-            8: 'https://streamhg.com/v/twrdqivn9h5e',
-            9: 'https://streamhg.com/v/f3pkik1eh5j6',
-            10: 'https://streamhg.com/v/3pevgpg4q9rt',
-            11: 'https://streamhg.com/v/cfa93nq68ljt',
-            12: 'https://streamhg.com/v/mih1yb05mruu'
+            1: 'https://streamhg.com/e/ah8mwksej95a',
+            2: 'https://streamhg.com/e/9dkbkic6eqj7',
+            3: 'https://streamhg.com/e/mgu5ordosvyg',
+            4: 'https://streamhg.com/e/82m4hs05k3rn',
+            5: 'https://streamhg.com/e/jtujkg298kw7',
+            6: 'https://streamhg.com/e/g09pjpikcizn',
+            7: 'https://streamhg.com/e/8wlv9zqezrg6',
+            8: 'https://streamhg.com/e/twrdqivn9h5e',
+            9: 'https://streamhg.com/e/f3pkik1eh5j6',
+            10: 'https://streamhg.com/e/3pevgpg4q9rt',
+            11: 'https://streamhg.com/e/cfa93nq68ljt',
+            12: 'https://streamhg.com/e/mih1yb05mruu'
         };
 
         let currentEpisode = 1;
@@ -182,7 +180,6 @@
             const spinner = document.getElementById('loadingSpinner');
             const iframe = document.getElementById('animeVideoPlayer');
             
-            // Show spinner when loading starts
             if (spinner) spinner.style.display = 'flex';
 
             let link = (currentServer === 'vidhide') ? server1Links[currentEpisode] : server2Links[currentEpisode];
@@ -203,7 +200,6 @@
 
             loadEpisode();
 
-            // Update active state of episode buttons
             document.querySelectorAll('.ep-btn').forEach(btn => {
                 if (parseInt(btn.getAttribute('data-ep')) === epNum) {
                     btn.className = "ep-btn bg-[#ff5500] text-white border border-[#ff5500] py-2.5 rounded-lg text-xs font-bold transition";
@@ -237,7 +233,6 @@
             loadEpisode();
         }
 
-        // Initial Load on page startup
         window.onload = function() {
             loadEpisode();
         };
