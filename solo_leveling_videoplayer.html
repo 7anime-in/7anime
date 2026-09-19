@@ -65,10 +65,10 @@
             </div>
         </div>
         <!-- Search Bar with Live Suggestions Dropdown Box -->
-        <div class="relative">
+        <div class="search-box relative">
             <input type="text" id="globalSearchInput" placeholder="Search anime..." class="bg-[#1a1a2b] text-xs px-3 py-1.5 rounded-lg border border-gray-700 text-white focus:outline-none w-40 md:w-56">
             <!-- Search Results Dropdown Box -->
-            <div id="searchDropdown" class="absolute right-0 mt-1 w-56 bg-[#151522] border border-gray-700 rounded-lg shadow-2xl hidden z-50 max-h-48 overflow-y-auto"></div>
+            <div id="searchResultsDropdown" class="search-dropdown" style="display: none;"></div>
         </div>
     </header>
 
@@ -181,8 +181,8 @@
         </div>
     </main>
 
-    <!-- External JavaScript File Link -->
+    <!-- Required JavaScript Files (Player logic + Search Engine) -->
+    <script src="script.js"></script>
     <script src="searchengine.js"></script>
 </body>
 </html>
-
