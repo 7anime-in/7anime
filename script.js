@@ -77,38 +77,11 @@ function loadHentaiPage() {
 }
 
 // ==========================================
-// VIDEO PLAYER, SEASON & EPISODE SWITCHER LOGIC
+// VIDEO PLAYER, SEASON & EPISODE SWITCHER LOGIC (HTML-Driven)
 // ==========================================
 let currentSeason = 1;
 let currentEpisode = 1;
 let currentServer = 'vidhide';
-
-function getEmbedLink(server, season, episode) {
-    // Alag-alag seasons ke hisab se video/embed links yahan generate honge
-    if (server === 'vidhide') {
-        return `https://vidhideembed.su/embed/solo-leveling-s${season}-ep-${episode}`;
-    } else {
-        return `https://streamhg.com/embed/solo-leveling-s${season}-ep-${episode}`;
-    }
-}
-
-function switchSeason(seasonNum) {
-    currentSeason = Number(seasonNum);
-    currentEpisode = 1; // Season badalne par default Episode 1 par set ho jayega
-
-    const btn1 = document.getElementById('seasonBtn1');
-    const btn2 = document.getElementById('seasonBtn2');
-
-    if (currentSeason === 1) {
-        if (btn1) btn1.className = "bg-[#ff5500] text-white px-3 py-1 rounded-lg text-xs font-bold transition shadow cursor-pointer";
-        if (btn2) btn2.className = "bg-[#1a1a2b] hover:bg-gray-800 text-gray-300 border border-gray-700 px-3 py-1 rounded-lg text-xs font-semibold transition cursor-pointer";
-    } else {
-        if (btn2) btn2.className = "bg-[#ff5500] text-white px-3 py-1 rounded-lg text-xs font-bold transition shadow cursor-pointer";
-        if (btn1) btn1.className = "bg-[#1a1a2b] hover:bg-gray-800 text-gray-300 border border-gray-700 px-3 py-1 rounded-lg text-xs font-semibold transition cursor-pointer";
-    }
-
-    selectEpisode(currentEpisode);
-}
 
 function selectEpisode(epNum) {
     currentEpisode = Number(epNum);
@@ -119,8 +92,20 @@ function selectEpisode(epNum) {
     if (spinner) spinner.style.display = 'flex';
     if (text) text.innerText = `S${currentSeason} - Episode ${currentEpisode}`;
     
+    // Find the button for this episode in the HTML grid to read its embedded links
+    const targetBtn = document.querySelector(`.ep-btn[data-ep="${currentEpisode}"]`);
+    let videoUrl = "";
+
+    if (targetBtn) {
+        if (currentServer === 'vidhide') {
+            videoUrl = targetBtn.getAttribute('data-vidhide') || "";
+        } else {
+            videoUrl = targetBtn.getAttribute('data-streamhg') || "";
+        }
+    }
+
     if (iframe) {
-        iframe.src = getEmbedLink(currentServer, currentSeason, currentEpisode);
+        iframe.src = videoUrl;
     }
 
     // Highlight active episode button correctly
@@ -150,10 +135,26 @@ function switchServer(serverName) {
         if (btn1) btn1.className = "bg-[#1a1a2b] hover:bg-gray-800 text-gray-300 border border-gray-700 px-3 py-1 rounded-lg text-xs font-semibold transition cursor-pointer";
     }
 
-    const iframe = document.getElementById('animeVideoPlayer');
-    if (iframe) {
-        iframe.src = getEmbedLink(currentServer, currentSeason, currentEpisode);
+    // Refresh current episode video based on new server
+    selectEpisode(currentEpisode);
+}
+
+function switchSeason(seasonNum) {
+    currentSeason = Number(seasonNum);
+    currentEpisode = 1; 
+
+    const btn1 = document.getElementById('seasonBtn1');
+    const btn2 = document.getElementById('seasonBtn2');
+
+    if (currentSeason === 1) {
+        if (btn1) btn1.className = "bg-[#ff5500] text-white px-3 py-1 rounded-lg text-xs font-bold transition shadow cursor-pointer";
+        if (btn2) btn2.className = "bg-[#1a1a2b] hover:bg-gray-800 text-gray-300 border border-gray-700 px-3 py-1 rounded-lg text-xs font-semibold transition cursor-pointer";
+    } else {
+        if (btn2) btn2.className = "bg-[#ff5500] text-white px-3 py-1 rounded-lg text-xs font-bold transition shadow cursor-pointer";
+        if (btn1) btn1.className = "bg-[#1a1a2b] hover:bg-gray-800 text-gray-300 border border-gray-700 px-3 py-1 rounded-lg text-xs font-semibold transition cursor-pointer";
     }
+
+    selectEpisode(currentEpisode);
 }
 
 function changeEpisode(direction) {
