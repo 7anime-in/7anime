@@ -36,9 +36,19 @@ searchStyle.innerHTML = `
 `;
 document.head.appendChild(searchStyle);
 
-// Live Dropdown Search Engine Logic
+// Global Database for Search Fallback (Works on Player pages too)
+const globalAnimeDatabase = [
+    { title: "Solo Leveling", url: "solo_leveling_videoplayer.html", type: "SERIES" },
+    { title: "One Piece", url: "one_piece_videoplayer.html", type: "SERIES" },
+    { title: "Demon Slayer", url: "demon_slayer_videoplayer.html", type: "SERIES" },
+    { title: "Jujutsu Kaisen", url: "jujutsu_kaisen_videoplayer.html", type: "SERIES" },
+    { title: "Classroom of the Elite", url: "classroom_of_the_elite_videoplayer.html", type: "SERIES" },
+    { title: "Dr. Stone", url: "dr_stone_videoplayer.html", type: "SERIES" },
+    { title: "Hell Mode: Hentai Special", url: "Hell_mode_videoplayer.html", type: "SERIES" }
+];
+
 const globalSearchInput = document.getElementById('globalSearchInput');
-const searchDropdown = document.getElementById('searchResultsDropdown');
+const searchDropdown = document.getElementById('searchResultsDropdown') || document.getElementById('searchDropdown');
 
 if (globalSearchInput && searchDropdown) {
     globalSearchInput.addEventListener('input', function() {
@@ -50,49 +60,61 @@ if (globalSearchInput && searchDropdown) {
             return;
         }
 
-        const cards = document.querySelectorAll('.anime-card');
         let resultsHTML = '';
         let count = 0;
 
-        cards.forEach(card => {
-            const titleEl = card.querySelector('.card-title');
-            const tagsEl = card.querySelector('.card-tags');
-            if (titleEl) {
-                const title = titleEl.innerText;
-                if (title.toLowerCase().includes(query) && count < 5) {
-                    const tagsText = tagsEl ? tagsEl.innerText.toLowerCase() : '';
-                    const isMovie = tagsText.includes('movie') || title.toLowerCase().includes('movie');
-                    const badgeClass = isMovie ? 'search-badge-movie' : 'search-badge-series';
-                    const badgeText = isMovie ? 'MOVIE' : 'SERIES';
-                    
-                    const onclickAttr = card.getAttribute('onclick');
-                    let targetUrl = '#';
-                    
-                    if (onclickAttr) {
-                        const match = onclickAttr.match(/'([^']+)'/);
-                        if (match) {
-                            let slug = match[1];
-                            if (onclickAttr.includes('openAnimePage')) {
-                                targetUrl = slug.toLowerCase() + '_videoplayer.html';
-                            } else {
-                                targetUrl = slug;
+        // First check cards on the current page
+        const cards = document.querySelectorAll('.anime-card');
+        if (cards.length > 0) {
+            cards.forEach(card => {
+                const titleEl = card.querySelector('.card-title');
+                const tagsEl = card.querySelector('.card-tags');
+                if (titleEl) {
+                    const title = titleEl.innerText;
+                    if (title.toLowerCase().includes(query) && count < 5) {
+                        const tagsText = tagsEl ? tagsEl.innerText.toLowerCase() : '';
+                        const isMovie = tagsText.includes('movie') || title.toLowerCase().includes('movie');
+                        const badgeText = isMovie ? 'MOVIE' : 'SERIES';
+                        
+                        const onclickAttr = card.getAttribute('onclick');
+                        let targetUrl = '#';
+                        if (onclickAttr) {
+                            const match = onclickAttr.match(/'([^']+)'/);
+                            if (match) {
+                                let slug = match[1];
+                                targetUrl = onclickAttr.includes('openAnimePage') ? slug.toLowerCase() + '_videoplayer.html' : slug;
                             }
                         }
-                    }
 
+                        resultsHTML += `
+                            <div class="search-item" onclick="window.location.href='${targetUrl}'">
+                                <span style="background: rgba(255,85,0,0.2); color: #ff5500; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 10px;">${badgeText}</span>
+                                <span style="font-weight: 500;">${title}</span>
+                            </div>
+                        `;
+                        count++;
+                    }
+                }
+            });
+        }
+
+        // If no cards on page (like player pages), use global database
+        if (count === 0) {
+            globalAnimeDatabase.forEach(anime => {
+                if (anime.title.toLowerCase().includes(query) && count < 5) {
                     resultsHTML += `
-                        <div class="search-item" onclick="window.location.href='${targetUrl}'">
-                            <span class="${badgeClass}" style="background: rgba(255,85,0,0.2); color: #ff5500; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 10px;">${badgeText}</span>
-                            <span style="font-weight: 500;">${title}</span>
+                        <div class="search-item" onclick="window.location.href='${anime.url}'">
+                            <span style="background: rgba(255,85,0,0.2); color: #ff5500; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 10px;">${anime.type}</span>
+                            <span style="font-weight: 500;">${anime.title}</span>
                         </div>
                     `;
                     count++;
                 }
-            }
-        });
+            });
+        }
 
         if (resultsHTML !== '') {
-            searchDropdown.innerHTML = resultsHTML + `<div class="search-item" style="justify-content: center; font-size: 11px; color: #9ca3af; background: #151522; cursor: default;">More results</div>`;
+            searchDropdown.innerHTML = resultsHTML;
             searchDropdown.style.display = 'block';
         } else {
             searchDropdown.innerHTML = `<div class="search-item" style="color: #9ca3af; cursor: default;">No results found</div>`;
