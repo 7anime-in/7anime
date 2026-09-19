@@ -157,6 +157,16 @@
 
             <!-- Episode List Sidebar -->
             <div class="bg-[#151522] p-4 rounded-2xl border border-gray-800 space-y-4">
+                
+                <!-- Season Switcher Tabs Added Here -->
+                <div class="flex items-center justify-between bg-[#151522] px-3 py-2 rounded-xl border border-gray-800">
+                    <span class="text-xs text-gray-400 font-semibold"><i class="fa-solid fa-layer-group text-[#ff5500]"></i> Select Season:</span>
+                    <div class="flex items-center space-x-2" id="seasonButtonsContainer">
+                        <button onclick="switchSeason(1)" id="seasonBtn1" class="bg-[#ff5500] text-white px-3 py-1 rounded-lg text-xs font-bold transition shadow cursor-pointer">Season 1</button>
+                        <button onclick="switchSeason(2)" id="seasonBtn2" class="bg-[#1a1a2b] hover:bg-gray-800 text-gray-300 border border-gray-700 px-3 py-1 rounded-lg text-xs font-semibold transition cursor-pointer">Season 2</button>
+                    </div>
+                </div>
+
                 <div class="flex items-center justify-between mb-2">
                     <div class="flex items-center space-x-2">
                         <i class="fa-solid fa-bars text-[#ff5500] text-sm"></i>
