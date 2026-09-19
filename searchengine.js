@@ -92,7 +92,7 @@ if (globalSearchInput && searchDropdown) {
         });
 
         if (resultsHTML !== '') {
-            searchDropdown.innerHTML = resultsHTML + `<div class="search-item" style="justify-content: center; font-size: 11px; color: #9ca3af; background: #151522;">More results</div>`;
+            searchDropdown.innerHTML = resultsHTML + `<div class="search-item" style="justify-content: center; font-size: 11px; color: #9ca3af; background: #151522; cursor: default;">More results</div>`;
             searchDropdown.style.display = 'block';
         } else {
             searchDropdown.innerHTML = `<div class="search-item" style="color: #9ca3af; cursor: default;">No results found</div>`;
@@ -100,7 +100,6 @@ if (globalSearchInput && searchDropdown) {
         }
     });
 
-    // Input ke baahar click karne par dropdown hide ho jaye
     document.addEventListener('click', function(e) {
         if (!globalSearchInput.contains(e.target) && !searchDropdown.contains(e.target)) {
             searchDropdown.style.display = 'none';
