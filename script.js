@@ -77,11 +77,29 @@ function loadHentaiPage() {
 }
 
 // ==========================================
-// VIDEO PLAYER, SEASON & EPISODE SWITCHER LOGIC (HTML-Driven)
+// VIDEO PLAYER, SEASON & QUALITY LOGIC
 // ==========================================
 let currentSeason = 1;
 let currentEpisode = 1;
 let currentServer = 'vidhide';
+let currentQuality = '720p'; // Default Quality set to 720p
+
+// Quality Change Handler
+function changeQuality(quality) {
+    currentQuality = quality;
+
+    // Update UI Quality Buttons State
+    document.querySelectorAll('.quality-btn').forEach(btn => {
+        if (btn.innerText.trim() === quality) {
+            btn.className = "quality-btn bg-[#ff5500] text-white border border-[#ff5500] px-2 py-0.5 rounded text-xs font-bold transition cursor-pointer";
+        } else {
+            btn.className = "quality-btn bg-[#1a1a2b] hover:bg-gray-800 text-gray-300 border border-gray-700 px-2 py-0.5 rounded text-xs font-medium transition cursor-pointer";
+        }
+    });
+
+    // Refresh video player for current episode
+    selectEpisode(currentEpisode);
+}
 
 function selectEpisode(epNum) {
     currentEpisode = Number(epNum);
@@ -92,19 +110,19 @@ function selectEpisode(epNum) {
     if (spinner) spinner.style.display = 'flex';
     if (text) text.innerText = `S${currentSeason} - Episode ${currentEpisode}`;
     
-    // Find the button for this episode in the HTML grid to read its embedded links
+    // Find the button for this episode in the HTML grid to read Vidhide link
     const targetBtn = document.querySelector(`.ep-btn[data-ep="${currentEpisode}"]`);
     let videoUrl = "";
 
     if (targetBtn) {
-        if (currentServer === 'vidhide') {
-            videoUrl = targetBtn.getAttribute('data-vidhide') || "";
-        } else {
-            videoUrl = targetBtn.getAttribute('data-streamhg') || "";
-        }
+        videoUrl = targetBtn.getAttribute('data-vidhide') || "";
     }
 
-    if (iframe) {
+    if (iframe && videoUrl) {
+        // Ensure Autoplay flag is present in URL
+        if (!videoUrl.includes('autoplay=1')) {
+            videoUrl += (videoUrl.includes('?') ? '&' : '?') + 'autoplay=1';
+        }
         iframe.src = videoUrl;
     }
 
@@ -122,20 +140,14 @@ function selectEpisode(epNum) {
 function switchServer(serverName) {
     currentServer = serverName;
     const btn1 = document.getElementById('serverBtn1');
-    const btn2 = document.getElementById('serverBtn2');
     const spinner = document.getElementById('loadingSpinner');
 
     if (spinner) spinner.style.display = 'flex';
 
-    if (serverName === 'vidhide') {
-        if (btn1) btn1.className = "bg-[#ff5500] text-white px-3 py-1 rounded-lg text-xs font-bold transition shadow cursor-pointer";
-        if (btn2) btn2.className = "bg-[#1a1a2b] hover:bg-gray-800 text-gray-300 border border-gray-700 px-3 py-1 rounded-lg text-xs font-semibold transition cursor-pointer";
-    } else {
-        if (btn2) btn2.className = "bg-[#ff5500] text-white px-3 py-1 rounded-lg text-xs font-bold transition shadow cursor-pointer";
-        if (btn1) btn1.className = "bg-[#1a1a2b] hover:bg-gray-800 text-gray-300 border border-gray-700 px-3 py-1 rounded-lg text-xs font-semibold transition cursor-pointer";
+    if (btn1) {
+        btn1.className = "bg-[#ff5500] text-white px-3 py-1 rounded-lg text-xs font-bold transition shadow cursor-pointer";
     }
 
-    // Refresh current episode video based on new server
     selectEpisode(currentEpisode);
 }
 
