@@ -118,15 +118,23 @@
         <!-- Video Player & Episode List Grid Section -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-            <!-- Video Player + Server Switcher -->
+            <!-- Video Player + Server & Quality Switcher -->
             <div class="lg:col-span-2 space-y-4">
                 
-                <!-- Server Switcher Tabs -->
-                <div class="flex items-center justify-between bg-[#151522] px-4 py-2.5 rounded-xl border border-gray-800">
-                    <span class="text-xs text-gray-400 font-semibold"><i class="fa-solid fa-server text-[#ff5500]"></i> Choose Server:</span>
+                <!-- Server & Quality Switcher Bar -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between bg-[#151522] px-4 py-2.5 rounded-xl border border-gray-800 gap-3">
                     <div class="flex items-center space-x-2">
+                        <span class="text-xs text-gray-400 font-semibold"><i class="fa-solid fa-server text-[#ff5500]"></i> Server:</span>
                         <button onclick="switchServer('vidhide')" id="serverBtn1" class="bg-[#ff5500] text-white px-3 py-1 rounded-lg text-xs font-bold transition shadow cursor-pointer">Server 1 (Vidhide)</button>
-                        <button onclick="switchServer('streamhg')" id="serverBtn2" class="bg-[#1a1a2b] hover:bg-gray-800 text-gray-300 border border-gray-700 px-3 py-1 rounded-lg text-xs font-semibold transition cursor-pointer">Server 2 (Streamhg)</button>
+                    </div>
+                    
+                    <!-- Quality Buttons (Default 720p Active) -->
+                    <div class="flex items-center space-x-1.5">
+                        <span class="text-xs text-gray-400 font-semibold mr-1"><i class="fa-solid fa-[#ff5500] fa-sliders"></i> Quality:</span>
+                        <button onclick="changeQuality('1080p')" class="quality-btn bg-[#1a1a2b] hover:bg-gray-800 text-gray-300 border border-gray-700 px-2 py-0.5 rounded text-xs font-medium transition cursor-pointer">1080p</button>
+                        <button onclick="changeQuality('720p')" class="quality-btn bg-[#ff5500] text-white border border-[#ff5500] px-2 py-0.5 rounded text-xs font-bold transition cursor-pointer">720p</button>
+                        <button onclick="changeQuality('480p')" class="quality-btn bg-[#1a1a2b] hover:bg-gray-800 text-gray-300 border border-gray-700 px-2 py-0.5 rounded text-xs font-medium transition cursor-pointer">480p</button>
+                        <button onclick="changeQuality('360p')" class="quality-btn bg-[#1a1a2b] hover:bg-gray-800 text-gray-300 border border-gray-700 px-2 py-0.5 rounded text-xs font-medium transition cursor-pointer">360p</button>
                     </div>
                 </div>
 
@@ -137,7 +145,7 @@
                             <div class="spinner mb-3"></div>
                             <p class="text-xs text-gray-400 font-medium tracking-wide">Loading video fast...</p>
                         </div>
-                        <iframe id="animeVideoPlayer" src="" class="w-full h-full border-0 absolute inset-0 z-10" allowfullscreen scrolling="no" onload="hideSpinner()"></iframe>
+                        <iframe id="animeVideoPlayer" src="" class="w-full h-full border-0 absolute inset-0 z-10" allow="autoplay; encrypted-media" allowfullscreen scrolling="no" onload="hideSpinner()"></iframe>
                     </div>
                 </div>
 
@@ -176,18 +184,18 @@
 
                 <!-- Episode Buttons with Embedded Links directly in HTML -->
                 <div class="grid grid-cols-3 gap-2 overflow-y-auto max-h-[300px] pr-1" id="episodeGridButtons">
-                    <button onclick="selectEpisode(1)" class="ep-btn bg-[#ff5500] text-white border border-[#ff5500] py-2.5 rounded-lg text-xs font-bold transition cursor-pointer" data-ep="1" data-vidhide="https://vidhidepro.com/embed/enianumkn5s8" data-streamhg="https://streamhg.com/embed/ah8mwksej95a">1</button>
-                    <button onclick="selectEpisode(2)" class="ep-btn bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition cursor-pointer" data-ep="2" data-vidhide="https://vidhidepro.com/embed/sb7pjd72e1s9" data-streamhg="https://streamhg.com/embed/9dkbkic6eqj7">2</button>
-                    <button onclick="selectEpisode(3)" class="ep-btn bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition cursor-pointer" data-ep="3" data-vidhide="https://vidhidepro.com/embed/cnan1gf2g8t7" data-streamhg="https://streamhg.com/embed/mgu5ordosvyg">3</button>
-                    <button onclick="selectEpisode(4)" class="ep-btn bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition cursor-pointer" data-ep="4" data-vidhide="https://vidhidepro.com/embed/t0dge5xo5zrl" data-streamhg="https://streamhg.com/embed/82m4hs05k3rn">4</button>
-                    <button onclick="selectEpisode(5)" class="ep-btn bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition cursor-pointer" data-ep="5" data-vidhide="https://vidhidepro.com/embed/foaoioos27ap" data-streamhg="https://streamhg.com/embed/jtujkg298kw7">5</button>
-                    <button onclick="selectEpisode(6)" class="ep-btn bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition cursor-pointer" data-ep="6" data-vidhide="https://vidhidepro.com/embed/m7jjs2sr03kw" data-streamhg="https://streamhg.com/embed/g09pjpikcizn">6</button>
-                    <button onclick="selectEpisode(7)" class="ep-btn bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition cursor-pointer" data-ep="7" data-vidhide="https://vidhidepro.com/embed/gs06s2v6r673" data-streamhg="https://streamhg.com/embed/8wlv9zqezrg6">7</button>
-                    <button onclick="selectEpisode(8)" class="ep-btn bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition cursor-pointer" data-ep="8" data-vidhide="https://vidhidepro.com/embed/xh0iyd50hvq6" data-streamhg="https://streamhg.com/embed/twrdqivn9h5e">8</button>
-                    <button onclick="selectEpisode(9)" class="ep-btn bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition cursor-pointer" data-ep="9" data-vidhide="https://vidhidepro.com/embed/bouhhv2xlb31" data-streamhg="https://streamhg.com/embed/f3pkik1eh5j6">9</button>
-                    <button onclick="selectEpisode(10)" class="ep-btn bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition cursor-pointer" data-ep="10" data-vidhide="https://vidhidepro.com/embed/og1ex9uwb2m7" data-streamhg="https://streamhg.com/embed/3pevgpg4q9rt">10</button>
-                    <button onclick="selectEpisode(11)" class="ep-btn bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition cursor-pointer" data-ep="11" data-vidhide="https://vidhidepro.com/embed/lhddo4tv4yyy" data-streamhg="https://streamhg.com/embed/cfa93nq68ljt">11</button>
-                    <button onclick="selectEpisode(12)" class="ep-btn bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition cursor-pointer" data-ep="12" data-vidhide="https://vidhidepro.com/embed/zvhhe7ig5duq" data-streamhg="https://streamhg.com/embed/mih1yb05mruu">12</button>
+                    <button onclick="selectEpisode(1)" class="ep-btn bg-[#ff5500] text-white border border-[#ff5500] py-2.5 rounded-lg text-xs font-bold transition cursor-pointer" data-ep="1" data-vidhide="https://vidhidepro.com/embed/enianumkn5s8?autoplay=1">1</button>
+                    <button onclick="selectEpisode(2)" class="ep-btn bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition cursor-pointer" data-ep="2" data-vidhide="https://vidhidepro.com/embed/sb7pjd72e1s9?autoplay=1">2</button>
+                    <button onclick="selectEpisode(3)" class="ep-btn bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition cursor-pointer" data-ep="3" data-vidhide="https://vidhidepro.com/embed/cnan1gf2g8t7?autoplay=1">3</button>
+                    <button onclick="selectEpisode(4)" class="ep-btn bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition cursor-pointer" data-ep="4" data-vidhide="https://vidhidepro.com/embed/t0dge5xo5zrl?autoplay=1">4</button>
+                    <button onclick="selectEpisode(5)" class="ep-btn bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition cursor-pointer" data-ep="5" data-vidhide="https://vidhidepro.com/embed/foaoioos27ap?autoplay=1">5</button>
+                    <button onclick="selectEpisode(6)" class="ep-btn bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition cursor-pointer" data-ep="6" data-vidhide="https://vidhidepro.com/embed/m7jjs2sr03kw?autoplay=1">6</button>
+                    <button onclick="selectEpisode(7)" class="ep-btn bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition cursor-pointer" data-ep="7" data-vidhide="https://vidhidepro.com/embed/gs06s2v6r673?autoplay=1">7</button>
+                    <button onclick="selectEpisode(8)" class="ep-btn bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition cursor-pointer" data-ep="8" data-vidhide="https://vidhidepro.com/embed/xh0iyd50hvq6?autoplay=1">8</button>
+                    <button onclick="selectEpisode(9)" class="ep-btn bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition cursor-pointer" data-ep="9" data-vidhide="https://vidhidepro.com/embed/bouhhv2xlb31?autoplay=1">9</button>
+                    <button onclick="selectEpisode(10)" class="ep-btn bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition cursor-pointer" data-ep="10" data-vidhide="https://vidhidepro.com/embed/og1ex9uwb2m7?autoplay=1">10</button>
+                    <button onclick="selectEpisode(11)" class="ep-btn bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition cursor-pointer" data-ep="11" data-vidhide="https://vidhidepro.com/embed/lhddo4tv4yyy?autoplay=1">11</button>
+                    <button onclick="selectEpisode(12)" class="ep-btn bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition cursor-pointer" data-ep="12" data-vidhide="https://vidhidepro.com/embed/zvhhe7ig5duq?autoplay=1">12</button>
                 </div>
             </div>
         </div>
