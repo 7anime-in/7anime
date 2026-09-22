@@ -37,6 +37,30 @@
 </head>
 <body class="bg-[#0b0c10] text-white font-sans antialiased selection:bg-[#ff5500] selection:text-white min-h-screen flex flex-col justify-between">
 
+    <!-- ================= 1. ADBLOCK WARNING OVERLAY ================= -->
+    <div id="adblockWarningModal" class="hidden fixed inset-0 bg-black/95 z-[9999] flex items-center justify-center p-4 backdrop-blur-md">
+        <div class="bg-[#151522] border border-red-500/40 rounded-2xl p-6 md:p-8 max-w-md w-full text-center space-y-5 shadow-2xl">
+            <div class="w-16 h-16 bg-red-500/10 border border-red-500/30 rounded-full flex items-center justify-center mx-auto text-red-500 text-3xl animate-bounce">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <div class="space-y-2">
+                <h3 class="text-xl font-extrabold text-white">AdBlocker Detected! 🚫</h3>
+                <p class="text-xs text-gray-300 leading-relaxed">
+                    Humari website aapko <span class="text-[#ff5500] font-bold">Free Downloads</span> provide karti hai. Site ki hosting/server cost ke liye Ads zaroori hain.
+                </p>
+                <p class="text-[11px] text-gray-400 border-t border-gray-800 pt-3 mt-2">
+                    Kripya is site ke liye apna <b class="text-white">AdBlocker Pause / Disable</b> karein aur page refresh karein.
+                </p>
+            </div>
+            <div class="pt-2">
+                <button onclick="location.reload()" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-xl text-xs transition shadow-lg cursor-pointer flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-rotate-right"></i>
+                    <span>Disable Karke Refresh Karein</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Header -->
     <header class="main-header flex items-center justify-between px-4 py-3 bg-[#151522] border-b border-gray-800 relative z-50">
         <div class="flex items-center space-x-3">
@@ -66,7 +90,38 @@
     </aside>
 
     <!-- Main Content Container -->
-    <main class="max-w-4xl mx-auto px-4 py-8 flex-1 w-full space-y-8">
+    <main class="max-w-4xl mx-auto px-4 py-6 flex-1 w-full space-y-6">
+
+        <!-- ================= TOP BANNER AD (728x90 Desktop / 320x50 Mobile) ================= -->
+        <div class="w-full flex flex-col items-center justify-center my-2">
+            <span class="text-[9px] text-gray-500 uppercase tracking-widest mb-1">- Advertisement -</span>
+            <!-- Desktop 728x90 Banner -->
+            <div class="hidden md:flex justify-center items-center overflow-hidden min-h-[90px]">
+                <script>
+                  atOptions = {
+                    'key' : '266405efe3dce7546f9cf7fc8942276f',
+                    'format' : 'iframe',
+                    'height' : 90,
+                    'width' : 728,
+                    'params' : {}
+                  };
+                </script>
+                <script src="https://seenimplieddump.com/266405efe3dce7546f9cf7fc8942276f/invoke.js"></script>
+            </div>
+            <!-- Mobile 320x50 Banner -->
+            <div class="flex md:hidden justify-center items-center overflow-hidden min-h-[50px]">
+                <script>
+                  atOptions = {
+                    'key' : 'cc4edbceab156b82e59dfda602d17208',
+                    'format' : 'iframe',
+                    'height' : 50,
+                    'width' : 320,
+                    'params' : {}
+                  };
+                </script>
+                <script src="https://seenimplieddump.com/cc4edbceab156b82e59dfda602d17208/invoke.js"></script>
+            </div>
+        </div>
 
         <!-- Anime Card Intro Header -->
         <div class="bg-[#151522] border border-gray-800 rounded-2xl p-4 md:p-6 flex flex-col md:flex-row gap-6 items-center md:items-start shadow-xl">
@@ -80,7 +135,7 @@
                     <span class="bg-amber-500/20 text-amber-400 border border-amber-500/40 px-2.5 py-0.5 rounded font-bold flex items-center space-x-1">
                         <i class="fa-solid fa-star text-[10px]"></i> <span>9.4/10</span>
                     </span>
-                    <span class="bg-[#1a1a2b] text-gray-300 border border-gray-700 px-2.5 py-0.5 rounded">All Seasons</span>
+                    <span class="bg-[#1a1a2b] text-gray-300 border border-gray-700 px-2.5 py-0.5 rounded">All Available Seasons</span>
                 </div>
                 <p class="text-gray-300 text-xs md:text-sm leading-relaxed">
                     Click the verification button below to generate high-speed direct download links.
@@ -88,8 +143,8 @@
             </div>
         </div>
 
-        <!-- STEP 1: Middle Verification Box -->
-        <div id="verificationStep" class="bg-[#151522] border border-gray-800 rounded-2xl p-8 text-center space-y-4 shadow-2xl my-8">
+        <!-- STEP 1: Verification Box (Integrated Smart Link) -->
+        <div id="verificationStep" class="bg-[#151522] border border-gray-800 rounded-2xl p-8 text-center space-y-4 shadow-2xl my-6">
             <div class="w-14 h-14 bg-[#ff5500]/10 border border-[#ff5500]/30 rounded-full flex items-center justify-center mx-auto text-[#ff5500] text-2xl">
                 <i class="fa-solid fa-shield-halved"></i>
             </div>
@@ -102,7 +157,24 @@
             </button>
         </div>
 
-        <!-- STEP 2: Bottom Download Trigger Button (Hidden by default) -->
+        <!-- ================= MIDDLE AD BANNER (300x250 Box Ad) ================= -->
+        <div class="w-full flex flex-col items-center justify-center my-4">
+            <span class="text-[9px] text-gray-500 uppercase tracking-widest mb-1">- Advertisement -</span>
+            <div class="flex justify-center items-center overflow-hidden min-h-[250px] bg-[#151522] p-2 border border-gray-800 rounded-xl">
+                <script>
+                  atOptions = {
+                    'key' : '26d9fe493cd81a084fd8969e8ef1e358',
+                    'format' : 'iframe',
+                    'height' : 250,
+                    'width' : 300,
+                    'params' : {}
+                  };
+                </script>
+                <script src="https://seenimplieddump.com/26d9fe493cd81a084fd8969e8ef1e358/invoke.js"></script>
+            </div>
+        </div>
+
+        <!-- STEP 2: Bottom Trigger Button -->
         <div id="bottomTriggerBox" class="hidden text-center py-6 border-t border-gray-800 space-y-3">
             <p class="text-xs text-green-400 font-semibold flex items-center justify-center space-x-1">
                 <i class="fa-solid fa-circle-check"></i>
@@ -114,40 +186,38 @@
             </button>
         </div>
 
-        <!-- STEP 3: MAIN DOWNLOAD HUB (Hidden until Step 2 is clicked) -->
+        <!-- STEP 3: MAIN DOWNLOAD HUB -->
         <div id="downloadHub" class="hidden space-y-6">
 
-            <!-- OPTION 1: Season Selector -->
+            <!-- OPTION 1: Season Selector (Dynamic Rendering) -->
             <div class="bg-[#151522] border border-gray-800 rounded-2xl p-4 md:p-5 space-y-3">
                 <div class="flex items-center space-x-2 border-b border-gray-800 pb-3">
-                    <i class="fa-solid fa-[#1] text-[#ff5500] text-lg"></i>
-                    <i class="fa-solid fa-[#2] text-[#ff5500] text-lg"></i>
+                    <i class="fa-solid fa-layer-group text-[#ff5500] text-lg"></i>
                     <h3 class="text-sm md:text-base font-bold text-[#ff5500]">Option 1: Select Season</h3>
                 </div>
-                <div class="flex items-center gap-3" id="seasonButtonsContainer">
-                    <button id="season1Btn" onclick="selectSeason(1)" class="bg-[#ff5500] text-white px-5 py-2 rounded-xl text-xs font-bold transition shadow cursor-pointer">
-                        Season 1
-                    </button>
-                    <button id="season2Btn" onclick="selectSeason(2)" class="bg-[#1a1a2b] hover:bg-gray-800 text-gray-300 border border-gray-700 px-5 py-2 rounded-xl text-xs font-semibold transition cursor-pointer">
-                        Season 2
-                    </button>
-                </div>
+                <!-- Season Buttons will render here dynamically -->
+                <div class="flex flex-wrap items-center gap-3" id="seasonButtonsContainer"></div>
             </div>
 
             <!-- OPTION 2: Full Season Batch Download -->
-            <div class="bg-[#151522] border border-gray-800 rounded-2xl p-4 md:p-5 space-y-3">
+            <div id="batchDownloadBox" class="bg-[#151522] border border-gray-800 rounded-2xl p-4 md:p-5 space-y-3">
                 <div class="flex items-center space-x-2 border-b border-gray-800 pb-3">
                     <i class="fa-solid fa-file-zipper text-[#ff5500] text-lg"></i>
                     <h3 class="text-sm md:text-base font-bold text-[#ff5500]">Option 2: Download Full Season (Zip Batch)</h3>
                 </div>
-                <p class="text-[11px] text-gray-400">Download all episodes of selected season in a single click:</p>
-                
-                <div id="batchDownloadLinks" class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    <!-- Links render dynamically via JS -->
+                <div id="batchDownloadLinks" class="grid grid-cols-1 sm:grid-cols-3 gap-3"></div>
+            </div>
+
+            <!-- ================= NATIVE BANNER AD ================= -->
+            <div class="w-full flex flex-col items-center justify-center my-4">
+                <span class="text-[9px] text-gray-500 uppercase tracking-widest mb-1">- Sponsored Content -</span>
+                <div class="w-full bg-[#151522] border border-gray-800 rounded-xl p-3">
+                    <script async="async" data-cfasync="false" src="https://seenimplieddump.com/1d9a698023dcebe6538e97b52efe6c85/invoke.js"></script>
+                    <div id="container-1d9a698023dcebe6538e97b52efe6c85"></div>
                 </div>
             </div>
 
-            <!-- OPTION 3: Selected Season Episode List -->
+            <!-- OPTION 3: Single Episode List -->
             <div class="bg-[#151522] border border-gray-800 rounded-2xl p-4 md:p-5 space-y-4">
                 <div class="flex items-center justify-between border-b border-gray-800 pb-3">
                     <div class="flex items-center space-x-2">
@@ -155,28 +225,45 @@
                         <h3 class="text-sm md:text-base font-bold text-[#ff5500]">Option 3: Single Episode Downloads</h3>
                     </div>
                     <span id="activeSeasonBadge" class="text-[11px] bg-[#1a1a2b] border border-gray-700 px-2.5 py-1 rounded text-gray-300 font-semibold">
-                        Season 1 List
+                        Season List
                     </span>
                 </div>
 
-                <!-- Episodes List Render Container -->
-                <div id="episodeListContainer" class="space-y-2.5">
-                    <!-- Episodes render dynamically via JS -->
-                </div>
+                <div id="episodeListContainer" class="space-y-2.5"></div>
             </div>
 
         </div>
 
+        <!-- ================= BOTTOM BANNER AD (468x60) ================= -->
+        <div class="w-full flex flex-col items-center justify-center my-6">
+            <span class="text-[9px] text-gray-500 uppercase tracking-widest mb-1">- Advertisement -</span>
+            <div class="flex justify-center items-center overflow-hidden min-h-[60px]">
+                <script>
+                  atOptions = {
+                    'key' : '779806ce0042f504cad817a179222957',
+                    'format' : 'iframe',
+                    'height' : 60,
+                    'width' : 468,
+                    'params' : {}
+                  };
+                </script>
+                <script src="https://seenimplieddump.com/779806ce0042f504cad817a179222957/invoke.js"></script>
+            </div>
+        </div>
+
     </main>
 
-    <!-- Page Footer -->
-    <footer class="bg-[#151522] border-t border-gray-800 py-4 text-center text-xs text-gray-500 mt-12">
+    <!-- Footer -->
+    <footer class="bg-[#151522] border-t border-gray-800 py-4 text-center text-xs text-gray-500 mt-8">
         © 7ANIME - All rights reserved.
     </footer>
 
-    <!-- JavaScript Logic -->
+    <!-- Logic Script -->
     <script>
-        // Sample Season Data (Easily expandable for any Anime)
+        // Smartlink URL
+        const SMARTLINK_URL = "https://seenimplieddump.com/r4encwrvs?key=991b24b9ac839ae4944305239012fd68";
+
+        // Anime Data Structure
         const animeData = {
             title: "Solo Leveling (Hindi Dub)",
             poster: "https://lh3.googleusercontent.com/d/1hZPMLLUNMOVG8DmSd1eGd5Nmdgh6AUYZ",
@@ -189,29 +276,30 @@
                     },
                     episodes: [
                         { ep: 1, title: "I'm Used to It", link480: "https://vidhidepro.com/download/enianumkn5s8", link720: "https://vidhidepro.com/download/enianumkn5s8", link1080: "https://vidhidepro.com/download/enianumkn5s8" },
-                        { ep: 2, title: "If I Had One More Chance", link480: "https://vidhidepro.com/download/sb7pjd72e1s9", link720: "https://vidhidepro.com/download/sb7pjd72e1s9", link1080: "https://vidhidepro.com/download/sb7pjd72e1s9" },
+                        { ep: 2, title: "If I Had One More Chance", link480: "https://vidhidepro.com/download/sb7pjd72e1s9", link720: "https://vidhidepro.com/download/sb7pjd72e1s9", link1080: "" },
                         { ep: 3, title: "It's Like a Game", link480: "https://vidhidepro.com/download/cnan1gf2g8t7", link720: "https://vidhidepro.com/download/cnan1gf2g8t7", link1080: "https://vidhidepro.com/download/cnan1gf2g8t7" },
                         { ep: 4, title: "I've Gotta Get Stronger", link480: "https://vidhidepro.com/download/t0dge5xo5zrl", link720: "https://vidhidepro.com/download/t0dge5xo5zrl", link1080: "https://vidhidepro.com/download/t0dge5xo5zrl" }
                     ]
                 },
+                // Season 2 me episode empty hain, to Button Hide Rahega
                 2: {
-                    batch: {
-                        "480p": "#",
-                        "720p": "#",
-                        "1080p": "#"
-                    },
-                    episodes: [
-                        { ep: 1, title: "Season 2 - Arise Again", link480: "#", link720: "#", link1080: "#" },
-                        { ep: 2, title: "Season 2 - Shadow Monarch", link480: "#", link720: "#", link1080: "#" }
-                    ]
+                    batch: {},
+                    episodes: []
                 }
             }
         };
 
         let currentSeason = 1;
 
-        // 1. Verify Logic
+        function isValidLink(url) {
+            return url && url.trim() !== "" && url.trim() !== "#";
+        }
+
+        // 1. Verification Trigger with Smartlink Redirect
         function handleVerify() {
+            // Open Smartlink in new tab for revenue boost
+            window.open(SMARTLINK_URL, '_blank');
+
             const btn = document.getElementById('verifyBtn');
             btn.disabled = true;
             btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> <span>Verifying...</span>`;
@@ -219,75 +307,128 @@
             setTimeout(() => {
                 document.getElementById('verificationStep').classList.add('hidden');
                 document.getElementById('bottomTriggerBox').classList.remove('hidden');
-                // Scroll smoothly to bottom trigger
                 document.getElementById('bottomTriggerBox').scrollIntoView({ behavior: 'smooth' });
-            }, 1500);
+            }, 1200);
         }
 
-        // 2. Reveal Download Hub Logic
+        // 2. Reveal Hub
         function revealDownloadHub() {
             document.getElementById('bottomTriggerBox').classList.add('hidden');
             const hub = document.getElementById('downloadHub');
             hub.classList.remove('hidden');
-            renderSeasonContent(currentSeason);
+            
+            renderSeasonButtons();
+            
+            const validSeasons = getValidSeasonKeys();
+            if(validSeasons.length > 0) {
+                selectSeason(Number(validSeasons[0]));
+            }
+            
             hub.scrollIntoView({ behavior: 'smooth' });
         }
 
-        // 3. Season Selection & Render Logic
+        function getValidSeasonKeys() {
+            return Object.keys(animeData.seasons).filter(sKey => {
+                const sObj = animeData.seasons[sKey];
+                return sObj && sObj.episodes && sObj.episodes.length > 0;
+            });
+        }
+
+        // 3. Render Seasons Dynamically
+        function renderSeasonButtons() {
+            const container = document.getElementById('seasonButtonsContainer');
+            container.innerHTML = "";
+            const validSeasons = getValidSeasonKeys();
+
+            if (validSeasons.length === 0) {
+                container.innerHTML = `<p class="text-xs text-gray-400">No downloadable seasons available right now.</p>`;
+                return;
+            }
+
+            validSeasons.forEach(sKey => {
+                const sNum = Number(sKey);
+                const btn = document.createElement('button');
+                btn.innerText = `Season ${sNum}`;
+                btn.onclick = () => selectSeason(sNum);
+                btn.className = (sNum === currentSeason)
+                    ? "bg-[#ff5500] text-white px-5 py-2 rounded-xl text-xs font-bold transition shadow cursor-pointer"
+                    : "bg-[#1a1a2b] hover:bg-gray-800 text-gray-300 border border-gray-700 px-5 py-2 rounded-xl text-xs font-semibold transition cursor-pointer";
+                container.appendChild(btn);
+            });
+        }
+
+        // 4. Select and Render Season Data
         function selectSeason(seasonNum) {
             currentSeason = seasonNum;
-
-            // UI Button Toggle
-            document.getElementById('season1Btn').className = seasonNum === 1 
-                ? "bg-[#ff5500] text-white px-5 py-2 rounded-xl text-xs font-bold transition shadow cursor-pointer"
-                : "bg-[#1a1a2b] hover:bg-gray-800 text-gray-300 border border-gray-700 px-5 py-2 rounded-xl text-xs font-semibold transition cursor-pointer";
-
-            document.getElementById('season2Btn').className = seasonNum === 2 
-                ? "bg-[#ff5500] text-white px-5 py-2 rounded-xl text-xs font-bold transition shadow cursor-pointer"
-                : "bg-[#1a1a2b] hover:bg-gray-800 text-gray-300 border border-gray-700 px-5 py-2 rounded-xl text-xs font-semibold transition cursor-pointer";
-
+            renderSeasonButtons();
             renderSeasonContent(seasonNum);
         }
 
         function renderSeasonContent(seasonNum) {
             const data = animeData.seasons[seasonNum];
             document.getElementById('activeSeasonBadge').innerText = `Season ${seasonNum} List`;
-
-            // Render Batch Links (Option 2)
+            // Batch Links
             const batchContainer = document.getElementById('batchDownloadLinks');
-            batchContainer.innerHTML = `
-                <a href="${data.batch['480p']}" target="_blank" class="bg-[#1a1a2b] hover:bg-[#ff5500]/20 border border-gray-700 hover:border-[#ff5500] p-3 rounded-xl flex items-center justify-between transition">
-                    <div><div class="text-xs font-bold">Season ${seasonNum} - 480p Zip</div><div class="text-[10px] text-gray-400">Batch File</div></div>
-                    <i class="fa-solid fa-download text-xs text-[#ff5500]"></i>
-                </a>
-                <a href="${data.batch['720p']}" target="_blank" class="bg-[#1a1a2b] hover:bg-[#ff5500]/20 border border-gray-700 hover:border-[#ff5500] p-3 rounded-xl flex items-center justify-between transition">
-                    <div><div class="text-xs font-bold">Season ${seasonNum} - 720p Zip</div><div class="text-[10px] text-gray-400">Batch File</div></div>
-                    <i class="fa-solid fa-download text-xs text-[#ff5500]"></i>
-                </a>
-                <a href="${data.batch['1080p']}" target="_blank" class="bg-[#1a1a2b] hover:bg-[#ff5500]/20 border border-gray-700 hover:border-[#ff5500] p-3 rounded-xl flex items-center justify-between transition">
-                    <div><div class="text-xs font-bold">Season ${seasonNum} - 1080p Zip</div><div class="text-[10px] text-gray-400">Batch File</div></div>
-                    <i class="fa-solid fa-download text-xs text-[#ff5500]"></i>
-                </a>
-            `;
+            const batchBox = document.getElementById('batchDownloadBox');
+            batchContainer.innerHTML = "";
 
-            // Render Episode List (Option 3)
+            let hasBatch = false;
+            ['480p', '720p', '1080p'].forEach(quality => {
+                const url = data.batch ? data.batch[quality] : null;
+                if (isValidLink(url)) {
+                    hasBatch = true;
+                    batchContainer.innerHTML += `
+                        <a href="${url}" target="_blank" class="bg-[#1a1a2b] hover:bg-[#ff5500]/20 border border-gray-700 hover:border-[#ff5500] p-3 rounded-xl flex items-center justify-between transition">
+                            <div><div class="text-xs font-bold">Season ${seasonNum} - ${quality} Zip</div><div class="text-[10px] text-gray-400">Batch Zip File</div></div>
+                            <i class="fa-solid fa-download text-xs text-[#ff5500]"></i>
+                        </a>
+                    `;
+                }
+            });
+
+            batchBox.style.display = hasBatch ? 'block' : 'none';
+
+            // Episode List
             const epContainer = document.getElementById('episodeListContainer');
-            epContainer.innerHTML = data.episodes.map(item => `
-                <div class="bg-[#1a1a2b]/60 border border-gray-800 hover:border-gray-700 p-3 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition">
-                    <div class="flex items-center space-x-3">
-                        <span class="w-8 h-8 rounded-lg bg-[#ff5500]/20 text-[#ff5500] font-extrabold text-xs flex items-center justify-center border border-[#ff5500]/40">${item.ep < 10 ? '0' + item.ep : item.ep}</span>
-                        <div>
-                            <h4 class="text-xs font-bold text-white">Episode ${item.ep} - ${item.title}</h4>
-                            <p class="text-[10px] text-gray-400">Official Hindi Dubbed</p>
+            epContainer.innerHTML = "";
+
+            if (!data.episodes || data.episodes.length === 0) {
+                epContainer.innerHTML = `<p class="text-xs text-gray-400 p-3">No episodes found for this season.</p>`;
+                return;
+            }
+
+            data.episodes.forEach(item => {
+                let qualityButtonsHtml = "";
+
+                if (isValidLink(item.link480)) {
+                    qualityButtonsHtml += `<a href="${item.link480}" target="_blank" class="flex-1 sm:flex-none text-center bg-[#151522] hover:bg-[#ff5500] text-gray-300 hover:text-white border border-gray-700 px-3 py-1.5 rounded-lg text-[11px] font-semibold transition">480p</a>`;
+                }
+                if (isValidLink(item.link720)) {
+                    qualityButtonsHtml += `<a href="${item.link720}" target="_blank" class="flex-1 sm:flex-none text-center bg-[#ff5500] hover:bg-[#e04c00] text-white px-3 py-1.5 rounded-lg text-[11px] font-bold transition shadow">720p</a>`;
+                }
+                if (isValidLink(item.link1080)) {
+                    qualityButtonsHtml += `<a href="${item.link1080}" target="_blank" class="flex-1 sm:flex-none text-center bg-[#151522] hover:bg-[#ff5500] text-gray-300 hover:text-white border border-gray-700 px-3 py-1.5 rounded-lg text-[11px] font-semibold transition">1080p</a>`;
+                }
+
+                if (!qualityButtonsHtml) {
+                    qualityButtonsHtml = `<span class="text-[11px] text-gray-500 font-medium italic">Not Uploaded Yet</span>`;
+                }
+
+                epContainer.innerHTML += `
+                    <div class="bg-[#1a1a2b]/60 border border-gray-800 hover:border-gray-700 p-3 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition">
+                        <div class="flex items-center space-x-3">
+                            <span class="w-8 h-8 rounded-lg bg-[#ff5500]/20 text-[#ff5500] font-extrabold text-xs flex items-center justify-center border border-[#ff5500]/40">${item.ep < 10 ? '0' + item.ep : item.ep}</span>
+                            <div>
+                                <h4 class="text-xs font-bold text-white">Episode ${item.ep} - ${item.title}</h4>
+                                <p class="text-[10px] text-gray-400">Official Hindi Dubbed</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            ${qualityButtonsHtml}
                         </div>
                     </div>
-                    <div class="flex items-center gap-2">
-                        <a href="${item.link480}" target="_blank" class="flex-1 sm:flex-none text-center bg-[#151522] hover:bg-[#ff5500] text-gray-300 hover:text-white border border-gray-700 px-3 py-1.5 rounded-lg text-[11px] font-semibold transition">480p</a>
-                        <a href="${item.link720}" target="_blank" class="flex-1 sm:flex-none text-center bg-[#ff5500] hover:bg-[#e04c00] text-white px-3 py-1.5 rounded-lg text-[11px] font-bold transition">720p</a>
-                        <a href="${item.link1080}" target="_blank" class="flex-1 sm:flex-none text-center bg-[#151522] hover:bg-[#ff5500] text-gray-300 hover:text-white border border-gray-700 px-3 py-1.5 rounded-lg text-[11px] font-semibold transition">1080p</a>
-                    </div>
-                </div>
-            `).join('');
+                `;
+            });
         }
 
         // Sidebar Toggle
@@ -295,6 +436,49 @@
             document.getElementById('sidebar').classList.toggle('active');
             document.getElementById('sidebarOverlay').classList.toggle('active');
         }
+
+        // ================= ADBLOCK DETECTION LOGIC =================
+        function triggerAdblockWarning() {
+            const modal = document.getElementById('adblockWarningModal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                const fakeAd = document.createElement('div');
+                fakeAd.innerHTML = '&nbsp;';
+                fakeAd.className = 'adsbox ad-zone banner-ad pub_300x250 google-ad adsterra-ad';
+                fakeAd.style.position = 'absolute';
+                fakeAd.style.top = '-9999px';
+                fakeAd.style.left = '-9999px';
+                fakeAd.style.height = '10px';
+                fakeAd.style.width = '10px';
+                document.body.appendChild(fakeAd);
+
+                const isBlocked = fakeAd.offsetHeight === 0 || 
+                                  fakeAd.clientHeight === 0 || 
+                                  window.getComputedStyle(fakeAd).display === 'none' ||
+                                  window.getComputedStyle(fakeAd).visibility === 'hidden';
+
+                if (isBlocked) {
+                    triggerAdblockWarning();
+                }
+                fakeAd.remove();
+            }, 500);
+        });
+
+        fetch('https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js', { method: 'HEAD', mode: 'no-cors' })
+            .catch(() => triggerAdblockWarning());
     </script>
+
+    <!-- ================= POPUNDER AD SCRIPT ================= -->
+    <script src="https://seenimplieddump.com/ea/4f/e6/ea4fe66a53acc6c4fc7b48bc03a4acf5.js"></script>
+
+    <!-- ================= SOCIAL BAR AD SCRIPT ================= -->
+    <script src="https://seenimplieddump.com/77/c2/24/77c224c37e85a092112b37e82c893705.js"></script>
+
 </body>
 </html>
