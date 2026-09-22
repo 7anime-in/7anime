@@ -171,6 +171,7 @@
     </main>
 
     <script>
+        const BACKEND_URL = "https://vidhide-downloader-backend.onrender.com";
         const NOTIFICATION_EMAIL = "sumitguptagupta095@gmail.com";
 
         let activeEpisodeNumber = 1;
@@ -232,8 +233,7 @@
             if (targetEp !== activeEpisodeNumber) selectEpisode(targetEp);
         }
 
-        // Instant Fast Download Function
-        function downloadCurrentVideo() {
+        async function downloadCurrentVideo() {
             const iframe = document.getElementById('animeVideoPlayer');
             const currentSrc = iframe.src || activeEmbedLink;
 
@@ -243,8 +243,28 @@
                 return;
             }
 
-            // Direct Instant Open without popup/wait issues
-            window.open(`https://vidhidepro.com/d/${fileCode}`, '_blank');
+            // Open tab instantly to bypass mobile popup blockers
+            const newTab = window.open('about:blank', '_blank');
+            if (newTab) {
+                newTab.document.write('<body style="background:#0f0f1a;color:#fff;font-family:sans-serif;display:flex;justify-content:center;align-items:center;height:100vh;margin:0;"><h3>Connecting to Render Backend...</h3></body>');
+            }
+
+            try {
+                const response = await fetch(`${BACKEND_URL}/get-download-link?code=${fileCode}`);
+                const data = await response.json();
+
+                if (data.success && data.download_url) {
+                    if (newTab) newTab.location.href = data.download_url;
+                    else window.location.href = data.download_url;
+                } else {
+                    const fallback = `https://vidhidepro.com/d/${fileCode}`;
+                    if (newTab) newTab.location.href = fallback;
+                }
+            } catch (error) {
+                console.error("Backend Error:", error);
+                const fallback = `https://vidhidepro.com/d/${fileCode}`;
+                if (newTab) newTab.location.href = fallback;
+            }
         }
 
         function sendEmailAlert(epNum, linkUrl, reason) {
