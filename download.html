@@ -9,7 +9,6 @@
 </head>
 <body class="bg-[#0f0f1a] text-white min-h-screen">
 
-    <!-- Header -->
     <header class="p-4 bg-[#1a1a2b] border-b border-gray-800 flex justify-between items-center">
         <h1 class="text-xl font-bold text-[#ff5500]">7ANIME</h1>
         <a id="backToPlayerBtn" href="solo_leveling_videoplayer.html" class="bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-xl text-sm font-bold transition flex items-center space-x-2">
@@ -19,7 +18,6 @@
     </header>
 
     <main class="max-w-4xl mx-auto p-4 md:p-6 space-y-6">
-        <!-- Details Card -->
         <div class="bg-[#1a1a2b] border border-gray-800 p-6 rounded-2xl flex flex-col md:flex-row items-center gap-6">
             <img id="animePoster" src="" alt="Poster" class="w-32 h-44 object-cover rounded-xl bg-gray-800">
             <div class="text-center md:text-left space-y-2">
@@ -31,26 +29,20 @@
             </div>
         </div>
 
-        <!-- Batch Packs Section -->
         <div class="space-y-3">
             <h2 class="text-sm font-bold text-gray-400 uppercase tracking-wider">Batch Download Packs</h2>
-            <div id="batchPacksContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <!-- Packs dynamic HTML render honge -->
-            </div>
+            <div id="batchPacksContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
         </div>
 
-        <!-- Individual Episodes Section -->
         <div class="space-y-3">
             <h2 class="text-sm font-bold text-gray-400 uppercase tracking-wider">All Episodes Direct Download</h2>
-            <div id="episodeListContainer" class="space-y-3">
-                <!-- Episodes dynamic HTML render honge -->
-            </div>
+            <div id="episodeListContainer" class="space-y-3"></div>
         </div>
     </main>
 
     <script>
-        // Render Backend URL Paste Karein
-        const BACKEND_URL = "https://YOUR-RENDER-APP-NAME.onrender.com"; 
+        // Fixed Render Backend URL
+        const BACKEND_URL = "https://vidhide-downloader-backend.onrender.com"; 
 
         let extractedEpisodes = [];
 
@@ -61,31 +53,20 @@
         }
 
         async function downloadViaBackend(fileCode) {
-            if (!fileCode) {
-                alert("Invalid File Code!");
-                return;
-            }
-
-            alert("Direct Download Link Process Ho Raha Hai, Hold Karo...");
+            if (!fileCode) return;
+            alert("Direct Download Process ho raha hai...");
 
             try {
                 const response = await fetch(`${BACKEND_URL}/get-download-link?code=${fileCode}`);
                 const data = await response.json();
 
                 if (data.success && data.download_url) {
-                    const link = document.createElement('a');
-                    link.href = data.download_url;
-                    link.setAttribute('download', '');
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
+                    window.open(data.download_url, '_blank');
                 } else {
-                    alert("Direct link nahi mil paaya! Normal download page khol rahe hain.");
                     window.open(`https://vidhidepro.com/d/${fileCode}`, '_blank');
                 }
             } catch (error) {
                 console.error("Backend Error:", error);
-                alert("Server response nahi de raha hai. Normal download page open kar rahe hain.");
                 window.open(`https://vidhidepro.com/d/${fileCode}`, '_blank');
             }
         }
@@ -93,12 +74,10 @@
         function downloadPack(startEp, endEp) {
             const selected = extractedEpisodes.filter(e => e.ep >= startEp && e.ep <= endEp);
             
-            if(confirm(`Download Episodes ${startEp} to ${endEp}? (${selected.length} files download hongi)`)) {
+            if(confirm(`Download Episodes ${startEp} to ${endEp}?`)) {
                 selected.forEach((item, index) => {
                     setTimeout(() => {
-                        if (item.code) {
-                            downloadViaBackend(item.code);
-                        }
+                        if (item.code) downloadViaBackend(item.code);
                     }, index * 1500);
                 });
             }
@@ -111,10 +90,7 @@
             document.getElementById('backToPlayerBtn').href = playerPage;
 
             fetch(playerPage)
-                .then(res => {
-                    if(!res.ok) throw new Error('Player page not found');
-                    return res.text();
-                })
+                .then(res => res.text())
                 .then(htmlText => {
                     const parser = new DOMParser();
                     const doc = parser.parseFromString(htmlText, 'text/html');
@@ -137,15 +113,11 @@
                         const fileCode = extractVidhideCode(embedUrl);
 
                         if (embedUrl && fileCode) {
-                            extractedEpisodes.push({
-                                ep: epNum,
-                                code: fileCode,
-                                downloadUrl: `https://vidhidepro.com/d/${fileCode}`
-                            });
+                            extractedEpisodes.push({ ep: epNum, code: fileCode });
                         }
                     });
 
-                    // Render Batch Packs
+                    // Render Packs
                     const packContainer = document.getElementById('batchPacksContainer');
                     const totalEps = extractedEpisodes.length;
                     const chunkSize = 4;
@@ -163,15 +135,13 @@
                                     <p class="text-sm font-extrabold text-white">Episodes ${start} - ${end}</p>
                                 </div>
                                 <button onclick="downloadPack(${start}, ${end})" class="bg-[#ff5500] hover:bg-[#e04c00] text-white px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center space-x-1 cursor-pointer">
-                                    <i class="fa-solid fa-download text-[10px]"></i>
-                                    <span>Get Pack</span>
+                                    <i class="fa-solid fa-download text-[10px]"></i> <span>Get Pack</span>
                                 </button>
-                            </div>
-                        `;
+                            </div>`;
                     }
                     packContainer.innerHTML = packsHTML || '<p class="text-xs text-gray-500">No packs available.</p>';
 
-                    // Render Episode List
+                    // Render Single Episodes
                     const epContainer = document.getElementById('episodeListContainer');
                     document.getElementById('epCountText').innerText = `${totalEps} Episodes`;
 
@@ -188,20 +158,12 @@
                                         <p class="text-[11px] text-gray-400">Hindi Audio Direct File</p>
                                     </div>
                                 </div>
-                                <div class="flex items-center space-x-2 self-end sm:self-center">
-                                    <button onclick="downloadViaBackend('${item.code}')" class="bg-[#ff5500] hover:bg-[#e04c00] text-white px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center space-x-1.5 cursor-pointer">
-                                        <i class="fa-solid fa-download text-[10px]"></i>
-                                        <span>Fast Direct Download</span>
-                                    </button>
-                                </div>
-                            </div>
-                        `;
+                                <button onclick="downloadViaBackend('${item.code}')" class="bg-[#ff5500] hover:bg-[#e04c00] text-white px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center space-x-1.5 cursor-pointer">
+                                    <i class="fa-solid fa-download text-[10px]"></i> <span>Fast Direct Download</span>
+                                </button>
+                            </div>`;
                     });
                     epContainer.innerHTML = epHTML || '<p class="text-xs text-gray-500">No episodes found.</p>';
-                })
-                .catch(err => {
-                    console.error(err);
-                    document.getElementById('animeTitle').innerText = "Error loading anime data";
                 });
         });
     </script>
