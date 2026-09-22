@@ -1,307 +1,152 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Solo Leveling Hindi Official Audio S1 - 7ANIME</title>
-    <!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Tailwind CSS CDN -->
+    <title>Solo Leveling - 7ANIME</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        .spinner {
-            width: 45px;
-            height: 45px;
-            border: 4px solid rgba(255, 85, 0, 0.2);
-            border-top: 4px solid #ff5500;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        /* Sidebar Styling */
-        .sidebar {
-            position: fixed;
-            top: 0;
-            left: -280px;
-            width: 280px;
-            height: 100%;
-            background-color: #151522;
-            z-index: 100;
-            transition: left 0.3s ease;
-            box-shadow: 5px 0 15px rgba(0,0,0,0.5);
-            border-right: 1px solid #2d2d3d;
-        }
-        .sidebar.active {
-            left: 0;
-        }
-        .sidebar-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.7);
-            z-index: 99;
-            display: none;
-        }
-        .sidebar-overlay.active {
-            display: block;
-        }
-    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="bg-[#0b0c10] text-white font-sans antialiased">
+<body class="bg-[#0f0f1a] text-white min-h-screen">
 
-    <!-- Header / Navbar -->
-    <header class="main-header flex items-center justify-between px-4 py-3 bg-[#151522] border-b border-gray-800 relative z-50">
-        <div class="flex items-center space-x-3">
-            <button class="text-white text-lg focus:outline-none cursor-pointer" id="menuBtn" onclick="toggleSidebar()">
-                <i class="fa-solid fa-bars"></i>
-            </button>
-            <div class="cursor-pointer font-extrabold text-lg" onclick="window.location.href='index.html'">
-                <span class="text-[#ff5500]">7</span><span class="text-white">ANIME 🔥</span>
-            </div>
-        </div>
-        <!-- Search Bar with Live Suggestions Dropdown Box -->
-        <div class="search-box relative">
-            <input type="text" id="globalSearchInput" placeholder="Search anime..." class="bg-[#1a1a2b] text-xs px-3 py-1.5 rounded-lg border border-gray-700 text-white focus:outline-none w-40 md:w-56">
-            <!-- Search Results Dropdown Box -->
-            <div id="searchResultsDropdown" class="search-dropdown" style="display: none;"></div>
-        </div>
+    <!-- Header -->
+    <header class="p-4 bg-[#1a1a2b] border-b border-gray-800 flex justify-between items-center">
+        <h1 class="text-xl font-bold text-[#ff5500]">7ANIME</h1>
+        <a href="download.html?page=solo_leveling_videoplayer.html" class="bg-[#ff5500] hover:bg-[#e04c00] text-white px-4 py-2 rounded-xl text-sm font-bold transition flex items-center space-x-2">
+            <i class="fa-solid fa-download"></i>
+            <span>Download Page</span>
+        </a>
     </header>
 
-    <!-- Slide-out Sidebar Drawer -->
-    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
-    <aside class="sidebar" id="sidebar">
-        <div class="flex items-center justify-between p-4 border-b border-gray-800">
-            <h3 class="font-bold text-sm"><i class="fa-solid fa-fire text-[#ff5500]"></i> Menu</h3>
-            <span class="cursor-pointer text-xl text-gray-400 hover:text-white" onclick="toggleSidebar()">&times;</span>
-        </div>
-        <ul class="p-4 space-y-3 text-xs font-semibold">
-            <li><a href="index.html" class="flex items-center space-x-2 text-gray-300 hover:text-[#ff5500]"><i class="fa-solid fa-house"></i> <span>HOME</span></a></li>
-            <li><a href="download.html?id=solo_leveling" class="flex items-center space-x-2 text-gray-300 hover:text-[#ff5500]"><i class="fa-solid fa-download"></i> <span>DOWNLOAD PAGE</span></a></li>
-        </ul>
-    </aside>
-
-    <!-- Main Wrapper Content -->
-    <main class="max-w-7xl mx-auto px-4 py-6 space-y-6">
-
-        <!-- Anime Details Header Section -->
-        <div class="bg-[#151522] border border-gray-800 rounded-2xl p-4 md:p-6 flex flex-col md:flex-row gap-6 items-start shadow-xl">
-            <div class="w-full md:w-48 flex-shrink-0 aspect-[3/4] rounded-xl overflow-hidden border border-gray-700 shadow-lg relative mx-auto md:mx-0">
-                <img src="https://lh3.googleusercontent.com/d/1hZPMLLUNMOVG8DmSd1eGd5Nmdgh6AUYZ" alt="Solo Leveling Hindi Dub" class="w-full h-full object-cover">
+    <!-- Main Content -->
+    <main class="max-w-6xl mx-auto p-4 md:p-6 space-y-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Poster & Info -->
+            <div class="bg-[#1a1a2b] p-4 rounded-2xl border border-gray-800 flex flex-col items-center text-center">
+                <img src="https://via.placeholder.com/300x420" alt="Solo Leveling Poster" class="w-48 h-64 object-cover rounded-xl shadow-lg mb-4">
+                <h1 class="text-xl font-bold mb-2">Solo Leveling</h1>
+                <p class="text-xs text-gray-300 leading-relaxed">Watch and download official episodes in Hindi audio direct links.</p>
             </div>
-            <div class="flex-1 space-y-3 w-full">
-                <div class="flex flex-wrap items-center justify-between gap-2">
-                    <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight">Solo Leveling (Hindi Official Audio)</h1>
-                    <div class="flex items-center space-x-2">
-                        <!-- Updated Dynamic Download Button -->
-                        <button onclick="window.location.href='download.html?id=solo_leveling'" class="bg-[#ff5500] hover:bg-[#e04c00] text-white px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition cursor-pointer">
-                            <i class="fa-solid fa-download text-[10px]"></i> <span>All Download Links</span>
-                        </button>
-                    </div>
-                </div>
-                <div class="flex flex-wrap items-center gap-2 text-xs">
-                    <span class="bg-purple-600/30 text-purple-300 border border-purple-500/40 px-2.5 py-0.5 rounded font-semibold">Hindi Dub</span>
-                    <span class="bg-amber-500/20 text-amber-400 border border-amber-500/40 px-2.5 py-0.5 rounded font-bold flex items-center space-x-1">
-                        <i class="fa-solid fa-star text-[10px]"></i> <span>9.4/10</span>
-                    </span>
-                    <span class="bg-[#1a1a2b] text-gray-300 border border-gray-700 px-2.5 py-0.5 rounded">Season 1</span>
-                </div>
-                <p class="text-gray-300 text-xs md:text-sm leading-relaxed">
-                    Solo Leveling Season 1 in Official Hindi Audio. Sung Jin-Woo's journey to become the ultimate hunter continues in Hindi.
-                </p>
-            </div>
-        </div>
 
-        <!-- Video Player & Episode List Grid Section -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-            <!-- Video Player + Server & Quality Switcher -->
-            <div class="lg:col-span-2 space-y-4">
-                
-                <!-- Server & Quality Switcher Bar -->
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between bg-[#151522] px-4 py-2.5 rounded-xl border border-gray-800 gap-3">
-                    <div class="flex items-center space-x-2">
-                        <span class="text-xs text-gray-400 font-semibold"><i class="fa-solid fa-server text-[#ff5500]"></i> Server:</span>
-                        <button onclick="switchServer('vidhide')" id="serverBtn1" class="bg-[#ff5500] text-white px-3 py-1 rounded-lg text-xs font-bold transition shadow cursor-pointer">Server 1 (Vidhide)</button>
-                    </div>
-                    
-                    <!-- Quality Buttons (Default 720p Active) -->
-                    <div class="flex items-center space-x-1.5">
-                        <span class="text-xs text-gray-400 font-semibold mr-1"><i class="fa-solid fa-sliders text-[#ff5500]"></i> Quality:</span>
-                        <button onclick="changeQuality('1080p')" class="quality-btn bg-[#1a1a2b] hover:bg-gray-800 text-gray-300 border border-gray-700 px-2 py-0.5 rounded text-xs font-medium transition cursor-pointer">1080p</button>
-                        <button onclick="changeQuality('720p')" class="quality-btn bg-[#ff5500] text-white border border-[#ff5500] px-2 py-0.5 rounded text-xs font-bold transition cursor-pointer">720p</button>
-                        <button onclick="changeQuality('480p')" class="quality-btn bg-[#1a1a2b] hover:bg-gray-800 text-gray-300 border border-gray-700 px-2 py-0.5 rounded text-xs font-medium transition cursor-pointer">480p</button>
-                        <button onclick="changeQuality('360p')" class="quality-btn bg-[#1a1a2b] hover:bg-gray-800 text-gray-300 border border-gray-700 px-2 py-0.5 rounded text-xs font-medium transition cursor-pointer">360p</button>
-                    </div>
+            <!-- Video Player Container -->
+            <div class="md:col-span-2 space-y-4">
+                <div class="aspect-video w-full bg-black rounded-2xl overflow-hidden border border-gray-800 relative">
+                    <iframe id="animeVideoPlayer" src="https://vidhidepro.com/embed/EXAMPLE1" class="w-full h-full border-0" allowfullscreen></iframe>
                 </div>
 
-                <!-- Player Box with Spinner -->
-                <div class="relative bg-black rounded-2xl overflow-hidden shadow-2xl border border-gray-800">
-                    <div class="relative aspect-video w-full bg-black flex items-center justify-center" id="playerContainer">
-                        <div id="loadingSpinner" class="absolute inset-0 bg-[#0b0c10] flex flex-col items-center justify-center z-20">
-                            <div class="spinner mb-3"></div>
-                            <p class="text-xs text-gray-400 font-medium tracking-wide">Loading video fast...</p>
-                        </div>
-                        <iframe id="animeVideoPlayer" src="" class="w-full h-full border-0 absolute inset-0 z-10" allow="autoplay; encrypted-media" allowfullscreen scrolling="no" onload="hideSpinner()" onerror="handleVideoError()"></iframe>
+                <!-- Video Controls & Direct Download Button -->
+                <div class="flex items-center justify-between bg-[#1a1a2b] p-4 rounded-xl border border-gray-800">
+                    <div>
+                        <h2 class="text-sm font-bold">Now Playing</h2>
+                        <p class="text-xs text-gray-400">Select episode from below</p>
                     </div>
-                </div>
-
-                <!-- Player Action Bar (Prev/Next + Direct Download + Dead Link Alert) -->
-                <div class="flex flex-wrap items-center justify-between bg-[#151522] px-4 py-3 rounded-xl border border-gray-800 text-xs md:text-sm gap-2">
-                    <button onclick="changeEpisode('prev')" class="flex items-center space-x-1.5 font-semibold text-gray-300 hover:text-white transition cursor-pointer">
-                        <i class="fa-solid fa-chevron-left text-[10px]"></i>
-                        <span>Prev Episode</span>
-                    </button>
-                    
-                    <div class="flex items-center space-x-2">
-                        <span id="currentPlayingText" class="font-bold text-gray-200">Episode 1</span>
-                        
-                        <!-- DIRECT VIDEO PLAYER DOWNLOAD BUTTON -->
-                        <button onclick="downloadCurrentVideo()" class="bg-[#ff5500] hover:bg-[#e04c00] text-white px-3 py-1 rounded-lg text-xs font-bold transition flex items-center space-x-1.5 cursor-pointer shadow">
-                            <i class="fa-solid fa-download text-[11px]"></i>
-                            <span>Download Video</span>
-                        </button>
-
-                        <!-- REPORT BROKEN/EXPIRED LINK BUTTON -->
-                        <button onclick="reportBrokenLink()" class="bg-red-600/20 hover:bg-red-600/40 text-red-400 border border-red-500/30 px-2.5 py-1 rounded-lg text-xs font-semibold transition flex items-center space-x-1 cursor-pointer" title="Report Expired/Broken Link">
-                            <i class="fa-solid fa-triangle-exclamation text-[11px]"></i>
-                            <span class="hidden sm:inline">Report Dead Link</span>
-                        </button>
-                    </div>
-
-                    <button onclick="changeEpisode('next')" class="flex items-center space-x-1.5 font-semibold text-gray-300 hover:text-white transition cursor-pointer">
-                        <span>Next Episode</span>
-                        <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                    <button onclick="downloadCurrentVideo()" class="bg-[#ff5500] hover:bg-[#e04c00] text-white px-4 py-2 rounded-xl text-sm font-bold transition flex items-center space-x-2 cursor-pointer">
+                        <i class="fa-solid fa-download"></i>
+                        <span>Download Video</span>
                     </button>
                 </div>
             </div>
+        </div>
 
-            <!-- Episode List Sidebar -->
-            <div class="bg-[#151522] p-4 rounded-2xl border border-gray-800 space-y-4">
-                
-                <!-- Season Switcher Tabs -->
-                <div class="flex items-center justify-between bg-[#151522] px-3 py-2 rounded-xl border border-gray-800">
-                    <span class="text-xs text-gray-400 font-semibold"><i class="fa-solid fa-layer-group text-[#ff5500]"></i> Select Season:</span>
-                    <div class="flex items-center space-x-2" id="seasonButtonsContainer">
-                        <button onclick="switchSeason(1)" id="seasonBtn1" class="bg-[#ff5500] text-white px-3 py-1 rounded-lg text-xs font-bold transition shadow cursor-pointer">Season 1</button>
-                        <button onclick="switchSeason(2)" id="seasonBtn2" class="bg-[#1a1a2b] hover:bg-gray-800 text-gray-300 border border-gray-700 px-3 py-1 rounded-lg text-xs font-semibold transition cursor-pointer">Season 2</button>
-                    </div>
-                </div>
-
-                <div class="flex items-center justify-between mb-2">
-                    <div class="flex items-center space-x-2">
-                        <i class="fa-solid fa-bars text-[#ff5500] text-sm"></i>
-                        <h3 class="font-bold text-sm">Episode List (Hindi S1)</h3>
-                    </div>
-                </div>
-
-                <!-- Episode Buttons with Embedded Links directly in HTML -->
-                <div class="grid grid-cols-3 gap-2 overflow-y-auto max-h-[300px] pr-1" id="episodeGridButtons">
-                    <button onclick="selectEpisode(1)" class="ep-btn bg-[#ff5500] text-white border border-[#ff5500] py-2.5 rounded-lg text-xs font-bold transition cursor-pointer" data-ep="1" data-vidhide="https://vidhidepro.com/embed/enianumkn5s8?autoplay=1">1</button>
-                    <button onclick="selectEpisode(2)" class="ep-btn bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition cursor-pointer" data-ep="2" data-vidhide="https://vidhidepro.com/embed/sb7pjd72e1s9?autoplay=1">2</button>
-                    <button onclick="selectEpisode(3)" class="ep-btn bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition cursor-pointer" data-ep="3" data-vidhide="https://vidhidepro.com/embed/cnan1gf2g8t7?autoplay=1">3</button>
-                    <button onclick="selectEpisode(4)" class="ep-btn bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition cursor-pointer" data-ep="4" data-vidhide="https://vidhidepro.com/embed/t0dge5xo5zrl?autoplay=1">4</button>
-                    <button onclick="selectEpisode(5)" class="ep-btn bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition cursor-pointer" data-ep="5" data-vidhide="https://vidhidepro.com/embed/foaoioos27ap?autoplay=1">5</button>
-                    <button onclick="selectEpisode(6)" class="ep-btn bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition cursor-pointer" data-ep="6" data-vidhide="https://vidhidepro.com/embed/m7jjs2sr03kw?autoplay=1">6</button>
-                    <button onclick="selectEpisode(7)" class="ep-btn bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition cursor-pointer" data-ep="7" data-vidhide="https://vidhidepro.com/embed/gs06s2v6r673?autoplay=1">7</button>
-                    <button onclick="selectEpisode(8)" class="ep-btn bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition cursor-pointer" data-ep="8" data-vidhide="https://vidhidepro.com/embed/xh0iyd50hvq6?autoplay=1">8</button>
-                    <button onclick="selectEpisode(9)" class="ep-btn bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition cursor-pointer" data-ep="9" data-vidhide="https://vidhidepro.com/embed/bouhhv2xlb31?autoplay=1">9</button>
-                    <button onclick="selectEpisode(10)" class="ep-btn bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition cursor-pointer" data-ep="10" data-vidhide="https://vidhidepro.com/embed/og1ex9uwb2m7?autoplay=1">10</button>
-                    <button onclick="selectEpisode(11)" class="ep-btn bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition cursor-pointer" data-ep="11" data-vidhide="https://vidhidepro.com/embed/lhddo4tv4yyy?autoplay=1">11</button>
-                    <button onclick="selectEpisode(12)" class="ep-btn bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition cursor-pointer" data-ep="12" data-vidhide="https://vidhidepro.com/embed/zvhhe7ig5duq?autoplay=1">12</button>
-                </div>
+        <!-- Episodes List -->
+        <div class="bg-[#1a1a2b] p-6 rounded-2xl border border-gray-800">
+            <h3 class="text-lg font-bold mb-4 flex items-center space-x-2">
+                <i class="fa-solid fa-list text-[#ff5500]"></i>
+                <span>Episodes</span>
+            </h3>
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                <button class="ep-btn bg-[#ff5500] text-white p-3 rounded-xl font-bold text-xs hover:bg-[#e04c00] transition text-center" 
+                        data-ep="1" 
+                        data-vidhide="https://vidhidepro.com/embed/EXAMPLE1" 
+                        onclick="changeEpisode(this, 'https://vidhidepro.com/embed/EXAMPLE1')">
+                    Episode 1
+                </button>
+                <button class="ep-btn bg-[#1a1a2b] border border-gray-700 text-gray-300 p-3 rounded-xl font-bold text-xs hover:border-[#ff5500] transition text-center" 
+                        data-ep="2" 
+                        data-vidhide="https://vidhidepro.com/embed/EXAMPLE2" 
+                        onclick="changeEpisode(this, 'https://vidhidepro.com/embed/EXAMPLE2')">
+                    Episode 2
+                </button>
+                <button class="ep-btn bg-[#1a1a2b] border border-gray-700 text-gray-300 p-3 rounded-xl font-bold text-xs hover:border-[#ff5500] transition text-center" 
+                        data-ep="3" 
+                        data-vidhide="https://vidhidepro.com/embed/EXAMPLE3" 
+                        onclick="changeEpisode(this, 'https://vidhidepro.com/embed/EXAMPLE3')">
+                    Episode 3
+                </button>
+                <button class="ep-btn bg-[#1a1a2b] border border-gray-700 text-gray-300 p-3 rounded-xl font-bold text-xs hover:border-[#ff5500] transition text-center" 
+                        data-ep="4" 
+                        data-vidhide="https://vidhidepro.com/embed/EXAMPLE4" 
+                        onclick="changeEpisode(this, 'https://vidhidepro.com/embed/EXAMPLE4')">
+                    Episode 4
+                </button>
             </div>
         </div>
     </main>
 
-    <!-- Required JavaScript Files -->
-    <script src="script.js"></script>
-    <script src="searchengine.js"></script>
-
-    <!-- Custom Script for Video Player Download & Dead Link Email Alerts -->
     <script>
-        const NOTIFICATION_EMAIL = "sumitguptagupta095@gmail.com";
-        let activeEmbedLink = "";
-        let activeEpisodeNumber = 1;
+        // Render Backend URL Paste Karein
+        const BACKEND_URL = "https://YOUR-RENDER-APP-NAME.onrender.com";
 
-        // Function to hide spinner when iframe loads
-        function hideSpinner() {
-            const spinner = document.getElementById('loadingSpinner');
-            if (spinner) spinner.style.display = 'none';
+        let activeEmbedLink = "https://vidhidepro.com/embed/EXAMPLE1";
+
+        function extractVidhideCode(url) {
+            if (!url) return null;
+            const match = url.match(/\/(?:embed|d)\/([a-zA-Z0-9]+)/);
+            return match ? match[1] : null;
         }
 
-        // Show spinner when changing video
-        function showSpinner() {
-            const spinner = document.getElementById('loadingSpinner');
-            if (spinner) spinner.style.display = 'flex';
+        function changeEpisode(btn, embedUrl) {
+            activeEmbedLink = embedUrl;
+            const iframe = document.getElementById('animeVideoPlayer');
+            iframe.src = embedUrl;
+
+            document.querySelectorAll('.ep-btn').forEach(b => {
+                b.classList.remove('bg-[#ff5500]', 'text-white');
+                b.classList.add('bg-[#1a1a2b]', 'text-gray-300');
+            });
+            btn.classList.remove('bg-[#1a1a2b]', 'text-gray-300');
+            btn.classList.add('bg-[#ff5500]', 'text-white');
         }
 
-        // Direct Download Current Video
-        function downloadCurrentVideo() {
+        async function downloadCurrentVideo() {
             const iframe = document.getElementById('animeVideoPlayer');
             const currentSrc = iframe.src || activeEmbedLink;
 
-            if (!currentSrc) {
-                alert("Please select an episode first!");
+            if (!currentSrc || currentSrc === "about:blank") {
+                alert("Pehle koi episode select karein!");
                 return;
             }
 
-            // Convert embed link to direct Vidhide download page (/embed/ -> /d/)
-            const downloadUrl = currentSrc.replace('/embed/', '/d/').replace('?autoplay=1', '');
-            window.open(downloadUrl, '_blank');
-        }
+            const fileCode = extractVidhideCode(currentSrc);
 
-        // Send Email Alert via FormSubmit AJAX API
-        function sendEmailAlert(epNum, linkUrl, reason) {
-            fetch(`https://formsubmit.co/ajax/${NOTIFICATION_EMAIL}`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Accept": "application/json"
-                },
-                body: JSON.stringify({
-                    _subject: `⚠️ Dead Link / Expired Alert: Solo Leveling Episode ${epNum}`,
-                    Anime: "Solo Leveling (Official Hindi Audio)",
-                    Episode: `Episode ${epNum}`,
-                    Broken_Link: linkUrl,
-                    Reason: reason,
-                    Time: new Date().toLocaleString()
-                })
-            })
-            .then(res => res.json())
-            .then(data => console.log("Email Alert Sent to Admin:", data))
-            .catch(err => console.error("Email Alert Failed:", err));
-        }
+            if (!fileCode) {
+                alert("Valid video link nahi mil paaya!");
+                return;
+            }
 
-        // Handle Manual User Report for Broken Link
-        function reportBrokenLink() {
-            if (confirm(`Episode ${activeEpisodeNumber} ka video play nahi ho raha hai? Report Admin ko bhej dein?`)) {
-                sendEmailAlert(activeEpisodeNumber, activeEmbedLink, "User Reported Broken Video");
-                alert("Report bhej di gayi hai! Admin ko gmail par notification mil gaya hai.");
+            alert("Direct Download Link process ho raha hai, please wait...");
+
+            try {
+                const response = await fetch(`${BACKEND_URL}/get-download-link?code=${fileCode}`);
+                const data = await response.json();
+
+                if (data.success && data.download_url) {
+                    const link = document.createElement('a');
+                    link.href = data.download_url;
+                    link.setAttribute('download', '');
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                } else {
+                    alert("Direct link nahi mila, normal download page khol rahe hain.");
+                    window.open(`https://vidhidepro.com/d/${fileCode}`, '_blank');
+                }
+            } catch (error) {
+                console.error("Download Error:", error);
+                alert("Backend response nahi de raha hai. Normal download page khol rahe hain.");
+                window.open(`https://vidhidepro.com/d/${fileCode}`, '_blank');
             }
         }
-
-        // Trigger automatic video error alert
-        function handleVideoError() {
-            hideSpinner();
-            sendEmailAlert(activeEpisodeNumber, activeEmbedLink, "Iframe Load Failed / Deleted Video");
-        }
-
-        // Update active link tracker when selecting episode
-        function selectEpisode(epNum) {
-            showSpinner();
-            activeEpisodeNumber = epNum;
-            const btn = document.querySelector(`.ep-btn[data-ep="${epNum}"]`);
-            if (btn) {
-                activeEmbedLink = btn.getAttribute('data-vidhide') || "";
-                document.getElementById('animeVideoPlayer').src = activeEmbedLink;
-                document.getElementById('currentPlayingText').innerText = `Episode ${epNum}`;
-            }
-        }
-
-        // Initialize First Episode
-        document.addEv
+    </script>
+</body>
+</html>
