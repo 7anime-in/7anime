@@ -41,6 +41,7 @@
     </main>
 
     <script>
+        const BACKEND_URL = "https://vidhide-downloader-backend.onrender.com"; 
         let extractedEpisodes = [];
 
         function extractVidhideCode(url) {
@@ -49,11 +50,31 @@
             return match ? match[1] : null;
         }
 
-        // Direct Instant Fast Download (No Delay, No Alert)
-        function downloadViaBackend(fileCode) {
+        async function downloadViaBackend(fileCode) {
             if (!fileCode) return;
-            const directUrl = `https://vidhidepro.com/d/${fileCode}`;
-            window.open(directUrl, '_blank');
+
+            // Pre-open tab to prevent browser blocking
+            const newTab = window.open('about:blank', '_blank');
+            if (newTab) {
+                newTab.document.write('<body style="background:#0f0f1a;color:#fff;font-family:sans-serif;display:flex;justify-content:center;align-items:center;height:100vh;margin:0;"><h3>Generating Direct Download Link...</h3></body>');
+            }
+
+            try {
+                const response = await fetch(`${BACKEND_URL}/get-download-link?code=${fileCode}`);
+                const data = await response.json();
+
+                if (data.success && data.download_url) {
+                    if (newTab) newTab.location.href = data.download_url;
+                    else window.location.href = data.download_url;
+                } else {
+                    const fallback = `https://vidhidepro.com/d/${fileCode}`;
+                    if (newTab) newTab.location.href = fallback;
+                }
+            } catch (error) {
+                console.error("Backend Error:", error);
+                const fallback = `https://vidhidepro.com/d/${fileCode}`;
+                if (newTab) newTab.location.href = fallback;
+            }
         }
 
         function downloadPack(startEp, endEp) {
@@ -61,7 +82,7 @@
             selected.forEach((item, index) => {
                 setTimeout(() => {
                     if (item.code) downloadViaBackend(item.code);
-                }, index * 800);
+                }, index * 1200);
             });
         }
 
