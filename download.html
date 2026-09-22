@@ -50,13 +50,13 @@
             return match ? match[1] : null;
         }
 
+        // Updated Download Function with CDN 403 & Popup Bypass Logic
         async function downloadViaBackend(fileCode) {
             if (!fileCode) return;
 
-            // Pre-open tab to prevent browser blocking
             const newTab = window.open('about:blank', '_blank');
             if (newTab) {
-                newTab.document.write('<body style="background:#0f0f1a;color:#fff;font-family:sans-serif;display:flex;justify-content:center;align-items:center;height:100vh;margin:0;"><h3>Generating Direct Download Link...</h3></body>');
+                newTab.document.write('<body style="background:#0f0f1a;color:#fff;font-family:sans-serif;display:flex;justify-content:center;align-items:center;height:100vh;margin:0;"><h3>Fetching Direct Download Link...</h3></body>');
             }
 
             try {
@@ -69,11 +69,13 @@
                 } else {
                     const fallback = `https://vidhidepro.com/d/${fileCode}`;
                     if (newTab) newTab.location.href = fallback;
+                    else window.location.href = fallback;
                 }
             } catch (error) {
                 console.error("Backend Error:", error);
                 const fallback = `https://vidhidepro.com/d/${fileCode}`;
                 if (newTab) newTab.location.href = fallback;
+                else window.location.href = fallback;
             }
         }
 
