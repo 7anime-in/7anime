@@ -99,7 +99,7 @@
                     <div class="flex items-center space-x-2">
                         <!-- Updated Dynamic Download Button -->
                         <button onclick="window.location.href='download.html?id=solo_leveling'" class="bg-[#ff5500] hover:bg-[#e04c00] text-white px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition cursor-pointer">
-                            <i class="fa-solid fa-download text-[10px]"></i> <span>Download</span>
+                            <i class="fa-solid fa-download text-[10px]"></i> <span>All Download Links</span>
                         </button>
                     </div>
                 </div>
@@ -131,7 +131,7 @@
                     
                     <!-- Quality Buttons (Default 720p Active) -->
                     <div class="flex items-center space-x-1.5">
-                        <span class="text-xs text-gray-400 font-semibold mr-1"><i class="fa-solid fa-[#ff5500] fa-sliders"></i> Quality:</span>
+                        <span class="text-xs text-gray-400 font-semibold mr-1"><i class="fa-solid fa-sliders text-[#ff5500]"></i> Quality:</span>
                         <button onclick="changeQuality('1080p')" class="quality-btn bg-[#1a1a2b] hover:bg-gray-800 text-gray-300 border border-gray-700 px-2 py-0.5 rounded text-xs font-medium transition cursor-pointer">1080p</button>
                         <button onclick="changeQuality('720p')" class="quality-btn bg-[#ff5500] text-white border border-[#ff5500] px-2 py-0.5 rounded text-xs font-bold transition cursor-pointer">720p</button>
                         <button onclick="changeQuality('480p')" class="quality-btn bg-[#1a1a2b] hover:bg-gray-800 text-gray-300 border border-gray-700 px-2 py-0.5 rounded text-xs font-medium transition cursor-pointer">480p</button>
@@ -146,17 +146,33 @@
                             <div class="spinner mb-3"></div>
                             <p class="text-xs text-gray-400 font-medium tracking-wide">Loading video fast...</p>
                         </div>
-                        <iframe id="animeVideoPlayer" src="" class="w-full h-full border-0 absolute inset-0 z-10" allow="autoplay; encrypted-media" allowfullscreen scrolling="no" onload="hideSpinner()"></iframe>
+                        <iframe id="animeVideoPlayer" src="" class="w-full h-full border-0 absolute inset-0 z-10" allow="autoplay; encrypted-media" allowfullscreen scrolling="no" onload="hideSpinner()" onerror="handleVideoError()"></iframe>
                     </div>
                 </div>
 
-                <!-- Next/Prev Episode Bar -->
-                <div class="flex items-center justify-between bg-[#151522] px-4 py-3 rounded-xl border border-gray-800 text-xs md:text-sm">
+                <!-- Player Action Bar (Prev/Next + Direct Download + Dead Link Alert) -->
+                <div class="flex flex-wrap items-center justify-between bg-[#151522] px-4 py-3 rounded-xl border border-gray-800 text-xs md:text-sm gap-2">
                     <button onclick="changeEpisode('prev')" class="flex items-center space-x-1.5 font-semibold text-gray-300 hover:text-white transition cursor-pointer">
                         <i class="fa-solid fa-chevron-left text-[10px]"></i>
                         <span>Prev Episode</span>
                     </button>
-                    <span id="currentPlayingText" class="font-bold text-gray-200">Episode 1</span>
+                    
+                    <div class="flex items-center space-x-2">
+                        <span id="currentPlayingText" class="font-bold text-gray-200">Episode 1</span>
+                        
+                        <!-- DIRECT VIDEO PLAYER DOWNLOAD BUTTON -->
+                        <button onclick="downloadCurrentVideo()" class="bg-[#ff5500] hover:bg-[#e04c00] text-white px-3 py-1 rounded-lg text-xs font-bold transition flex items-center space-x-1.5 cursor-pointer shadow">
+                            <i class="fa-solid fa-download text-[11px]"></i>
+                            <span>Download Video</span>
+                        </button>
+
+                        <!-- REPORT BROKEN/EXPIRED LINK BUTTON -->
+                        <button onclick="reportBrokenLink()" class="bg-red-600/20 hover:bg-red-600/40 text-red-400 border border-red-500/30 px-2.5 py-1 rounded-lg text-xs font-semibold transition flex items-center space-x-1 cursor-pointer" title="Report Expired/Broken Link">
+                            <i class="fa-solid fa-triangle-exclamation text-[11px]"></i>
+                            <span class="hidden sm:inline">Report Dead Link</span>
+                        </button>
+                    </div>
+
                     <button onclick="changeEpisode('next')" class="flex items-center space-x-1.5 font-semibold text-gray-300 hover:text-white transition cursor-pointer">
                         <span>Next Episode</span>
                         <i class="fa-solid fa-chevron-right text-[10px]"></i>
@@ -205,5 +221,87 @@
     <!-- Required JavaScript Files -->
     <script src="script.js"></script>
     <script src="searchengine.js"></script>
-</body>
-</html>
+
+    <!-- Custom Script for Video Player Download & Dead Link Email Alerts -->
+    <script>
+        const NOTIFICATION_EMAIL = "sumitguptagupta095@gmail.com";
+        let activeEmbedLink = "";
+        let activeEpisodeNumber = 1;
+
+        // Function to hide spinner when iframe loads
+        function hideSpinner() {
+            const spinner = document.getElementById('loadingSpinner');
+            if (spinner) spinner.style.display = 'none';
+        }
+
+        // Show spinner when changing video
+        function showSpinner() {
+            const spinner = document.getElementById('loadingSpinner');
+            if (spinner) spinner.style.display = 'flex';
+        }
+
+        // Direct Download Current Video
+        function downloadCurrentVideo() {
+            const iframe = document.getElementById('animeVideoPlayer');
+            const currentSrc = iframe.src || activeEmbedLink;
+
+            if (!currentSrc) {
+                alert("Please select an episode first!");
+                return;
+            }
+
+            // Convert embed link to direct Vidhide download page (/embed/ -> /d/)
+            const downloadUrl = currentSrc.replace('/embed/', '/d/').replace('?autoplay=1', '');
+            window.open(downloadUrl, '_blank');
+        }
+
+        // Send Email Alert via FormSubmit AJAX API
+        function sendEmailAlert(epNum, linkUrl, reason) {
+            fetch(`https://formsubmit.co/ajax/${NOTIFICATION_EMAIL}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json"
+                },
+                body: JSON.stringify({
+                    _subject: `⚠️ Dead Link / Expired Alert: Solo Leveling Episode ${epNum}`,
+                    Anime: "Solo Leveling (Official Hindi Audio)",
+                    Episode: `Episode ${epNum}`,
+                    Broken_Link: linkUrl,
+                    Reason: reason,
+                    Time: new Date().toLocaleString()
+                })
+            })
+            .then(res => res.json())
+            .then(data => console.log("Email Alert Sent to Admin:", data))
+            .catch(err => console.error("Email Alert Failed:", err));
+        }
+
+        // Handle Manual User Report for Broken Link
+        function reportBrokenLink() {
+            if (confirm(`Episode ${activeEpisodeNumber} ka video play nahi ho raha hai? Report Admin ko bhej dein?`)) {
+                sendEmailAlert(activeEpisodeNumber, activeEmbedLink, "User Reported Broken Video");
+                alert("Report bhej di gayi hai! Admin ko gmail par notification mil gaya hai.");
+            }
+        }
+
+        // Trigger automatic video error alert
+        function handleVideoError() {
+            hideSpinner();
+            sendEmailAlert(activeEpisodeNumber, activeEmbedLink, "Iframe Load Failed / Deleted Video");
+        }
+
+        // Update active link tracker when selecting episode
+        function selectEpisode(epNum) {
+            showSpinner();
+            activeEpisodeNumber = epNum;
+            const btn = document.querySelector(`.ep-btn[data-ep="${epNum}"]`);
+            if (btn) {
+                activeEmbedLink = btn.getAttribute('data-vidhide') || "";
+                document.getElementById('animeVideoPlayer').src = activeEmbedLink;
+                document.getElementById('currentPlayingText').innerText = `Episode ${epNum}`;
+            }
+        }
+
+        // Initialize First Episode
+        document.addEv
