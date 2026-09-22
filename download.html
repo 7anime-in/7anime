@@ -1,121 +1,105 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title id="pageTitle">Download Anime - 7ANIME</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Download Anime - 7ANIME</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        .sidebar {
-            position: fixed; top: 0; left: -280px; width: 280px; height: 100%;
-            background-color: #151522; z-index: 100; transition: left 0.3s ease;
-            box-shadow: 5px 0 15px rgba(0,0,0,0.5); border-right: 1px solid #2d2d3d;
-        }
-        .sidebar.active { left: 0; }
-        .sidebar-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.7); z-index: 99; display: none;
-        }
-        .sidebar-overlay.active { display: block; }
-    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="bg-[#0b0c10] text-white font-sans antialiased">
+<body class="bg-[#0f0f1a] text-white min-h-screen">
 
     <!-- Header -->
-    <header class="main-header flex items-center justify-between px-4 py-3 bg-[#151522] border-b border-gray-800 relative z-50">
-        <div class="flex items-center space-x-3">
-            <button class="text-white text-lg focus:outline-none cursor-pointer" id="menuBtn" onclick="toggleSidebar()">
-                <i class="fa-solid fa-bars"></i>
-            </button>
-            <div class="cursor-pointer font-extrabold text-lg" onclick="window.location.href='index.html'">
-                <span class="text-[#ff5500]">7</span><span class="text-white">ANIME 🔥</span>
-            </div>
-        </div>
+    <header class="p-4 bg-[#1a1a2b] border-b border-gray-800 flex justify-between items-center">
+        <h1 class="text-xl font-bold text-[#ff5500]">7ANIME</h1>
+        <a id="backToPlayerBtn" href="solo_leveling_videoplayer.html" class="bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-xl text-sm font-bold transition flex items-center space-x-2">
+            <i class="fa-solid fa-arrow-left"></i>
+            <span>Back to Player</span>
+        </a>
     </header>
 
-    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
-    <aside class="sidebar" id="sidebar">
-        <div class="flex items-center justify-between p-4 border-b border-gray-800">
-            <h3 class="font-bold text-sm"><i class="fa-solid fa-fire text-[#ff5500]"></i> Menu</h3>
-            <span class="cursor-pointer text-xl text-gray-400 hover:text-white" onclick="toggleSidebar()">&times;</span>
-        </div>
-        <ul class="p-4 space-y-3 text-xs font-semibold">
-            <li><a href="index.html" class="flex items-center space-x-2 text-gray-300 hover:text-[#ff5500]"><i class="fa-solid fa-house"></i> <span>HOME</span></a></li>
-        </ul>
-    </aside>
-
-    <main class="max-w-6xl mx-auto px-4 py-6 space-y-6">
-
-        <!-- Banner Section -->
-        <div class="bg-[#151522] border border-gray-800 rounded-2xl p-4 md:p-6 flex flex-col md:flex-row gap-6 items-start shadow-xl">
-            <div class="w-full md:w-44 flex-shrink-0 aspect-[3/4] rounded-xl overflow-hidden border border-gray-700 shadow-lg relative mx-auto md:mx-0">
-                <img id="animePoster" src="" alt="Poster" class="w-full h-full object-cover">
-            </div>
-            <div class="flex-1 space-y-3 w-full">
-                <div class="flex flex-wrap items-center justify-between gap-2">
-                    <h1 id="animeTitle" class="text-2xl md:text-3xl font-extrabold tracking-tight">Fetching details...</h1>
-                    <a id="backToPlayerBtn" href="#" class="bg-[#1a1a2b] hover:bg-gray-800 border border-gray-700 text-gray-200 px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition">
-                        <i class="fa-solid fa-play text-[10px] text-[#ff5500]"></i> <span>Watch Player</span>
-                    </a>
-                </div>
-                <div class="flex flex-wrap items-center gap-2 text-xs">
-                    <span class="bg-purple-600/30 text-purple-300 border border-purple-500/40 px-2.5 py-0.5 rounded font-semibold">Hindi Dubbed</span>
-                    <span class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 px-2.5 py-0.5 rounded font-semibold">Complete</span>
-                </div>
-                <p id="animeDesc" class="text-gray-300 text-xs md:text-sm leading-relaxed">Reading data directly from player page...</p>
+    <main class="max-w-4xl mx-auto p-4 md:p-6 space-y-6">
+        <!-- Details Card -->
+        <div class="bg-[#1a1a2b] border border-gray-800 p-6 rounded-2xl flex flex-col md:flex-row items-center gap-6">
+            <img id="animePoster" src="" alt="Poster" class="w-32 h-44 object-cover rounded-xl bg-gray-800">
+            <div class="text-center md:text-left space-y-2">
+                <h1 id="animeTitle" class="text-2xl font-extrabold text-white">Loading Anime...</h1>
+                <p id="animeDesc" class="text-xs text-gray-300 max-w-xl"></p>
+                <span id="epCountText" class="inline-block bg-[#ff5500]/20 text-[#ff5500] text-xs font-bold px-3 py-1 rounded-full border border-[#ff5500]/30">
+                    0 Episodes
+                </span>
             </div>
         </div>
 
-        <!-- Section 1: Episode Packs (4 Episodes per Part) -->
-        <div class="bg-[#151522] border border-gray-800 rounded-2xl p-4 md:p-6 space-y-4 shadow-lg">
-            <div class="flex items-center space-x-2 border-b border-gray-800 pb-3">
-                <i class="fa-solid fa-layer-group text-[#ff5500] text-lg"></i>
-                <h2 class="text-base md:text-lg font-bold">Batch Episode Packs (1-Click Multi Download)</h2>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3" id="batchPacksContainer">
-                <p class="text-xs text-gray-500">Loading packs...</p>
+        <!-- Batch Packs Section -->
+        <div class="space-y-3">
+            <h2 class="text-sm font-bold text-gray-400 uppercase tracking-wider">Batch Download Packs</h2>
+            <div id="batchPacksContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <!-- Packs dynamic HTML render honge -->
             </div>
         </div>
 
-        <!-- Section 2: Single Episode Download List -->
-        <div class="bg-[#151522] border border-gray-800 rounded-2xl p-4 md:p-6 space-y-4 shadow-lg">
-            <div class="flex items-center justify-between border-b border-gray-800 pb-3">
-                <div class="flex items-center space-x-2">
-                    <i class="fa-solid fa-list-check text-[#ff5500] text-lg"></i>
-                    <h2 class="text-base md:text-lg font-bold">Single Episode Fast Download</h2>
-                </div>
-                <span id="epCountText" class="text-xs text-gray-400">0 Episodes</span>
-            </div>
-
-            <div class="space-y-2.5" id="episodeListContainer">
-                <p class="text-xs text-gray-500">Loading episodes...</p>
+        <!-- Individual Episodes Section -->
+        <div class="space-y-3">
+            <h2 class="text-sm font-bold text-gray-400 uppercase tracking-wider">All Episodes Direct Download</h2>
+            <div id="episodeListContainer" class="space-y-3">
+                <!-- Episodes dynamic HTML render honge -->
             </div>
         </div>
-
     </main>
 
-    <script src="script.js"></script>
-    <script src="searchengine.js"></script>
-
     <script>
-        // Embed Link to Vidhide Download Page Converter
-        function getVidhideDownloadLink(embedUrl) {
-            if (!embedUrl) return '#';
-            return embedUrl.replace('/embed/', '/d/').replace('?autoplay=1', '');
-        }
+        // Render Backend URL Paste Karein
+        const BACKEND_URL = "https://YOUR-RENDER-APP-NAME.onrender.com"; 
 
         let extractedEpisodes = [];
 
-        // Multi-Tab Download for Episode Packs
+        function extractVidhideCode(url) {
+            if (!url) return null;
+            const match = url.match(/\/(?:embed|d)\/([a-zA-Z0-9]+)/);
+            return match ? match[1] : null;
+        }
+
+        async function downloadViaBackend(fileCode) {
+            if (!fileCode) {
+                alert("Invalid File Code!");
+                return;
+            }
+
+            alert("Direct Download Link Process Ho Raha Hai, Hold Karo...");
+
+            try {
+                const response = await fetch(`${BACKEND_URL}/get-download-link?code=${fileCode}`);
+                const data = await response.json();
+
+                if (data.success && data.download_url) {
+                    const link = document.createElement('a');
+                    link.href = data.download_url;
+                    link.setAttribute('download', '');
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                } else {
+                    alert("Direct link nahi mil paaya! Normal download page khol rahe hain.");
+                    window.open(`https://vidhidepro.com/d/${fileCode}`, '_blank');
+                }
+            } catch (error) {
+                console.error("Backend Error:", error);
+                alert("Server response nahi de raha hai. Normal download page open kar rahe hain.");
+                window.open(`https://vidhidepro.com/d/${fileCode}`, '_blank');
+            }
+        }
+
         function downloadPack(startEp, endEp) {
             const selected = extractedEpisodes.filter(e => e.ep >= startEp && e.ep <= endEp);
             
-            if(confirm(`Download Episodes ${startEp} to ${endEp}? (${selected.length} tabs will open)`)) {
+            if(confirm(`Download Episodes ${startEp} to ${endEp}? (${selected.length} files download hongi)`)) {
                 selected.forEach((item, index) => {
                     setTimeout(() => {
-                        window.open(item.downloadUrl, '_blank');
-                    }, index * 800); // Popup delay to prevent browser block
+                        if (item.code) {
+                            downloadViaBackend(item.code);
+                        }
+                    }, index * 1500);
                 });
             }
         }
@@ -126,7 +110,6 @@
 
             document.getElementById('backToPlayerBtn').href = playerPage;
 
-            // Fetch Video Player HTML file dynamically
             fetch(playerPage)
                 .then(res => {
                     if(!res.ok) throw new Error('Player page not found');
@@ -136,7 +119,6 @@
                     const parser = new DOMParser();
                     const doc = parser.parseFromString(htmlText, 'text/html');
 
-                    // Extract Metadata from Player Page
                     const title = doc.querySelector('h1')?.innerText || 'Anime Download';
                     const poster = doc.querySelector('img')?.src || '';
                     const desc = doc.querySelector('p.text-gray-300')?.innerText || 'Watch and download official episodes.';
@@ -146,23 +128,24 @@
                     document.getElementById('animePoster').src = poster;
                     document.getElementById('animeDesc').innerText = desc;
 
-                    // Extract Episode Buttons
                     const epButtons = doc.querySelectorAll('.ep-btn');
                     extractedEpisodes = [];
 
                     epButtons.forEach(btn => {
                         const epNum = parseInt(btn.getAttribute('data-ep'));
                         const embedUrl = btn.getAttribute('data-vidhide');
+                        const fileCode = extractVidhideCode(embedUrl);
 
-                        if (embedUrl) {
+                        if (embedUrl && fileCode) {
                             extractedEpisodes.push({
                                 ep: epNum,
-                                downloadUrl: getVidhideDownloadLink(embedUrl)
+                                code: fileCode,
+                                downloadUrl: `https://vidhidepro.com/d/${fileCode}`
                             });
                         }
                     });
 
-                    // Render Episode Packs (Part 1, Part 2, etc.)
+                    // Render Batch Packs
                     const packContainer = document.getElementById('batchPacksContainer');
                     const totalEps = extractedEpisodes.length;
                     const chunkSize = 4;
@@ -188,7 +171,7 @@
                     }
                     packContainer.innerHTML = packsHTML || '<p class="text-xs text-gray-500">No packs available.</p>';
 
-                    // Render Single Episode List
+                    // Render Episode List
                     const epContainer = document.getElementById('episodeListContainer');
                     document.getElementById('epCountText').innerText = `${totalEps} Episodes`;
 
@@ -206,10 +189,10 @@
                                     </div>
                                 </div>
                                 <div class="flex items-center space-x-2 self-end sm:self-center">
-                                    <a href="${item.downloadUrl}" target="_blank" class="bg-[#ff5500] hover:bg-[#e04c00] text-white px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center space-x-1.5">
+                                    <button onclick="downloadViaBackend('${item.code}')" class="bg-[#ff5500] hover:bg-[#e04c00] text-white px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center space-x-1.5 cursor-pointer">
                                         <i class="fa-solid fa-download text-[10px]"></i>
-                                        <span>Fast Download</span>
-                                    </a>
+                                        <span>Fast Direct Download</span>
+                                    </button>
                                 </div>
                             </div>
                         `;
