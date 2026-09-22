@@ -41,9 +41,6 @@
     </main>
 
     <script>
-        // Fixed Render Backend URL
-        const BACKEND_URL = "https://vidhide-downloader-backend.onrender.com"; 
-
         let extractedEpisodes = [];
 
         function extractVidhideCode(url) {
@@ -52,35 +49,20 @@
             return match ? match[1] : null;
         }
 
-        async function downloadViaBackend(fileCode) {
+        // Direct Instant Fast Download (No Delay, No Alert)
+        function downloadViaBackend(fileCode) {
             if (!fileCode) return;
-            alert("Direct Download Process ho raha hai...");
-
-            try {
-                const response = await fetch(`${BACKEND_URL}/get-download-link?code=${fileCode}`);
-                const data = await response.json();
-
-                if (data.success && data.download_url) {
-                    window.open(data.download_url, '_blank');
-                } else {
-                    window.open(`https://vidhidepro.com/d/${fileCode}`, '_blank');
-                }
-            } catch (error) {
-                console.error("Backend Error:", error);
-                window.open(`https://vidhidepro.com/d/${fileCode}`, '_blank');
-            }
+            const directUrl = `https://vidhidepro.com/d/${fileCode}`;
+            window.open(directUrl, '_blank');
         }
 
         function downloadPack(startEp, endEp) {
             const selected = extractedEpisodes.filter(e => e.ep >= startEp && e.ep <= endEp);
-            
-            if(confirm(`Download Episodes ${startEp} to ${endEp}?`)) {
-                selected.forEach((item, index) => {
-                    setTimeout(() => {
-                        if (item.code) downloadViaBackend(item.code);
-                    }, index * 1500);
-                });
-            }
+            selected.forEach((item, index) => {
+                setTimeout(() => {
+                    if (item.code) downloadViaBackend(item.code);
+                }, index * 800);
+            });
         }
 
         document.addEventListener('DOMContentLoaded', () => {
