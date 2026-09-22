@@ -171,8 +171,6 @@
     </main>
 
     <script>
-        // Fixed Render Backend URL
-        const BACKEND_URL = "https://vidhide-downloader-backend.onrender.com";
         const NOTIFICATION_EMAIL = "sumitguptagupta095@gmail.com";
 
         let activeEpisodeNumber = 1;
@@ -234,14 +232,10 @@
             if (targetEp !== activeEpisodeNumber) selectEpisode(targetEp);
         }
 
-        async function downloadCurrentVideo() {
+        // Instant Fast Download Function
+        function downloadCurrentVideo() {
             const iframe = document.getElementById('animeVideoPlayer');
             const currentSrc = iframe.src || activeEmbedLink;
-
-            if (!currentSrc || currentSrc === "about:blank") {
-                alert("Please select an episode first!");
-                return;
-            }
 
             const fileCode = extractVidhideCode(currentSrc);
             if (!fileCode) {
@@ -249,21 +243,8 @@
                 return;
             }
 
-            alert("Direct Download Process ho raha hai, please wait...");
-
-            try {
-                const response = await fetch(`${BACKEND_URL}/get-download-link?code=${fileCode}`);
-                const data = await response.json();
-
-                if (data.success && data.download_url) {
-                    window.open(data.download_url, '_blank');
-                } else {
-                    window.open(`https://vidhidepro.com/d/${fileCode}`, '_blank');
-                }
-            } catch (error) {
-                console.error("Backend Error:", error);
-                window.open(`https://vidhidepro.com/d/${fileCode}`, '_blank');
-            }
+            // Direct Instant Open without popup/wait issues
+            window.open(`https://vidhidepro.com/d/${fileCode}`, '_blank');
         }
 
         function sendEmailAlert(epNum, linkUrl, reason) {
