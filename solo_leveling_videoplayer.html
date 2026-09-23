@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Solo Leveling Hindi Official Audio - 7ANIME</title>
+    <title id="pageTitle">Solo Leveling Hindi Official Audio - 7ANIME</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -107,8 +107,18 @@
                             <p class="text-xs text-gray-400 font-medium tracking-wide">Loading video fast...</p>
                         </div>
                         
-                        <!-- Native Video Streaming Engine -->
-                        <video id="animeVideoPlayer" controls playsinline controlsList="nodownload" class="w-full h-full border-0 absolute inset-0 z-10 bg-black" onloadeddata="hideSpinner()" onerror="handleVideoError()">
+                        <!-- Native Fast Streaming Video Engine -->
+                        <video id="animeVideoPlayer" 
+                               controls 
+                               playsinline 
+                               preload="metadata"
+                               controlsList="nodownload" 
+                               class="w-full h-full border-0 absolute inset-0 z-10 bg-black" 
+                               oncanplay="hideSpinner()"
+                               onplaying="hideSpinner()"
+                               onwaiting="showSpinner()"
+                               onloadeddata="hideSpinner()" 
+                               onerror="handleVideoError()">
                             <source id="videoSource" src="" type="video/mp4">
                         </video>
                     </div>
@@ -161,14 +171,18 @@
         const BACKEND_URL = "https://sevenanime-http-bot.onrender.com";
         const NOTIFICATION_EMAIL = "sumitguptagupta095@gmail.com";
 
-        // Local Fallback / Default Data Structure
+        // Dynamic URL Parameter detection (Defaults to solo_leveling)
+        const urlParams = new URLSearchParams(window.location.search);
+        const CURRENT_ANIME_SLUG = urlParams.get('anime') || 'solo_leveling';
+
+        // Local Fallback Data Structure
         let animeData = {
+            "title": "Solo Leveling",
             "seasons": {
                 "1": [
                     { "ep": 1, "chat_id": "-1004315586873", "msg_id": 80 },
                     { "ep": 2, "chat_id": "-1004315586873", "msg_id": 81 }
-                ],
-                "2": []
+                ]
             }
         };
 
@@ -196,7 +210,10 @@
             const container = document.getElementById('seasonButtonsContainer');
             container.innerHTML = '';
 
-            Object.keys(animeData.seasons).forEach(seasonNum => {
+            const seasonsList = Object.keys(animeData.seasons);
+            if (seasonsList.length === 0) seasonsList.push("1");
+
+            seasonsList.forEach(seasonNum => {
                 const isSelected = parseInt(seasonNum) === currentSeason;
                 const btn = document.createElement('button');
                 btn.className = isSelected 
@@ -259,9 +276,16 @@
             const source = document.getElementById('videoSource');
 
             if (source && player) {
+                player.pause();
                 source.src = activeStreamLink;
                 player.load();
-                player.play().catch(() => {});
+                
+                const playPromise = player.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(error => {
+                        console.log("Autoplay prevented or waiting for user interaction");
+                    });
+                }
             }
 
             document.getElementById('currentPlayingText').innerText = `S${currentSeason} Ep ${epNum}`;
@@ -300,8 +324,8 @@
                 method: "POST",
                 headers: { "Content-Type": "application/json", "Accept": "application/json" },
                 body: JSON.stringify({
-                    _subject: `⚠️ Dead Link Alert: Solo Leveling S${currentSeason} Ep ${epNum}`,
-                    Anime: "Solo Leveling",
+                    _subject: `⚠️ Dead Link Alert: S${currentSeason} Ep ${epNum}`,
+                    Anime: CURRENT_ANIME_SLUG,
                     Season: currentSeason,
                     Episode: epNum,
                     Broken_Link: linkUrl,
@@ -320,21 +344,25 @@
 
         function handleVideoError() {
             hideSpinner();
-            console.log("Video Stream Error. Checking Link...");
+            console.log("Video Stream Error or Range request pending.");
         }
 
-        // Auto Fetch New Uploads from Render Backend / API
+        // Fetch Anime Data dynamically from Render Backend
         async function fetchLatestAnimeData() {
             try {
-                const res = await fetch(`${BACKEND_URL}/api/episodes/solo_leveling`);
+                const res = await fetch(`${BACKEND_URL}/api/episodes/${CURRENT_ANIME_SLUG}`);
                 if (res.ok) {
                     const remoteData = await res.json();
                     if (remoteData && remoteData.seasons) {
                         animeData = remoteData;
+                        if (remoteData.title) {
+                            document.getElementById('animeTitle').innerText = remoteData.title;
+                            document.getElementById('pageTitle').innerText = `${remoteData.title} - 7ANIME`;
+                        }
                     }
                 }
             } catch(e) {
-                console.log("Using built-in data. Backend offline or API endpoint not setup yet.");
+                console.log("Using built-in data. Backend offline or loading default.");
             }
             renderSeasons();
             renderEpisodes();
