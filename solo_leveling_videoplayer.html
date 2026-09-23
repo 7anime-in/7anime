@@ -95,7 +95,7 @@
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between bg-[#151522] px-4 py-2.5 rounded-xl border border-gray-800 gap-3">
                     <div class="flex items-center space-x-2">
                         <span class="text-xs text-gray-400 font-semibold"><i class="fa-solid fa-server text-[#ff5500]"></i> Server:</span>
-                        <button class="bg-[#ff5500] text-white px-3 py-1 rounded-lg text-xs font-bold transition shadow">Server 1 (Vidhide)</button>
+                        <button class="bg-[#ff5500] text-white px-3 py-1 rounded-lg text-xs font-bold transition shadow">SevenAnime Fast Server</button>
                     </div>
                 </div>
 
@@ -106,7 +106,11 @@
                             <div class="spinner mb-3"></div>
                             <p class="text-xs text-gray-400 font-medium tracking-wide">Loading video fast...</p>
                         </div>
-                        <iframe id="animeVideoPlayer" src="" class="w-full h-full border-0 absolute inset-0 z-10" allow="autoplay; encrypted-media" allowfullscreen scrolling="no" onload="hideSpinner()" onerror="handleVideoError()"></iframe>
+                        
+                        <!-- Native Video Streaming Engine -->
+                        <video id="animeVideoPlayer" controls playsinline controlsList="nodownload" class="w-full h-full border-0 absolute inset-0 z-10 bg-black" onloadeddata="hideSpinner()" onerror="handleVideoError()">
+                            <source id="videoSource" src="" type="video/mp4">
+                        </video>
                     </div>
                 </div>
 
@@ -154,33 +158,24 @@
     </main>
 
     <script>
-        const BACKEND_URL = "https://vidhide-downloader-backend.onrender.com";
+        const BACKEND_URL = "https://sevenanime-http-bot.onrender.com";
         const NOTIFICATION_EMAIL = "sumitguptagupta095@gmail.com";
 
-        // Local Fallback Data (Agar backend API live na ho)
+        // Local Fallback / Default Data Structure
         let animeData = {
             "seasons": {
                 "1": [
-                    { "ep": 1, "vidhide": "https://vidhidepro.com/embed/enianumkn5s8?autoplay=1" },
-                    { "ep": 2, "vidhide": "https://vidhidepro.com/embed/sb7pjd72e1s9?autoplay=1" },
-                    { "ep": 3, "vidhide": "https://vidhidepro.com/embed/cnan1gf2g8t7?autoplay=1" },
-                    { "ep": 4, "vidhide": "https://vidhidepro.com/embed/t0dge5xo5zrl?autoplay=1" },
-                    { "ep": 5, "vidhide": "https://vidhidepro.com/embed/foaoioos27ap?autoplay=1" },
-                    { "ep": 6, "vidhide": "https://vidhidepro.com/embed/m7jjs2sr03kw?autoplay=1" },
-                    { "ep": 7, "vidhide": "https://vidhidepro.com/embed/gs06s2v6r673?autoplay=1" },
-                    { "ep": 8, "vidhide": "https://vidhidepro.com/embed/xh0iyd50hvq6?autoplay=1" },
-                    { "ep": 9, "vidhide": "https://vidhidepro.com/embed/bouhhv2xlb31?autoplay=1" },
-                    { "ep": 10, "vidhide": "https://vidhidepro.com/embed/og1ex9uwb2m7?autoplay=1" },
-                    { "ep": 11, "vidhide": "https://vidhidepro.com/embed/lhddo4tv4yyy?autoplay=1" },
-                    { "ep": 12, "vidhide": "https://vidhidepro.com/embed/zvhhe7ig5duq?autoplay=1" }
+                    { "ep": 1, "chat_id": "-1004315586873", "msg_id": 80 },
+                    { "ep": 2, "chat_id": "-1004315586873", "msg_id": 81 }
                 ],
-                "2": [] // Jab aap S2 ka video upload karenge, yahan automatic list banegi
+                "2": []
             }
         };
 
         let currentSeason = 1;
         let activeEpisodeNumber = 1;
-        let activeEmbedLink = "";
+        let activeStreamLink = "";
+        let activeDownloadLink = "";
 
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('active');
@@ -197,13 +192,6 @@
             if (spinner) spinner.style.display = 'flex';
         }
 
-        function extractVidhideCode(url) {
-            if (!url) return null;
-            const match = url.match(/\/(?:embed|d)\/([a-zA-Z0-9]+)/);
-            return match ? match[1] : null;
-        }
-
-        // Render Seasons dynamically
         function renderSeasons() {
             const container = document.getElementById('seasonButtonsContainer');
             container.innerHTML = '';
@@ -220,7 +208,6 @@
             });
         }
 
-        // Switch active Season
         function switchSeason(seasonNum) {
             currentSeason = seasonNum;
             document.getElementById('activeSeasonBadge').innerText = `Season ${seasonNum}`;
@@ -231,7 +218,6 @@
             }
         }
 
-        // Render Episodes dynamically
         function renderEpisodes() {
             const container = document.getElementById('episodeGridButtons');
             container.innerHTML = '';
@@ -247,7 +233,6 @@
                 const btn = document.createElement('button');
                 btn.className = `ep-btn bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition cursor-pointer`;
                 btn.setAttribute('data-ep', item.ep);
-                btn.setAttribute('data-vidhide', item.vidhide);
                 btn.innerText = item.ep;
                 btn.onclick = () => selectEpisode(item.ep);
                 container.appendChild(btn);
@@ -261,10 +246,23 @@
 
             showSpinner();
             activeEpisodeNumber = epNum;
-            activeEmbedLink = epData.vidhide;
 
-            const iframe = document.getElementById('animeVideoPlayer');
-            iframe.src = epData.vidhide;
+            if (epData.chat_id && epData.msg_id) {
+                activeStreamLink = `${BACKEND_URL}/stream/${epData.chat_id}/${epData.msg_id}`;
+                activeDownloadLink = `${BACKEND_URL}/download/${epData.chat_id}/${epData.msg_id}`;
+            } else if (epData.vidhide) {
+                activeStreamLink = epData.vidhide;
+                activeDownloadLink = epData.vidhide;
+            }
+
+            const player = document.getElementById('animeVideoPlayer');
+            const source = document.getElementById('videoSource');
+
+            if (source && player) {
+                source.src = activeStreamLink;
+                player.load();
+                player.play().catch(() => {});
+            }
 
             document.getElementById('currentPlayingText').innerText = `S${currentSeason} Ep ${epNum}`;
 
@@ -289,33 +287,12 @@
             }
         }
 
-        async function downloadCurrentVideo() {
-            const fileCode = extractVidhideCode(activeEmbedLink);
-            if (!fileCode) {
-                alert("Valid video link not found!");
+        function downloadCurrentVideo() {
+            if (!activeDownloadLink) {
+                alert("Download link not available for this episode!");
                 return;
             }
-
-            const newTab = window.open('about:blank', '_blank');
-            if (newTab) {
-                newTab.document.write('<body style="background:#0f0f1a;color:#fff;font-family:sans-serif;display:flex;justify-content:center;align-items:center;height:100vh;margin:0;"><h3>Connecting to Render Backend...</h3></body>');
-            }
-
-            try {
-                const response = await fetch(`${BACKEND_URL}/get-download-link?code=${fileCode}`);
-                const data = await response.json();
-
-                if (data.success && data.download_url) {
-                    if (newTab) newTab.location.href = data.download_url;
-                    else window.location.href = data.download_url;
-                } else {
-                    const fallback = `https://vidhidepro.com/d/${fileCode}`;
-                    if (newTab) newTab.location.href = fallback;
-                }
-            } catch (error) {
-                const fallback = `https://vidhidepro.com/d/${fileCode}`;
-                if (newTab) newTab.location.href = fallback;
-            }
+            window.open(activeDownloadLink, '_blank');
         }
 
         function sendEmailAlert(epNum, linkUrl, reason) {
@@ -336,20 +313,20 @@
 
         function reportBrokenLink() {
             if (confirm(`S${currentSeason} Episode ${activeEpisodeNumber} ka link report karein?`)) {
-                sendEmailAlert(activeEpisodeNumber, activeEmbedLink, "User Reported Broken Video");
+                sendEmailAlert(activeEpisodeNumber, activeStreamLink, "User Reported Broken Video");
                 alert("Report Send Ho Gayi Hai!");
             }
         }
 
         function handleVideoError() {
             hideSpinner();
-            sendEmailAlert(activeEpisodeNumber, activeEmbedLink, "Iframe Load Failed");
+            console.log("Video Stream Error. Checking Link...");
         }
 
         // Auto Fetch New Uploads from Render Backend / API
         async function fetchLatestAnimeData() {
             try {
-                const res = await fetch(`${BACKEND_URL}/api/solo-leveling`);
+                const res = await fetch(`${BACKEND_URL}/api/episodes/solo_leveling`);
                 if (res.ok) {
                     const remoteData = await res.json();
                     if (remoteData && remoteData.seasons) {
@@ -357,11 +334,13 @@
                     }
                 }
             } catch(e) {
-                console.log("Using built-in data. Backend offline or API endpoint not setup.");
+                console.log("Using built-in data. Backend offline or API endpoint not setup yet.");
             }
             renderSeasons();
             renderEpisodes();
-            selectEpisode(1);
+            if (animeData.seasons[currentSeason] && animeData.seasons[currentSeason].length > 0) {
+                selectEpisode(animeData.seasons[currentSeason][0].ep);
+            }
         }
 
         document.addEventListener('DOMContentLoaded', fetchLatestAnimeData);
