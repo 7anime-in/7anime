@@ -59,7 +59,7 @@
         </div>
         <ul class="p-4 space-y-3 text-xs font-semibold">
             <li><a href="index.html" class="flex items-center space-x-2 text-gray-300 hover:text-[#ff5500]"><i class="fa-solid fa-house"></i> <span>HOME</span></a></li>
-            <li><a href="download.html?page=solo_leveling_videoplayer.html" class="flex items-center space-x-2 text-gray-300 hover:text-[#ff5500]"><i class="fa-solid fa-download"></i> <span>DOWNLOAD PAGE</span></a></li>
+            <li><a href="download.html" class="flex items-center space-x-2 text-gray-300 hover:text-[#ff5500]"><i class="fa-solid fa-download"></i> <span>DOWNLOAD PAGE</span></a></li>
         </ul>
     </aside>
 
@@ -67,12 +67,12 @@
     <main class="max-w-7xl mx-auto px-4 py-6 space-y-6">
         <div class="bg-[#151522] border border-gray-800 rounded-2xl p-4 md:p-6 flex flex-col md:flex-row gap-6 items-start shadow-xl">
             <div class="w-full md:w-48 flex-shrink-0 aspect-[3/4] rounded-xl overflow-hidden border border-gray-700 shadow-lg relative mx-auto md:mx-0">
-                <img id="animePoster" src="https://lh3.googleusercontent.com/d/1hZPMLLUNMOVG8DmSd1eGd5Nmdgh6AUYZ" alt="Solo Leveling Hindi Dub" class="w-full h-full object-cover">
+                <img id="animePoster" src="https://lh3.googleusercontent.com/d/1hZPMLLUNMOVG8DmSd1eGd5Nmdgh6AUYZ" alt="Anime Poster" class="w-full h-full object-cover">
             </div>
             <div class="flex-1 space-y-3 w-full">
                 <div class="flex flex-wrap items-center justify-between gap-2">
                     <h1 id="animeTitle" class="text-2xl md:text-3xl font-extrabold tracking-tight">Solo Leveling (Hindi Official Audio)</h1>
-                    <button onclick="window.location.href='download.html?page=solo_leveling_videoplayer.html'" class="bg-[#ff5500] hover:bg-[#e04c00] text-white px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition cursor-pointer">
+                    <button onclick="window.location.href='download.html'" class="bg-[#ff5500] hover:bg-[#e04c00] text-white px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition cursor-pointer">
                         <i class="fa-solid fa-download text-[10px]"></i> <span>All Download Links</span>
                     </button>
                 </div>
@@ -84,7 +84,7 @@
                     <span id="activeSeasonBadge" class="bg-[#1a1a2b] text-gray-300 border border-gray-700 px-2.5 py-0.5 rounded">Season 1</span>
                 </div>
                 <p id="animeDescription" class="text-gray-300 text-xs md:text-sm leading-relaxed">
-                    Solo Leveling Official Hindi Audio. Watch Sung Jin-Woo level up in real time.
+                    Watch latest episodes online in best quality.
                 </p>
             </div>
         </div>
@@ -107,18 +107,7 @@
                             <p class="text-xs text-gray-400 font-medium tracking-wide">Loading video fast...</p>
                         </div>
                         
-                        <!-- Native Fast Streaming Video Engine -->
-                        <video id="animeVideoPlayer" 
-                               controls 
-                               playsinline 
-                               preload="metadata"
-                               controlsList="nodownload" 
-                               class="w-full h-full border-0 absolute inset-0 z-10 bg-black" 
-                               oncanplay="hideSpinner()"
-                               onplaying="hideSpinner()"
-                               onwaiting="showSpinner()"
-                               onloadeddata="hideSpinner()" 
-                               onerror="handleVideoError()">
+                        <video id="animeVideoPlayer" controls playsinline preload="metadata" class="w-full h-full border-0 absolute inset-0 z-10 bg-black" oncanplay="hideSpinner()" onplaying="hideSpinner()" onwaiting="showSpinner()" onerror="handleVideoError()">
                             <source id="videoSource" src="" type="video/mp4">
                         </video>
                     </div>
@@ -154,41 +143,27 @@
             <div class="bg-[#151522] p-4 rounded-2xl border border-gray-800 space-y-4">
                 <div class="flex items-center justify-between border-b border-gray-800 pb-2">
                     <h3 class="font-bold text-sm"><i class="fa-solid fa-layer-group text-[#ff5500]"></i> Select Season</h3>
-                    <div class="flex items-center space-x-2" id="seasonButtonsContainer">
-                        <!-- Dynamic Season Buttons render here -->
-                    </div>
+                    <div class="flex items-center space-x-2" id="seasonButtonsContainer"></div>
                 </div>
 
                 <h3 class="font-bold text-sm"><i class="fa-solid fa-bars text-[#ff5500]"></i> Episode List</h3>
-                <div class="grid grid-cols-3 gap-2 overflow-y-auto max-h-[300px] pr-1" id="episodeGridButtons">
-                    <!-- Dynamic Episode Buttons render here -->
-                </div>
+                <div class="grid grid-cols-3 gap-2 overflow-y-auto max-h-[300px] pr-1" id="episodeGridButtons"></div>
             </div>
         </div>
     </main>
 
     <script>
         const BACKEND_URL = "https://sevenanime-http-bot.onrender.com";
-        const NOTIFICATION_EMAIL = "sumitguptagupta095@gmail.com";
-
-        // Dynamic URL Parameter detection (Defaults to solo_leveling)
         const urlParams = new URLSearchParams(window.location.search);
         const CURRENT_ANIME_SLUG = urlParams.get('anime') || 'solo_leveling';
 
-        // Local Fallback Data Structure
         let animeData = {
             "title": "Solo Leveling",
-            "seasons": {
-                "1": [
-                    { "ep": 1, "chat_id": "-1004315586873", "msg_id": 80 },
-                    { "ep": 2, "chat_id": "-1004315586873", "msg_id": 81 }
-                ]
-            }
+            "seasons": {}
         };
 
         let currentSeason = 1;
         let activeEpisodeNumber = 1;
-        let activeStreamLink = "";
         let activeDownloadLink = "";
 
         function toggleSidebar() {
@@ -242,7 +217,7 @@
             const episodes = animeData.seasons[currentSeason] || [];
 
             if(episodes.length === 0) {
-                container.innerHTML = `<p class="col-span-3 text-xs text-gray-400 py-4 text-center">No episodes uploaded yet for Season ${currentSeason}.</p>`;
+                container.innerHTML = `<p class="col-span-3 text-xs text-gray-400 py-4 text-center">No episodes found.</p>`;
                 return;
             }
 
@@ -264,39 +239,25 @@
             showSpinner();
             activeEpisodeNumber = epNum;
 
-            if (epData.chat_id && epData.msg_id) {
-                activeStreamLink = `${BACKEND_URL}/stream/${epData.chat_id}/${epData.msg_id}`;
-                activeDownloadLink = `${BACKEND_URL}/download/${epData.chat_id}/${epData.msg_id}`;
-            } else if (epData.vidhide) {
-                activeStreamLink = epData.vidhide;
-                activeDownloadLink = epData.vidhide;
-            }
+            const streamLink = `${BACKEND_URL}/stream/${epData.chat_id}/${epData.msg_id}`;
+            activeDownloadLink = `${BACKEND_URL}/download/${epData.chat_id}/${epData.msg_id}`;
 
             const player = document.getElementById('animeVideoPlayer');
             const source = document.getElementById('videoSource');
 
             if (source && player) {
-                player.pause();
-                source.src = activeStreamLink;
+                source.src = streamLink;
                 player.load();
-                
-                const playPromise = player.play();
-                if (playPromise !== undefined) {
-                    playPromise.catch(error => {
-                        console.log("Autoplay prevented or waiting for user interaction");
-                    });
-                }
+                player.play().catch(() => {});
             }
 
             document.getElementById('currentPlayingText').innerText = `S${currentSeason} Ep ${epNum}`;
 
             document.querySelectorAll('.ep-btn').forEach(b => {
                 const bEp = parseInt(b.getAttribute('data-ep'));
-                if (bEp === epNum) {
-                    b.className = "ep-btn bg-[#ff5500] text-white border border-[#ff5500] py-2.5 rounded-lg text-xs font-bold transition cursor-pointer";
-                } else {
-                    b.className = "ep-btn bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition cursor-pointer";
-                }
+                b.className = (bEp === epNum)
+                    ? "ep-btn bg-[#ff5500] text-white border border-[#ff5500] py-2.5 rounded-lg text-xs font-bold transition cursor-pointer"
+                    : "ep-btn bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition cursor-pointer";
             });
         }
 
@@ -313,41 +274,21 @@
 
         function downloadCurrentVideo() {
             if (!activeDownloadLink) {
-                alert("Download link not available for this episode!");
+                alert("Download link ready nahi hai!");
                 return;
             }
-            window.open(activeDownloadLink, '_blank');
-        }
-
-        function sendEmailAlert(epNum, linkUrl, reason) {
-            fetch(`https://formsubmit.co/ajax/${NOTIFICATION_EMAIL}`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json", "Accept": "application/json" },
-                body: JSON.stringify({
-                    _subject: `⚠️ Dead Link Alert: S${currentSeason} Ep ${epNum}`,
-                    Anime: CURRENT_ANIME_SLUG,
-                    Season: currentSeason,
-                    Episode: epNum,
-                    Broken_Link: linkUrl,
-                    Reason: reason,
-                    Time: new Date().toLocaleString()
-                })
-            });
-        }
-
-        function reportBrokenLink() {
-            if (confirm(`S${currentSeason} Episode ${activeEpisodeNumber} ka link report karein?`)) {
-                sendEmailAlert(activeEpisodeNumber, activeStreamLink, "User Reported Broken Video");
-                alert("Report Send Ho Gayi Hai!");
-            }
+            const a = document.createElement('a');
+            a.href = activeDownloadLink;
+            a.target = '_blank';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
         }
 
         function handleVideoError() {
             hideSpinner();
-            console.log("Video Stream Error or Range request pending.");
         }
 
-        // Fetch Anime Data dynamically from Render Backend
         async function fetchLatestAnimeData() {
             try {
                 const res = await fetch(`${BACKEND_URL}/api/episodes/${CURRENT_ANIME_SLUG}`);
@@ -362,7 +303,7 @@
                     }
                 }
             } catch(e) {
-                console.log("Using built-in data. Backend offline or loading default.");
+                console.log("Fetch Error");
             }
             renderSeasons();
             renderEpisodes();
