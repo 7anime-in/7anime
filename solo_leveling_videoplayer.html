@@ -30,7 +30,7 @@
 </head>
 <body class="bg-[#0b0c10] text-white font-sans antialiased">
 
-    <!-- Navbar -->
+    <!-- Header / Navbar -->
     <header class="main-header flex items-center justify-between px-4 py-3 bg-[#151522] border-b border-gray-800 relative z-50">
         <div class="flex items-center space-x-3">
             <button class="text-white text-lg focus:outline-none cursor-pointer" id="menuBtn" onclick="toggleSidebar()">
@@ -46,7 +46,7 @@
         </div>
     </header>
 
-    <!-- Sidebar -->
+    <!-- Sidebar Drawer -->
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
     <aside class="sidebar" id="sidebar">
         <div class="flex items-center justify-between p-4 border-b border-gray-800">
@@ -58,15 +58,15 @@
         </ul>
     </aside>
 
+    <!-- Main Player Body -->
     <main class="max-w-7xl mx-auto px-4 py-6 space-y-6">
-        <!-- Anime Details Header -->
         <div class="bg-[#151522] border border-gray-800 rounded-2xl p-4 md:p-6 flex flex-col md:flex-row gap-6 items-start shadow-xl">
             <div class="w-full md:w-48 flex-shrink-0 aspect-[3/4] rounded-xl overflow-hidden border border-gray-700 shadow-lg relative mx-auto md:mx-0">
                 <img id="animePoster" src="https://lh3.googleusercontent.com/d/1DrYU7Rcf8h1JHkkakd6ks9MAiFYsnj4V" alt="Anime Poster" class="w-full h-full object-cover">
             </div>
             <div class="flex-1 space-y-3 w-full">
                 <div class="flex flex-wrap items-center justify-between gap-2">
-                    <h1 id="animeTitle" class="text-2xl md:text-3xl font-extrabold tracking-tight">Solo Leveling</h1>
+                    <h1 id="animeTitle" class="text-2xl md:text-3xl font-extrabold tracking-tight">Anime Title</h1>
                 </div>
                 <div class="flex flex-wrap items-center gap-2 text-xs">
                     <span class="bg-purple-600/30 text-purple-300 border border-purple-500/40 px-2.5 py-0.5 rounded font-semibold">Hindi Dub</span>
@@ -76,12 +76,12 @@
                     <span id="activeSeasonBadge" class="bg-[#1a1a2b] text-gray-300 border border-gray-700 px-2.5 py-0.5 rounded">Season 1</span>
                 </div>
                 <p id="animeDescription" class="text-gray-300 text-xs md:text-sm leading-relaxed">
-                    Watch latest episodes online in best quality.
+                    Watch latest episodes online in high quality.
                 </p>
             </div>
         </div>
 
-        <!-- Player & Controls Grid -->
+        <!-- Video Frame -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div class="lg:col-span-2 space-y-4">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between bg-[#151522] px-4 py-2.5 rounded-xl border border-gray-800 gap-3">
@@ -91,7 +91,6 @@
                     </div>
                 </div>
 
-                <!-- Video Frame -->
                 <div class="relative bg-black rounded-2xl overflow-hidden shadow-2xl border border-gray-800">
                     <div class="relative aspect-video w-full bg-black flex items-center justify-center" id="playerContainer">
                         <div id="loadingSpinner" class="absolute inset-0 bg-[#0b0c10] flex flex-col items-center justify-center z-20">
@@ -105,9 +104,9 @@
                     </div>
                 </div>
 
-                <!-- External Player Options (MKV Fix Buttons) -->
+                <!-- VLC & MX Player External Buttons -->
                 <div class="bg-[#151522] p-3 rounded-xl border border-gray-800 flex flex-wrap items-center justify-between gap-2">
-                    <span class="text-xs text-gray-400 font-medium">⚠️ If video doesn't play in browser:</span>
+                    <span class="text-xs text-gray-400 font-medium">⚠️ MKV Video play na hone par niche click karo:</span>
                     <div class="flex items-center space-x-2">
                         <a id="vlcBtn" href="#" target="_blank" class="bg-orange-600 hover:bg-orange-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold flex items-center space-x-1.5 transition">
                             <i class="fa-solid fa-cone-orange"></i> <span>Play in VLC</span>
@@ -118,7 +117,7 @@
                     </div>
                 </div>
 
-                <!-- Next/Prev & Download Bar -->
+                <!-- Bottom Controls -->
                 <div class="flex flex-wrap items-center justify-between bg-[#151522] px-4 py-3 rounded-xl border border-gray-800 text-xs md:text-sm gap-2">
                     <button onclick="changeEpisode('prev')" class="flex items-center space-x-1.5 font-semibold text-gray-300 hover:text-white transition cursor-pointer">
                         <i class="fa-solid fa-chevron-left text-[10px]"></i> <span>Prev Episode</span>
@@ -137,7 +136,7 @@
                 </div>
             </div>
 
-            <!-- Season & Episode Selection -->
+            <!-- Season / Episode Grid -->
             <div class="bg-[#151522] p-4 rounded-2xl border border-gray-800 space-y-4">
                 <div class="flex items-center justify-between border-b border-gray-800 pb-2">
                     <h3 class="font-bold text-sm"><i class="fa-solid fa-layer-group text-[#ff5500]"></i> Select Season</h3>
@@ -150,30 +149,14 @@
         </div>
     </main>
 
+    <script src="script.js"></script>
     <script>
-        const BACKEND_URL = "https://sevenanime-http-bot.onrender.com";
         const urlParams = new URLSearchParams(window.location.search);
         const CURRENT_ANIME_SLUG = urlParams.get('anime') || 'solo_leveling';
 
-        let animeData = { "title": "Solo Leveling", "seasons": {} };
-        let currentSeason = 1;
+        let animeData = { "title": "Anime", "seasons": {} };
         let activeEpisodeNumber = 1;
         let activeDownloadLink = "";
-
-        function toggleSidebar() {
-            document.getElementById('sidebar').classList.toggle('active');
-            document.getElementById('sidebarOverlay').classList.toggle('active');
-        }
-
-        function hideSpinner() {
-            const spinner = document.getElementById('loadingSpinner');
-            if (spinner) spinner.style.display = 'none';
-        }
-
-        function showSpinner() {
-            const spinner = document.getElementById('loadingSpinner');
-            if (spinner) spinner.style.display = 'flex';
-        }
 
         function renderSeasons() {
             const container = document.getElementById('seasonButtonsContainer');
@@ -228,7 +211,9 @@
             const epData = episodes.find(e => e.ep === epNum);
             if (!epData) return;
 
-            showSpinner();
+            const spinner = document.getElementById('loadingSpinner');
+            if (spinner) spinner.style.display = 'flex';
+            
             activeEpisodeNumber = epNum;
 
             const streamLink = `${BACKEND_URL}/stream/${epData.chat_id}/${epData.msg_id}`;
@@ -243,7 +228,6 @@
                 player.play().catch(() => {});
             }
 
-            // Set External Players (VLC & MX Player) Links
             document.getElementById('vlcBtn').href = "vlc://" + streamLink;
             document.getElementById('mxBtn').href = "intent:" + streamLink + "#Intent;package=com.mxtech.videoplayer.ad;type=video/*;end";
 
@@ -255,17 +239,6 @@
                     ? "ep-btn bg-[#ff5500] text-white border border-[#ff5500] py-2.5 rounded-lg text-xs font-bold transition cursor-pointer"
                     : "ep-btn bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition cursor-pointer";
             });
-        }
-
-        function changeEpisode(direction) {
-            const episodes = animeData.seasons[currentSeason] || [];
-            const currentIndex = episodes.findIndex(e => e.ep === activeEpisodeNumber);
-
-            if (direction === 'prev' && currentIndex > 0) {
-                selectEpisode(episodes[currentIndex - 1].ep);
-            } else if (direction === 'next' && currentIndex < episodes.length - 1) {
-                selectEpisode(episodes[currentIndex + 1].ep);
-            }
         }
 
         function downloadCurrentVideo() {
