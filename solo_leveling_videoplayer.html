@@ -3,22 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title id="pageTitle">Solo Leveling Hindi Official Audio - 7ANIME</title>
+    <title id="pageTitle">Watch Anime - 7ANIME</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .spinner {
-            width: 45px;
-            height: 45px;
+            width: 45px; height: 45px;
             border: 4px solid rgba(255, 85, 0, 0.2);
             border-top: 4px solid #ff5500;
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
         }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .sidebar {
             position: fixed; top: 0; left: -280px; width: 280px; height: 100%;
             background-color: #151522; z-index: 100; transition: left 0.3s ease;
@@ -34,7 +30,7 @@
 </head>
 <body class="bg-[#0b0c10] text-white font-sans antialiased">
 
-    <!-- Header / Navbar -->
+    <!-- Navbar -->
     <header class="main-header flex items-center justify-between px-4 py-3 bg-[#151522] border-b border-gray-800 relative z-50">
         <div class="flex items-center space-x-3">
             <button class="text-white text-lg focus:outline-none cursor-pointer" id="menuBtn" onclick="toggleSidebar()">
@@ -50,7 +46,7 @@
         </div>
     </header>
 
-    <!-- Sidebar Drawer -->
+    <!-- Sidebar -->
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
     <aside class="sidebar" id="sidebar">
         <div class="flex items-center justify-between p-4 border-b border-gray-800">
@@ -59,22 +55,18 @@
         </div>
         <ul class="p-4 space-y-3 text-xs font-semibold">
             <li><a href="index.html" class="flex items-center space-x-2 text-gray-300 hover:text-[#ff5500]"><i class="fa-solid fa-house"></i> <span>HOME</span></a></li>
-            <li><a href="download.html" class="flex items-center space-x-2 text-gray-300 hover:text-[#ff5500]"><i class="fa-solid fa-download"></i> <span>DOWNLOAD PAGE</span></a></li>
         </ul>
     </aside>
 
-    <!-- Main Section -->
     <main class="max-w-7xl mx-auto px-4 py-6 space-y-6">
+        <!-- Anime Details Header -->
         <div class="bg-[#151522] border border-gray-800 rounded-2xl p-4 md:p-6 flex flex-col md:flex-row gap-6 items-start shadow-xl">
             <div class="w-full md:w-48 flex-shrink-0 aspect-[3/4] rounded-xl overflow-hidden border border-gray-700 shadow-lg relative mx-auto md:mx-0">
-                <img id="animePoster" src="https://lh3.googleusercontent.com/d/1hZPMLLUNMOVG8DmSd1eGd5Nmdgh6AUYZ" alt="Anime Poster" class="w-full h-full object-cover">
+                <img id="animePoster" src="https://lh3.googleusercontent.com/d/1DrYU7Rcf8h1JHkkakd6ks9MAiFYsnj4V" alt="Anime Poster" class="w-full h-full object-cover">
             </div>
             <div class="flex-1 space-y-3 w-full">
                 <div class="flex flex-wrap items-center justify-between gap-2">
-                    <h1 id="animeTitle" class="text-2xl md:text-3xl font-extrabold tracking-tight">Solo Leveling (Hindi Official Audio)</h1>
-                    <button onclick="window.location.href='download.html'" class="bg-[#ff5500] hover:bg-[#e04c00] text-white px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition cursor-pointer">
-                        <i class="fa-solid fa-download text-[10px]"></i> <span>All Download Links</span>
-                    </button>
+                    <h1 id="animeTitle" class="text-2xl md:text-3xl font-extrabold tracking-tight">Solo Leveling</h1>
                 </div>
                 <div class="flex flex-wrap items-center gap-2 text-xs">
                     <span class="bg-purple-600/30 text-purple-300 border border-purple-500/40 px-2.5 py-0.5 rounded font-semibold">Hindi Dub</span>
@@ -89,7 +81,7 @@
             </div>
         </div>
 
-        <!-- Video Player Grid -->
+        <!-- Player & Controls Grid -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div class="lg:col-span-2 space-y-4">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between bg-[#151522] px-4 py-2.5 rounded-xl border border-gray-800 gap-3">
@@ -113,7 +105,20 @@
                     </div>
                 </div>
 
-                <!-- Player Actions -->
+                <!-- External Player Options (MKV Fix Buttons) -->
+                <div class="bg-[#151522] p-3 rounded-xl border border-gray-800 flex flex-wrap items-center justify-between gap-2">
+                    <span class="text-xs text-gray-400 font-medium">⚠️ If video doesn't play in browser:</span>
+                    <div class="flex items-center space-x-2">
+                        <a id="vlcBtn" href="#" target="_blank" class="bg-orange-600 hover:bg-orange-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold flex items-center space-x-1.5 transition">
+                            <i class="fa-solid fa-cone-orange"></i> <span>Play in VLC</span>
+                        </a>
+                        <a id="mxBtn" href="#" target="_blank" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold flex items-center space-x-1.5 transition">
+                            <i class="fa-solid fa-play"></i> <span>Play in MX Player</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Next/Prev & Download Bar -->
                 <div class="flex flex-wrap items-center justify-between bg-[#151522] px-4 py-3 rounded-xl border border-gray-800 text-xs md:text-sm gap-2">
                     <button onclick="changeEpisode('prev')" class="flex items-center space-x-1.5 font-semibold text-gray-300 hover:text-white transition cursor-pointer">
                         <i class="fa-solid fa-chevron-left text-[10px]"></i> <span>Prev Episode</span>
@@ -121,15 +126,8 @@
                     
                     <div class="flex items-center space-x-2">
                         <span id="currentPlayingText" class="font-bold text-gray-200">Episode 1</span>
-                        
                         <button onclick="downloadCurrentVideo()" class="bg-[#ff5500] hover:bg-[#e04c00] text-white px-3 py-1 rounded-lg text-xs font-bold transition flex items-center space-x-1.5 cursor-pointer shadow">
-                            <i class="fa-solid fa-download text-[11px]"></i>
-                            <span>Download Video</span>
-                        </button>
-
-                        <button onclick="reportBrokenLink()" class="bg-red-600/20 hover:bg-red-600/40 text-red-400 border border-red-500/30 px-2.5 py-1 rounded-lg text-xs font-semibold transition flex items-center space-x-1 cursor-pointer">
-                            <i class="fa-solid fa-triangle-exclamation text-[11px]"></i>
-                            <span class="hidden sm:inline">Report Dead Link</span>
+                            <i class="fa-solid fa-download text-[11px]"></i> <span>Download Video</span>
                         </button>
                     </div>
 
@@ -139,7 +137,7 @@
                 </div>
             </div>
 
-            <!-- Episodes & Season Selection -->
+            <!-- Season & Episode Selection -->
             <div class="bg-[#151522] p-4 rounded-2xl border border-gray-800 space-y-4">
                 <div class="flex items-center justify-between border-b border-gray-800 pb-2">
                     <h3 class="font-bold text-sm"><i class="fa-solid fa-layer-group text-[#ff5500]"></i> Select Season</h3>
@@ -157,11 +155,7 @@
         const urlParams = new URLSearchParams(window.location.search);
         const CURRENT_ANIME_SLUG = urlParams.get('anime') || 'solo_leveling';
 
-        let animeData = {
-            "title": "Solo Leveling",
-            "seasons": {}
-        };
-
+        let animeData = { "title": "Solo Leveling", "seasons": {} };
         let currentSeason = 1;
         let activeEpisodeNumber = 1;
         let activeDownloadLink = "";
@@ -184,7 +178,6 @@
         function renderSeasons() {
             const container = document.getElementById('seasonButtonsContainer');
             container.innerHTML = '';
-
             const seasonsList = Object.keys(animeData.seasons);
             if (seasonsList.length === 0) seasonsList.push("1");
 
@@ -213,7 +206,6 @@
         function renderEpisodes() {
             const container = document.getElementById('episodeGridButtons');
             container.innerHTML = '';
-
             const episodes = animeData.seasons[currentSeason] || [];
 
             if(episodes.length === 0) {
@@ -251,6 +243,10 @@
                 player.play().catch(() => {});
             }
 
+            // Set External Players (VLC & MX Player) Links
+            document.getElementById('vlcBtn').href = "vlc://" + streamLink;
+            document.getElementById('mxBtn').href = "intent:" + streamLink + "#Intent;package=com.mxtech.videoplayer.ad;type=video/*;end";
+
             document.getElementById('currentPlayingText').innerText = `S${currentSeason} Ep ${epNum}`;
 
             document.querySelectorAll('.ep-btn').forEach(b => {
@@ -273,16 +269,8 @@
         }
 
         function downloadCurrentVideo() {
-            if (!activeDownloadLink) {
-                alert("Download link ready nahi hai!");
-                return;
-            }
-            const a = document.createElement('a');
-            a.href = activeDownloadLink;
-            a.target = '_blank';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
+            if (!activeDownloadLink) return alert("Download link ready nahi hai!");
+            window.open(activeDownloadLink, '_blank');
         }
 
         function handleVideoError() {
