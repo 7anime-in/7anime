@@ -1,11 +1,11 @@
-// Private Consumet API Endpoint
-const API_BASE_URL = 'https://api-consumet-org-tau-five.vercel.app';
+// Backend API Endpoint
+const BACKEND_URL = 'https://sevenanime-http-bot.onrender.com';
 
-// 1. Open Player Page Function
+// 1. Dynamic Page Navigation Function
 function openAnimePage(animeSlug) {
-    if(!animeSlug) return;
-    const targetPage = animeSlug.toLowerCase() + '_videoplayer.html';
-    window.location.href = targetPage;
+    if (!animeSlug) return;
+    const cleanSlug = animeSlug.toLowerCase().trim().replace(/\s+/g, '_');
+    window.location.href = `videoplayer.html?anime=${cleanSlug}`;
 }
 
 // 2. Sidebar Drawer Open/Close Logic
@@ -18,7 +18,7 @@ function toggleSidebar() {
     }
 }
 
-// 3. Open Age Limit Modal
+// 3. Open Age Limit Modal (18+)
 function openAgeModal() {
     toggleSidebar(); 
     const modal = document.getElementById('ageModal');
@@ -41,15 +41,15 @@ function confirmAge(is18Plus) {
     }
 }
 
-// 5. Load Only Hentai Content
+// 5. Load Only Hentai Content (18+ Filter)
 function loadHentaiPage() {
     const cards = document.querySelectorAll('.anime-card');
     const heroSection = document.getElementById('heroSection');
     const sectionTitle = document.getElementById('sectionTitle');
 
-    if(heroSection) heroSection.style.display = 'none';
+    if (heroSection) heroSection.style.display = 'none';
 
-    if(sectionTitle) {
+    if (sectionTitle) {
         sectionTitle.innerHTML = '<i class="fa-solid fa-fire" style="color:#ff0055;"></i> 18+ Hentai Collection';
     }
 
@@ -77,18 +77,16 @@ function loadHentaiPage() {
 }
 
 // ==========================================
-// VIDEO PLAYER, SEASON & QUALITY LOGIC
+// VIDEO PLAYER, SEASON & STREAM CONTROLS
 // ==========================================
 let currentSeason = 1;
 let currentEpisode = 1;
-let currentServer = 'vidhide';
-let currentQuality = '720p'; // Default Quality set to 720p
+let currentQuality = '720p';
 
-// Quality Change Handler
+// Quality Switcher Handler UI
 function changeQuality(quality) {
     currentQuality = quality;
 
-    // Update UI Quality Buttons State
     document.querySelectorAll('.quality-btn').forEach(btn => {
         if (btn.innerText.trim() === quality) {
             btn.className = "quality-btn bg-[#ff5500] text-white border border-[#ff5500] px-2 py-0.5 rounded text-xs font-bold transition cursor-pointer";
@@ -97,36 +95,36 @@ function changeQuality(quality) {
         }
     });
 
-    // Refresh video player for current episode
-    selectEpisode(currentEpisode);
+    if (typeof selectEpisode === 'function') {
+        selectEpisode(currentEpisode);
+    }
 }
 
+// Select Episode Function (Supports both HTML Video and Iframe fallback)
 function selectEpisode(epNum) {
     currentEpisode = Number(epNum);
-    const iframe = document.getElementById('animeVideoPlayer');
+    const videoPlayer = document.getElementById('animeVideoPlayer');
+    const iframePlayer = document.getElementById('animeIframePlayer');
     const spinner = document.getElementById('loadingSpinner');
     const text = document.getElementById('currentPlayingText');
     
     if (spinner) spinner.style.display = 'flex';
     if (text) text.innerText = `S${currentSeason} - Episode ${currentEpisode}`;
     
-    // Find the button for this episode in the HTML grid to read Vidhide link
     const targetBtn = document.querySelector(`.ep-btn[data-ep="${currentEpisode}"]`);
-    let videoUrl = "";
-
-    if (targetBtn) {
-        videoUrl = targetBtn.getAttribute('data-vidhide') || "";
-    }
-
-    if (iframe && videoUrl) {
-        // Ensure Autoplay flag is present in URL
-        if (!videoUrl.includes('autoplay=1')) {
-            videoUrl += (videoUrl.includes('?') ? '&' : '?') + 'autoplay=1';
+    
+    // If Vidhide iframe link exists
+    if (iframePlayer && targetBtn) {
+        let videoUrl = targetBtn.getAttribute('data-vidhide') || "";
+        if (videoUrl) {
+            if (!videoUrl.includes('autoplay=1')) {
+                videoUrl += (videoUrl.includes('?') ? '&' : '?') + 'autoplay=1';
+            }
+            iframePlayer.src = videoUrl;
         }
-        iframe.src = videoUrl;
     }
 
-    // Highlight active episode button correctly
+    // Highlight active episode button
     document.querySelectorAll('.ep-btn').forEach(btn => {
         const btnEp = Number(btn.getAttribute('data-ep'));
         if (btnEp === currentEpisode) {
@@ -138,16 +136,8 @@ function selectEpisode(epNum) {
 }
 
 function switchServer(serverName) {
-    currentServer = serverName;
-    const btn1 = document.getElementById('serverBtn1');
     const spinner = document.getElementById('loadingSpinner');
-
     if (spinner) spinner.style.display = 'flex';
-
-    if (btn1) {
-        btn1.className = "bg-[#ff5500] text-white px-3 py-1 rounded-lg text-xs font-bold transition shadow cursor-pointer";
-    }
-
     selectEpisode(currentEpisode);
 }
 
@@ -171,9 +161,7 @@ function switchSeason(seasonNum) {
 
 function changeEpisode(direction) {
     if (direction === 'next') {
-        if (currentEpisode < 12) {
-            selectEpisode(currentEpisode + 1);
-        }
+        selectEpisode(currentEpisode + 1);
     } else if (direction === 'prev') {
         if (currentEpisode > 1) {
             selectEpisode(currentEpisode - 1);
@@ -188,8 +176,10 @@ function hideSpinner() {
     }
 }
 
+// Global Event Listeners
 window.addEventListener('DOMContentLoaded', () => {
-    if (document.getElementById('animeVideoPlayer')) {
+    // If iframe player exists without backend fetching
+    if (document.getElementById('animeIframePlayer')) {
         selectEpisode(1);
     }
 });
