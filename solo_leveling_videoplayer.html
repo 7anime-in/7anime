@@ -120,8 +120,8 @@
                             <p class="text-xs text-gray-400 font-medium tracking-wide">Connecting to Fast Stream Server...</p>
                         </div>
                         
-                        <!-- Fixed Video Element -->
-                        <video id="animeVideoPlayer" controls controlsList="nodownload" preload="metadata" class="w-full h-full object-contain absolute inset-0 z-10 bg-black" onloadeddata="hideSpinner()" onerror="handleVideoError()">
+                        <!-- Dynamic Responsive Video Element -->
+                        <video id="animeVideoPlayer" controls controlsList="nodownload" preload="metadata" class="w-full h-full object-contain absolute inset-0 z-10 bg-black" onloadeddata="hideSpinner()" oncanplay="hideSpinner()" onplaying="hideSpinner()" onerror="handleVideoError()">
                             Your browser does not support HTML5 video streaming.
                         </video>
                     </div>
@@ -286,12 +286,13 @@
             videoPlayer.src = streamUrl;
             videoPlayer.load();
 
-            videoPlayer.oncanplay = function() {
+            // Auto fallback hide spinner after 6s in case browser events lag
+            setTimeout(() => {
                 hideSpinner();
-            };
+            }, 6000);
 
             videoPlayer.play().catch((err) => {
-                console.log("Autoplay blocked or waiting for user action:", err);
+                console.log("Autoplay blocked or waiting for user click:", err);
             });
 
             document.getElementById('currentPlayingText').innerText = `Episode ${epData.ep}`;
@@ -360,4 +361,5 @@
         window.onload = initPage;
     </script>
 </body>
-</html>
+    </html>
+    
