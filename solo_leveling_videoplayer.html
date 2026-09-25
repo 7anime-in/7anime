@@ -3,27 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title id="pageTitle">Watch Anime - 7ANIME</title>
+    <title id="pageTitle">7ANIME - Watch Anime</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .spinner {
-            width: 45px; height: 45px;
+            width: 45px;
+            height: 45px;
             border: 4px solid rgba(255, 85, 0, 0.2);
             border-top: 4px solid #ff5500;
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
         }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
         .sidebar {
-            position: fixed; top: 0; left: -280px; width: 280px; height: 100%;
-            background-color: #151522; z-index: 100; transition: left 0.3s ease;
-            box-shadow: 5px 0 15px rgba(0,0,0,0.5); border-right: 1px solid #2d2d3d;
+            position: fixed;
+            top: 0;
+            left: -280px;
+            width: 280px;
+            height: 100%;
+            background-color: #151522;
+            z-index: 100;
+            transition: left 0.3s ease;
+            box-shadow: 5px 0 15px rgba(0,0,0,0.5);
+            border-right: 1px solid #2d2d3d;
         }
         .sidebar.active { left: 0; }
         .sidebar-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.7); z-index: 99; display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 99;
+            display: none;
         }
         .sidebar-overlay.active { display: block; }
     </style>
@@ -40,6 +57,7 @@
                 <span class="text-[#ff5500]">7</span><span class="text-white">ANIME 🔥</span>
             </div>
         </div>
+        <!-- Unchanged Search Engine Box -->
         <div class="search-box relative">
             <input type="text" id="globalSearchInput" placeholder="Search anime..." class="bg-[#1a1a2b] text-xs px-3 py-1.5 rounded-lg border border-gray-700 text-white focus:outline-none w-40 md:w-56">
             <div id="searchResultsDropdown" class="search-dropdown" style="display: none;"></div>
@@ -55,18 +73,22 @@
         </div>
         <ul class="p-4 space-y-3 text-xs font-semibold">
             <li><a href="index.html" class="flex items-center space-x-2 text-gray-300 hover:text-[#ff5500]"><i class="fa-solid fa-house"></i> <span>HOME</span></a></li>
+            <li><a href="index.html" class="flex items-center space-x-2 text-gray-300 hover:text-[#ff5500]"><i class="fa-solid fa-download"></i> <span>ALL ANIMES</span></a></li>
         </ul>
     </aside>
 
-    <!-- Main Player Body -->
+    <!-- Main Section -->
     <main class="max-w-7xl mx-auto px-4 py-6 space-y-6">
         <div class="bg-[#151522] border border-gray-800 rounded-2xl p-4 md:p-6 flex flex-col md:flex-row gap-6 items-start shadow-xl">
             <div class="w-full md:w-48 flex-shrink-0 aspect-[3/4] rounded-xl overflow-hidden border border-gray-700 shadow-lg relative mx-auto md:mx-0">
-                <img id="animePoster" src="https://lh3.googleusercontent.com/d/1DrYU7Rcf8h1JHkkakd6ks9MAiFYsnj4V" alt="Anime Poster" class="w-full h-full object-cover">
+                <img id="animePoster" src="https://lh3.googleusercontent.com/d/1hZPMLLUNMOVG8DmSd1eGd5Nmdgh6AUYZ" alt="Anime Poster" class="w-full h-full object-cover">
             </div>
             <div class="flex-1 space-y-3 w-full">
                 <div class="flex flex-wrap items-center justify-between gap-2">
-                    <h1 id="animeTitle" class="text-2xl md:text-3xl font-extrabold tracking-tight">Anime Title</h1>
+                    <h1 id="animeTitleDisplay" class="text-2xl md:text-3xl font-extrabold tracking-tight">Loading Anime...</h1>
+                    <button onclick="downloadCurrentVideo()" class="bg-[#ff5500] hover:bg-[#e04c00] text-white px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition cursor-pointer">
+                        <i class="fa-solid fa-download text-[10px]"></i> <span>Download Episode</span>
+                    </button>
                 </div>
                 <div class="flex flex-wrap items-center gap-2 text-xs">
                     <span class="bg-purple-600/30 text-purple-300 border border-purple-500/40 px-2.5 py-0.5 rounded font-semibold">Hindi Dub</span>
@@ -76,48 +98,46 @@
                     <span id="activeSeasonBadge" class="bg-[#1a1a2b] text-gray-300 border border-gray-700 px-2.5 py-0.5 rounded">Season 1</span>
                 </div>
                 <p id="animeDescription" class="text-gray-300 text-xs md:text-sm leading-relaxed">
-                    Watch latest episodes online in high quality.
+                    Watch and download high-quality episodes directly from our fast streaming servers.
                 </p>
+                
+                <!-- Dynamic Season Selector -->
+                <div class="pt-2">
+                    <span class="text-xs text-gray-400 font-semibold block mb-1">Seasons:</span>
+                    <div id="seasonButtonsContainer" class="flex flex-wrap gap-2">
+                        <!-- Auto Generated Season Buttons -->
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- Video Frame -->
+        <!-- Video Player Grid -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div class="lg:col-span-2 space-y-4">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between bg-[#151522] px-4 py-2.5 rounded-xl border border-gray-800 gap-3">
                     <div class="flex items-center space-x-2">
                         <span class="text-xs text-gray-400 font-semibold"><i class="fa-solid fa-server text-[#ff5500]"></i> Server:</span>
-                        <button class="bg-[#ff5500] text-white px-3 py-1 rounded-lg text-xs font-bold transition shadow">SevenAnime Fast Server</button>
+                        <button class="bg-[#ff5500] text-white px-3 py-1 rounded-lg text-xs font-bold transition shadow">Fast Stream Engine</button>
                     </div>
                 </div>
 
+                <!-- Native Video Frame -->
                 <div class="relative bg-black rounded-2xl overflow-hidden shadow-2xl border border-gray-800">
                     <div class="relative aspect-video w-full bg-black flex items-center justify-center" id="playerContainer">
                         <div id="loadingSpinner" class="absolute inset-0 bg-[#0b0c10] flex flex-col items-center justify-center z-20">
                             <div class="spinner mb-3"></div>
-                            <p class="text-xs text-gray-400 font-medium tracking-wide">Loading video fast...</p>
+                            <p class="text-xs text-gray-400 font-medium tracking-wide">Connecting to Fast Stream Server...</p>
                         </div>
                         
-                        <video id="animeVideoPlayer" controls playsinline preload="metadata" class="w-full h-full border-0 absolute inset-0 z-10 bg-black" oncanplay="hideSpinner()" onplaying="hideSpinner()" onwaiting="showSpinner()" onerror="handleVideoError()">
+                        <!-- High Performance HTML5 Video Player -->
+                        <video id="animeVideoPlayer" controls controlsList="nodownload" preload="metadata" class="w-full h-full object-contain absolute inset-0 z-10 bg-black" onloadeddata="hideSpinner()" onerror="handleVideoError()">
                             <source id="videoSource" src="" type="video/mp4">
+                            Your browser does not support HTML5 video streaming.
                         </video>
                     </div>
                 </div>
 
-                <!-- VLC & MX Player External Buttons -->
-                <div class="bg-[#151522] p-3 rounded-xl border border-gray-800 flex flex-wrap items-center justify-between gap-2">
-                    <span class="text-xs text-gray-400 font-medium">⚠️ MKV Video play na hone par niche click karo:</span>
-                    <div class="flex items-center space-x-2">
-                        <a id="vlcBtn" href="#" target="_blank" class="bg-orange-600 hover:bg-orange-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold flex items-center space-x-1.5 transition">
-                            <i class="fa-solid fa-cone-orange"></i> <span>Play in VLC</span>
-                        </a>
-                        <a id="mxBtn" href="#" target="_blank" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold flex items-center space-x-1.5 transition">
-                            <i class="fa-solid fa-play"></i> <span>Play in MX Player</span>
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Bottom Controls -->
+                <!-- Player Actions -->
                 <div class="flex flex-wrap items-center justify-between bg-[#151522] px-4 py-3 rounded-xl border border-gray-800 text-xs md:text-sm gap-2">
                     <button onclick="changeEpisode('prev')" class="flex items-center space-x-1.5 font-semibold text-gray-300 hover:text-white transition cursor-pointer">
                         <i class="fa-solid fa-chevron-left text-[10px]"></i> <span>Prev Episode</span>
@@ -125,8 +145,16 @@
                     
                     <div class="flex items-center space-x-2">
                         <span id="currentPlayingText" class="font-bold text-gray-200">Episode 1</span>
+                        
+                        <!-- Dynamic Direct Download Button -->
                         <button onclick="downloadCurrentVideo()" class="bg-[#ff5500] hover:bg-[#e04c00] text-white px-3 py-1 rounded-lg text-xs font-bold transition flex items-center space-x-1.5 cursor-pointer shadow">
-                            <i class="fa-solid fa-download text-[11px]"></i> <span>Download Video</span>
+                            <i class="fa-solid fa-download text-[11px]"></i>
+                            <span>Download Video</span>
+                        </button>
+
+                        <button onclick="reportBrokenLink()" class="bg-red-600/20 hover:bg-red-600/40 text-red-400 border border-red-500/30 px-2.5 py-1 rounded-lg text-xs font-semibold transition flex items-center space-x-1 cursor-pointer">
+                            <i class="fa-solid fa-triangle-exclamation text-[11px]"></i>
+                            <span class="hidden sm:inline">Report Dead Link</span>
                         </button>
                     </div>
 
@@ -136,144 +164,210 @@
                 </div>
             </div>
 
-            <!-- Season / Episode Grid -->
+            <!-- Auto Generated Episode Buttons -->
             <div class="bg-[#151522] p-4 rounded-2xl border border-gray-800 space-y-4">
-                <div class="flex items-center justify-between border-b border-gray-800 pb-2">
-                    <h3 class="font-bold text-sm"><i class="fa-solid fa-layer-group text-[#ff5500]"></i> Select Season</h3>
-                    <div class="flex items-center space-x-2" id="seasonButtonsContainer"></div>
-                </div>
-
                 <h3 class="font-bold text-sm"><i class="fa-solid fa-bars text-[#ff5500]"></i> Episode List</h3>
-                <div class="grid grid-cols-3 gap-2 overflow-y-auto max-h-[300px] pr-1" id="episodeGridButtons"></div>
+                <div class="grid grid-cols-3 gap-2 overflow-y-auto max-h-[350px] pr-1" id="episodeGridButtons">
+                    <!-- Dynamic Buttons Render Here -->
+                </div>
             </div>
         </div>
     </main>
 
-    <script src="script.js"></script>
     <script>
-        const urlParams = new URLSearchParams(window.location.search);
-        const CURRENT_ANIME_SLUG = urlParams.get('anime') || 'solo_leveling';
+        const BACKEND_URL = "https://sevenanime-http-bot.onrender.com";
+        const NOTIFICATION_EMAIL = "sumitguptagupta095@gmail.com";
 
-        let animeData = { "title": "Anime", "seasons": {} };
-        let activeEpisodeNumber = 1;
-        let activeDownloadLink = "";
+        let currentAnimeData = null;
+        let activeSeason = "1";
+        let activeEpisodeIndex = 0;
+        let activeChatId = "";
+        let activeMsgId = "";
 
-        function renderSeasons() {
-            const container = document.getElementById('seasonButtonsContainer');
-            container.innerHTML = '';
-            const seasonsList = Object.keys(animeData.seasons);
-            if (seasonsList.length === 0) seasonsList.push("1");
-
-            seasonsList.forEach(seasonNum => {
-                const isSelected = parseInt(seasonNum) === currentSeason;
-                const btn = document.createElement('button');
-                btn.className = isSelected 
-                    ? "bg-[#ff5500] text-white px-3 py-1 rounded-lg text-xs font-bold transition shadow cursor-pointer"
-                    : "bg-[#1a1a2b] hover:bg-gray-800 text-gray-300 border border-gray-700 px-3 py-1 rounded-lg text-xs font-semibold transition cursor-pointer";
-                btn.innerText = `Season ${seasonNum}`;
-                btn.onclick = () => switchSeason(parseInt(seasonNum));
-                container.appendChild(btn);
-            });
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('active');
+            document.getElementById('sidebarOverlay').classList.toggle('active');
         }
 
-        function switchSeason(seasonNum) {
-            currentSeason = seasonNum;
-            document.getElementById('activeSeasonBadge').innerText = `Season ${seasonNum}`;
-            renderSeasons();
-            renderEpisodes();
-            if (animeData.seasons[currentSeason] && animeData.seasons[currentSeason].length > 0) {
-                selectEpisode(animeData.seasons[currentSeason][0].ep);
+        function hideSpinner() {
+            const spinner = document.getElementById('loadingSpinner');
+            if (spinner) spinner.style.display = 'none';
+        }
+
+        function showSpinner() {
+            const spinner = document.getElementById('loadingSpinner');
+            if (spinner) spinner.style.display = 'flex';
+        }
+
+        // 1. Dynamic Engine: Read URL parameter (?anime=solo_leveling)
+        async function initPage() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const animeSlug = urlParams.get('anime') || 'solo_leveling';
+
+            try {
+                showSpinner();
+                const response = await fetch(`${BACKEND_URL}/api/episodes/${animeSlug}`);
+                currentAnimeData = await response.json();
+
+                if (currentAnimeData && currentAnimeData.title) {
+                    document.getElementById('animeTitleDisplay').innerText = currentAnimeData.title;
+                    document.getElementById('pageTitle').innerText = `${currentAnimeData.title} - 7ANIME`;
+                }
+
+                renderSeasons();
+                selectSeason(activeSeason);
+            } catch (err) {
+                console.error("Error fetching anime details:", err);
+                alert("Anime data fetch karne me error aaya.");
             }
         }
 
-        function renderEpisodes() {
-            const container = document.getElementById('episodeGridButtons');
-            container.innerHTML = '';
-            const episodes = animeData.seasons[currentSeason] || [];
+        // 2. Auto Generate Season Buttons
+        function renderSeasons() {
+            const container = document.getElementById('seasonButtonsContainer');
+            container.innerHTML = "";
 
-            if(episodes.length === 0) {
-                container.innerHTML = `<p class="col-span-3 text-xs text-gray-400 py-4 text-center">No episodes found.</p>`;
+            if (!currentAnimeData || !currentAnimeData.seasons) return;
+
+            const seasonKeys = Object.keys(currentAnimeData.seasons);
+            if (seasonKeys.length === 0) {
+                container.innerHTML = `<span class="text-xs text-gray-400">No seasons available</span>`;
                 return;
             }
 
-            episodes.forEach(item => {
+            seasonKeys.forEach(sNum => {
                 const btn = document.createElement('button');
-                btn.className = `ep-btn bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition cursor-pointer`;
-                btn.setAttribute('data-ep', item.ep);
-                btn.innerText = item.ep;
-                btn.onclick = () => selectEpisode(item.ep);
+                btn.className = `px-3 py-1 rounded-lg text-xs font-bold transition cursor-pointer ${sNum === activeSeason ? 'bg-[#ff5500] text-white' : 'bg-[#1a1a2b] text-gray-300 border border-gray-700'}`;
+                btn.innerText = `Season ${sNum}`;
+                btn.onclick = () => selectSeason(sNum);
                 container.appendChild(btn);
             });
         }
 
-        function selectEpisode(epNum) {
-            const episodes = animeData.seasons[currentSeason] || [];
-            const epData = episodes.find(e => e.ep === epNum);
-            if (!epData) return;
+        function selectSeason(seasonNum) {
+            activeSeason = seasonNum;
+            document.getElementById('activeSeasonBadge').innerText = `Season ${seasonNum}`;
+            renderSeasons();
+            renderEpisodes();
+        }
 
-            const spinner = document.getElementById('loadingSpinner');
-            if (spinner) spinner.style.display = 'flex';
-            
-            activeEpisodeNumber = epNum;
+        // 3. Auto Generate Episode Buttons from Telegram Indexed Database
+        function renderEpisodes() {
+            const grid = document.getElementById('episodeGridButtons');
+            grid.innerHTML = "";
 
-            const streamLink = `${BACKEND_URL}/stream/${epData.chat_id}/${epData.msg_id}`;
-            activeDownloadLink = `${BACKEND_URL}/download/${epData.chat_id}/${epData.msg_id}`;
+            const epList = currentAnimeData?.seasons?.[activeSeason] || [];
 
-            const player = document.getElementById('animeVideoPlayer');
-            const source = document.getElementById('videoSource');
-
-            if (source && player) {
-                source.src = streamLink;
-                player.load();
-                player.play().catch(() => {});
+            if (epList.length === 0) {
+                grid.innerHTML = `<p class="col-span-3 text-xs text-gray-400 py-4 text-center">No episodes uploaded yet.</p>`;
+                hideSpinner();
+                return;
             }
 
-            document.getElementById('vlcBtn').href = "vlc://" + streamLink;
-            document.getElementById('mxBtn').href = "intent:" + streamLink + "#Intent;package=com.mxtech.videoplayer.ad;type=video/*;end";
+            epList.forEach((epItem, index) => {
+                const btn = document.createElement('button');
+                btn.className = `ep-btn py-2.5 rounded-lg text-xs font-medium transition cursor-pointer ${index === activeEpisodeIndex ? 'bg-[#ff5500] text-white border border-[#ff5500] font-bold' : 'bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 text-gray-300'}`;
+                btn.innerText = epItem.ep;
+                btn.onclick = () => playEpisode(index);
+                grid.appendChild(btn);
+            });
 
-            document.getElementById('currentPlayingText').innerText = `S${currentSeason} Ep ${epNum}`;
+            if (epList.length > 0) {
+                playEpisode(0);
+            }
+        }
 
-            document.querySelectorAll('.ep-btn').forEach(b => {
-                const bEp = parseInt(b.getAttribute('data-ep'));
-                b.className = (bEp === epNum)
-                    ? "ep-btn bg-[#ff5500] text-white border border-[#ff5500] py-2.5 rounded-lg text-xs font-bold transition cursor-pointer"
-                    : "ep-btn bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium transition cursor-pointer";
+        // 4. Stream Selected Video & Set Active Identifiers
+        function playEpisode(index) {
+            const epList = currentAnimeData?.seasons?.[activeSeason] || [];
+            if (!epList[index]) return;
+
+            activeEpisodeIndex = index;
+            const epData = epList[index];
+
+            activeChatId = epData.chat_id;
+            activeMsgId = epData.msg_id;
+
+            showSpinner();
+
+            const streamUrl = `${BACKEND_URL}/stream/${activeChatId}/${activeMsgId}`;
+            const videoPlayer = document.getElementById('animeVideoPlayer');
+            const videoSource = document.getElementById('videoSource');
+
+            videoSource.src = streamUrl;
+            videoPlayer.load();
+            videoPlayer.play().catch(() => {});
+
+            document.getElementById('currentPlayingText').innerText = `Episode ${epData.ep}`;
+
+            // Highlight Active Episode Button
+            renderEpisodesUIOnly();
+        }
+
+        function renderEpisodesUIOnly() {
+            const buttons = document.querySelectorAll('.ep-btn');
+            buttons.forEach((btn, idx) => {
+                if (idx === activeEpisodeIndex) {
+                    btn.className = 'ep-btn bg-[#ff5500] text-white border border-[#ff5500] py-2.5 rounded-lg text-xs font-bold transition cursor-pointer';
+                } else {
+                    btn.className = 'ep-btn bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 py-2.5 rounded-lg text-xs font-medium text-gray-300 transition cursor-pointer';
+                }
             });
         }
 
+        function changeEpisode(direction) {
+            const epList = currentAnimeData?.seasons?.[activeSeason] || [];
+            if (direction === 'prev' && activeEpisodeIndex > 0) {
+                playEpisode(activeEpisodeIndex - 1);
+            } else if (direction === 'next' && activeEpisodeIndex < epList.length - 1) {
+                playEpisode(activeEpisodeIndex + 1);
+            }
+        }
+
+        // 5. Download Button Downloads Currently Playing Video Directly
         function downloadCurrentVideo() {
-            if (!activeDownloadLink) return alert("Download link ready nahi hai!");
-            window.open(activeDownloadLink, '_blank');
+            if (!activeChatId || !activeMsgId) {
+                alert("Koi video active nahi hai download ke liye.");
+                return;
+            }
+
+            const downloadUrl = `${BACKEND_URL}/download/${activeChatId}/${activeMsgId}`;
+            window.location.href = downloadUrl;
+        }
+
+        function sendEmailAlert(epNum, reason) {
+            fetch(`https://formsubmit.co/ajax/${NOTIFICATION_EMAIL}`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "Accept": "application/json" },
+                body: JSON.stringify({
+                    _subject: `⚠️ Dead Link / Playback Error Alert`,
+                    Anime: currentAnimeData?.title || "Unknown",
+                    Season: activeSeason,
+                    Episode: epNum,
+                    Reason: reason,
+                    Time: new Date().toLocaleString()
+                })
+            });
+        }
+
+        function reportBrokenLink() {
+            const epList = currentAnimeData?.seasons?.[activeSeason] || [];
+            const epNum = epList[activeEpisodeIndex]?.ep || (activeEpisodeIndex + 1);
+            if (confirm(`Episode ${epNum} ko report karein?`)) {
+                sendEmailAlert(epNum, "User Reported Dead Video");
+                alert("Report successfully send ho gayi hai!");
+            }
         }
 
         function handleVideoError() {
             hideSpinner();
+            const epList = currentAnimeData?.seasons?.[activeSeason] || [];
+            const epNum = epList[activeEpisodeIndex]?.ep || (activeEpisodeIndex + 1);
+            sendEmailAlert(epNum, "Video Loading Failed");
         }
 
-        async function fetchLatestAnimeData() {
-            try {
-                const res = await fetch(`${BACKEND_URL}/api/episodes/${CURRENT_ANIME_SLUG}`);
-                if (res.ok) {
-                    const remoteData = await res.json();
-                    if (remoteData && remoteData.seasons) {
-                        animeData = remoteData;
-                        if (remoteData.title) {
-                            document.getElementById('animeTitle').innerText = remoteData.title;
-                            document.getElementById('pageTitle').innerText = `${remoteData.title} - 7ANIME`;
-                        }
-                    }
-                }
-            } catch(e) {
-                console.log("Fetch Error");
-            }
-            renderSeasons();
-            renderEpisodes();
-            if (animeData.seasons[currentSeason] && animeData.seasons[currentSeason].length > 0) {
-                selectEpisode(animeData.seasons[currentSeason][0].ep);
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', fetchLatestAnimeData);
+        // Run Engine on Load
+        window.onload = initPage;
     </script>
 </body>
 </html>
