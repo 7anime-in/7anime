@@ -100,14 +100,6 @@
                 <p id="animeDescription" class="text-gray-300 text-xs md:text-sm leading-relaxed">
                     Watch and download high-quality episodes directly from our fast streaming servers.
                 </p>
-                
-                <!-- Dynamic Season Selector -->
-                <div class="pt-2">
-                    <span class="text-xs text-gray-400 font-semibold block mb-1">Seasons:</span>
-                    <div id="seasonButtonsContainer" class="flex flex-wrap gap-2">
-                        <!-- Auto Generated Season Buttons -->
-                    </div>
-                </div>
             </div>
         </div>
 
@@ -164,8 +156,19 @@
                 </div>
             </div>
 
-            <!-- Auto Generated Episode Buttons -->
+            <!-- Season Selection & Auto Generated Episode Buttons -->
             <div class="bg-[#151522] p-4 rounded-2xl border border-gray-800 space-y-4">
+                <!-- Season Buttons Section (Moved Directly Above Episode List) -->
+                <div>
+                    <span class="text-xs text-gray-400 font-semibold block mb-2"><i class="fa-solid fa-layer-group text-[#ff5500]"></i> Select Season:</span>
+                    <div id="seasonButtonsContainer" class="flex flex-wrap gap-2">
+                        <!-- Auto Generated Season Buttons -->
+                    </div>
+                </div>
+
+                <hr class="border-gray-800/80">
+
+                <!-- Episode List Section -->
                 <h3 class="font-bold text-sm"><i class="fa-solid fa-bars text-[#ff5500]"></i> Episode List</h3>
                 <div class="grid grid-cols-3 gap-2 overflow-y-auto max-h-[350px] pr-1" id="episodeGridButtons">
                     <!-- Dynamic Buttons Render Here -->
@@ -199,7 +202,7 @@
             if (spinner) spinner.style.display = 'flex';
         }
 
-        // 1. Dynamic Engine: Read URL parameter (?anime=solo_leveling)
+        // Read URL parameter (?anime=solo_leveling)
         async function initPage() {
             const urlParams = new URLSearchParams(window.location.search);
             const animeSlug = urlParams.get('anime') || 'solo_leveling';
@@ -222,7 +225,7 @@
             }
         }
 
-        // 2. Auto Generate Season Buttons
+        // Auto Generate Season Buttons Above Episode List
         function renderSeasons() {
             const container = document.getElementById('seasonButtonsContainer');
             container.innerHTML = "";
@@ -237,7 +240,7 @@
 
             seasonKeys.forEach(sNum => {
                 const btn = document.createElement('button');
-                btn.className = `px-3 py-1 rounded-lg text-xs font-bold transition cursor-pointer ${sNum === activeSeason ? 'bg-[#ff5500] text-white' : 'bg-[#1a1a2b] text-gray-300 border border-gray-700'}`;
+                btn.className = `px-3 py-1 rounded-lg text-xs font-bold transition cursor-pointer ${sNum === activeSeason ? 'bg-[#ff5500] text-white' : 'bg-[#1a1a2b] text-gray-300 border border-gray-700 hover:bg-[#ff5500]/20'}`;
                 btn.innerText = `Season ${sNum}`;
                 btn.onclick = () => selectSeason(sNum);
                 container.appendChild(btn);
@@ -251,7 +254,7 @@
             renderEpisodes();
         }
 
-        // 3. Auto Generate Episode Buttons from Telegram Indexed Database
+        // Auto Generate Episode Buttons from Telegram Indexed Database
         function renderEpisodes() {
             const grid = document.getElementById('episodeGridButtons');
             grid.innerHTML = "";
@@ -277,7 +280,7 @@
             }
         }
 
-        // 4. Stream Selected Video & Set Active Identifiers
+        // Stream Selected Video
         function playEpisode(index) {
             const epList = currentAnimeData?.seasons?.[activeSeason] || [];
             if (!epList[index]) return;
@@ -300,7 +303,6 @@
 
             document.getElementById('currentPlayingText').innerText = `Episode ${epData.ep}`;
 
-            // Highlight Active Episode Button
             renderEpisodesUIOnly();
         }
 
@@ -324,7 +326,7 @@
             }
         }
 
-        // 5. Download Button Downloads Currently Playing Video Directly
+        // Download Currently Playing Video Directly
         function downloadCurrentVideo() {
             if (!activeChatId || !activeMsgId) {
                 alert("Koi video active nahi hai download ke liye.");
@@ -366,7 +368,6 @@
             sendEmailAlert(epNum, "Video Loading Failed");
         }
 
-        // Run Engine on Load
         window.onload = initPage;
     </script>
 </body>
