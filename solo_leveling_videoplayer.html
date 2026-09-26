@@ -59,7 +59,6 @@
         </div>
         <div class="search-box relative">
             <input type="text" id="globalSearchInput" placeholder="Search anime..." class="bg-[#1a1a2b] text-xs px-3 py-1.5 rounded-lg border border-gray-700 text-white focus:outline-none w-40 md:w-56">
-            <div id="searchResultsDropdown" class="search-dropdown" style="display: none;"></div>
         </div>
     </header>
 
@@ -120,7 +119,6 @@
                             <p class="text-xs text-gray-400 font-medium tracking-wide">Connecting to Fast Stream Server...</p>
                         </div>
                         
-                        <!-- Dynamic Responsive Video Element -->
                         <video id="animeVideoPlayer" controls controlsList="nodownload" preload="metadata" class="w-full h-full object-contain absolute inset-0 z-10 bg-black" onloadeddata="hideSpinner()" oncanplay="hideSpinner()" onplaying="hideSpinner()" onerror="handleVideoError()">
                             Your browser does not support HTML5 video streaming.
                         </video>
@@ -153,8 +151,25 @@
                 </div>
             </div>
 
-            <!-- Season Selection & Episode Buttons -->
+            <!-- Audio Dub Switch, Season Selection & Episode Buttons -->
             <div class="bg-[#151522] p-4 rounded-2xl border border-gray-800 space-y-4">
+                
+                <!-- DUBBING SWITCH: OFFICIAL VS UNOFFICIAL -->
+                <div>
+                    <span class="text-xs text-gray-400 font-semibold block mb-2"><i class="fa-solid fa-sliders text-[#ff5500]"></i> Select Audio Version:</span>
+                    <div class="grid grid-cols-2 gap-2 bg-[#1a1a2b] p-1.5 rounded-xl border border-gray-800">
+                        <button id="dubOfficialBtn" onclick="switchDubType('official')" class="py-1.5 rounded-lg text-xs font-bold transition cursor-pointer bg-[#ff5500] text-white shadow">
+                            ✨ Official
+                        </button>
+                        <button id="dubUnofficialBtn" onclick="switchDubType('unofficial')" class="py-1.5 rounded-lg text-xs font-bold transition cursor-pointer text-gray-400 hover:text-white">
+                            🎧 FanDub
+                        </button>
+                    </div>
+                </div>
+
+                <hr class="border-gray-800/80">
+
+                <!-- Season Selection -->
                 <div>
                     <span class="text-xs text-gray-400 font-semibold block mb-2"><i class="fa-solid fa-layer-group text-[#ff5500]"></i> Select Season:</span>
                     <div id="seasonButtonsContainer" class="flex flex-wrap gap-2"></div>
@@ -174,9 +189,11 @@
 
         let currentAnimeData = null;
         let activeSeason = "1";
+        let activeDubType = "official"; // 'official' or 'unofficial'
         let activeEpisodeIndex = 0;
         let activeChatId = "";
         let activeMsgId = "";
+        let filteredEpisodes = [];
 
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('active');
@@ -215,6 +232,23 @@
             }
         }
 
+        function switchDubType(type) {
+            activeDubType = type;
+
+            const officialBtn = document.getElementById('dubOfficialBtn');
+            const unofficialBtn = document.getElementById('dubUnofficialBtn');
+
+            if (type === 'official') {
+                officialBtn.className = "py-1.5 rounded-lg text-xs font-bold transition cursor-pointer bg-[#ff5500] text-white shadow";
+                unofficialBtn.className = "py-1.5 rounded-lg text-xs font-bold transition cursor-pointer text-gray-400 hover:text-white";
+            } else {
+                unofficialBtn.className = "py-1.5 rounded-lg text-xs font-bold transition cursor-pointer bg-[#ff5500] text-white shadow";
+                officialBtn.className = "py-1.5 rounded-lg text-xs font-bold transition cursor-pointer text-gray-400 hover:text-white";
+            }
+
+            renderEpisodes();
+        }
+
         function renderSeasons() {
             const container = document.getElementById('seasonButtonsContainer');
             container.innerHTML = "";
@@ -247,15 +281,17 @@
             const grid = document.getElementById('episodeGridButtons');
             grid.innerHTML = "";
 
-            const epList = currentAnimeData?.seasons?.[activeSeason] || [];
+            const rawEpList = currentAnimeData?.seasons?.[activeSeason] || [];
 
-            if (epList.length === 0) {
-                grid.innerHTML = `<p class="col-span-3 text-xs text-gray-400 py-4 text-center">No episodes uploaded yet.</p>`;
+            filteredEpisodes = rawEpList.filter(ep => (ep.type || 'official') === activeDubType);
+
+            if (filteredEpisodes.length === 0) {
+                grid.innerHTML = `<p class="col-span-3 text-xs text-gray-400 py-4 text-center">Is category (${activeDubType.toUpperCase()}) me episodes nahi hain.</p>`;
                 hideSpinner();
                 return;
             }
 
-            epList.forEach((epItem, index) => {
+            filteredEpisodes.forEach((epItem, index) => {
                 const btn = document.createElement('button');
                 btn.className = `ep-btn py-2.5 rounded-lg text-xs font-medium transition cursor-pointer ${index === activeEpisodeIndex ? 'bg-[#ff5500] text-white border border-[#ff5500] font-bold' : 'bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 text-gray-300'}`;
                 btn.innerText = epItem.ep;
@@ -263,36 +299,32 @@
                 grid.appendChild(btn);
             });
 
-            if (epList.length > 0) {
+            if (filteredEpisodes.length > 0) {
                 playEpisode(0);
             }
         }
 
         function playEpisode(index) {
-            const epList = currentAnimeData?.seasons?.[activeSeason] || [];
-            if (!epList[index]) return;
+            if (!filteredEpisodes[index]) return;
 
             activeEpisodeIndex = index;
-            const epData = epList[index];
+            const epData = filteredEpisodes[index];
 
             activeChatId = epData.chat_id;
             activeMsgId = epData.msg_id;
 
             showSpinner();
 
-            const streamUrl = `${BACKEND_URL}/stream/${activeChatId}/${activeMsgId}`;
+            const streamUrl = `${BACKEND_URL}/stream/${encodeURIComponent(activeChatId)}/${activeMsgId}`;
             const videoPlayer = document.getElementById('animeVideoPlayer');
 
             videoPlayer.src = streamUrl;
             videoPlayer.load();
 
-            // Auto fallback hide spinner after 6s in case browser events lag
-            setTimeout(() => {
-                hideSpinner();
-            }, 6000);
+            setTimeout(() => { hideSpinner(); }, 6000);
 
             videoPlayer.play().catch((err) => {
-                console.log("Autoplay blocked or waiting for user click:", err);
+                console.log("Autoplay blocked or waiting for play click:", err);
             });
 
             document.getElementById('currentPlayingText').innerText = `Episode ${epData.ep}`;
@@ -311,10 +343,9 @@
         }
 
         function changeEpisode(direction) {
-            const epList = currentAnimeData?.seasons?.[activeSeason] || [];
             if (direction === 'prev' && activeEpisodeIndex > 0) {
                 playEpisode(activeEpisodeIndex - 1);
-            } else if (direction === 'next' && activeEpisodeIndex < epList.length - 1) {
+            } else if (direction === 'next' && activeEpisodeIndex < filteredEpisodes.length - 1) {
                 playEpisode(activeEpisodeIndex + 1);
             }
         }
@@ -324,7 +355,7 @@
                 alert("Koi video active nahi hai download ke liye.");
                 return;
             }
-            window.location.href = `${BACKEND_URL}/download/${activeChatId}/${activeMsgId}`;
+            window.location.href = `${BACKEND_URL}/download/${encodeURIComponent(activeChatId)}/${activeMsgId}`;
         }
 
         function sendEmailAlert(epNum, reason) {
@@ -335,6 +366,7 @@
                     _subject: `⚠️ Dead Link / Playback Error Alert`,
                     Anime: currentAnimeData?.title || "Unknown",
                     Season: activeSeason,
+                    Type: activeDubType,
                     Episode: epNum,
                     Reason: reason,
                     Time: new Date().toLocaleString()
@@ -343,8 +375,7 @@
         }
 
         function reportBrokenLink() {
-            const epList = currentAnimeData?.seasons?.[activeSeason] || [];
-            const epNum = epList[activeEpisodeIndex]?.ep || (activeEpisodeIndex + 1);
+            const epNum = filteredEpisodes[activeEpisodeIndex]?.ep || (activeEpisodeIndex + 1);
             if (confirm(`Episode ${epNum} ko report karein?`)) {
                 sendEmailAlert(epNum, "User Reported Dead Video");
                 alert("Report successfully send ho gayi hai!");
@@ -353,13 +384,11 @@
 
         function handleVideoError() {
             hideSpinner();
-            const epList = currentAnimeData?.seasons?.[activeSeason] || [];
-            const epNum = epList[activeEpisodeIndex]?.ep || (activeEpisodeIndex + 1);
+            const epNum = filteredEpisodes[activeEpisodeIndex]?.ep || (activeEpisodeIndex + 1);
             sendEmailAlert(epNum, "Video Loading Failed");
         }
 
         window.onload = initPage;
     </script>
 </body>
-    </html>
-    
+</html>
