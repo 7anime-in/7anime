@@ -261,6 +261,10 @@
                 return;
             }
 
+            if (!seasonKeys.includes(activeSeason)) {
+                activeSeason = seasonKeys[0];
+            }
+
             seasonKeys.forEach(sNum => {
                 const btn = document.createElement('button');
                 btn.className = `px-3 py-1 rounded-lg text-xs font-bold transition cursor-pointer ${sNum === activeSeason ? 'bg-[#ff5500] text-white' : 'bg-[#1a1a2b] text-gray-300 border border-gray-700 hover:bg-[#ff5500]/20'}`;
@@ -315,7 +319,6 @@
 
             showSpinner();
 
-            // Updated Stream URL with .mp4 extension for strict video stream handling on Mobile Chrome
             const cleanChatId = activeChatId.replace(/^@/, '');
             const streamUrl = `${BACKEND_URL}/stream/${encodeURIComponent(cleanChatId)}/${activeMsgId}.mp4`;
             const videoPlayer = document.getElementById('animeVideoPlayer');
@@ -323,7 +326,7 @@
             videoPlayer.src = streamUrl;
             videoPlayer.load();
 
-            setTimeout(() => { hideSpinner(); }, 6000);
+            setTimeout(() => { hideSpinner(); }, 5000);
 
             videoPlayer.play().catch((err) => {
                 console.log("Autoplay blocked or waiting for play click:", err);
@@ -385,7 +388,7 @@
             }
         }
 
-        function handleVideoError() {
+function handleVideoError() {
             hideSpinner();
             const epNum = filteredEpisodes[activeEpisodeIndex]?.ep || (activeEpisodeIndex + 1);
             sendEmailAlert(epNum, "Video Loading Failed");
