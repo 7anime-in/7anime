@@ -119,7 +119,7 @@
                             <p class="text-xs text-gray-400 font-medium tracking-wide">Connecting to Fast Stream Server...</p>
                         </div>
                         
-                        <video id="animeVideoPlayer" controls controlsList="nodownload" preload="metadata" class="w-full h-full object-contain absolute inset-0 z-10 bg-black" onloadeddata="hideSpinner()" oncanplay="hideSpinner()" onplaying="hideSpinner()" onerror="handleVideoError()">
+                        <video id="animeVideoPlayer" controls controlsList="nodownload" preload="metadata" playsinline webkit-playsinline class="w-full h-full object-contain absolute inset-0 z-10 bg-black" onloadeddata="hideSpinner()" oncanplay="hideSpinner()" onplaying="hideSpinner()" onerror="handleVideoError()">
                             Your browser does not support HTML5 video streaming.
                         </video>
                     </div>
@@ -153,8 +153,6 @@
 
             <!-- Audio Dub Switch, Season Selection & Episode Buttons -->
             <div class="bg-[#151522] p-4 rounded-2xl border border-gray-800 space-y-4">
-                
-                <!-- DUBBING SWITCH: OFFICIAL VS UNOFFICIAL -->
                 <div>
                     <span class="text-xs text-gray-400 font-semibold block mb-2"><i class="fa-solid fa-sliders text-[#ff5500]"></i> Select Audio Version:</span>
                     <div class="grid grid-cols-2 gap-2 bg-[#1a1a2b] p-1.5 rounded-xl border border-gray-800">
@@ -169,7 +167,6 @@
 
                 <hr class="border-gray-800/80">
 
-                <!-- Season Selection -->
                 <div>
                     <span class="text-xs text-gray-400 font-semibold block mb-2"><i class="fa-solid fa-layer-group text-[#ff5500]"></i> Select Season:</span>
                     <div id="seasonButtonsContainer" class="flex flex-wrap gap-2"></div>
@@ -189,7 +186,7 @@
 
         let currentAnimeData = null;
         let activeSeason = "1";
-        let activeDubType = "official"; // 'official' or 'unofficial'
+        let activeDubType = "official";
         let activeEpisodeIndex = 0;
         let activeChatId = "";
         let activeMsgId = "";
@@ -228,7 +225,7 @@
                 selectSeason(activeSeason);
             } catch (err) {
                 console.error("Error fetching anime details:", err);
-                alert("Anime data fetch karne me error aaya.");
+                hideSpinner();
             }
         }
 
@@ -315,16 +312,18 @@
 
             showSpinner();
 
-            const streamUrl = `${BACKEND_URL}/stream/${encodeURIComponent(activeChatId)}/${activeMsgId}`;
+            const cleanChatId = activeChatId.replace(/^@/, '');
+            const streamUrl = `${BACKEND_URL}/stream/${encodeURIComponent(cleanChatId)}/${activeMsgId}`;
             const videoPlayer = document.getElementById('animeVideoPlayer');
 
             videoPlayer.src = streamUrl;
             videoPlayer.load();
 
-            setTimeout(() => { hideSpinner(); }, 6000);
-
-            videoPlayer.play().catch((err) => {
-                console.log("Autoplay blocked or waiting for play click:", err);
+            videoPlayer.play().then(() => {
+                hideSpinner();
+            }).catch((err) => {
+                console.log("Autoplay waiting for click:", err);
+                hideSpinner();
             });
 
             document.getElementById('currentPlayingText').innerText = `Episode ${epData.ep}`;
@@ -355,7 +354,8 @@
                 alert("Koi video active nahi hai download ke liye.");
                 return;
             }
-            window.location.href = `${BACKEND_URL}/download/${encodeURIComponent(activeChatId)}/${activeMsgId}`;
+            const cleanChatId = activeChatId.replace(/^@/, '');
+            window.location.href = `${BACKEND_URL}/download/${encodeURIComponent(cleanChatId)}/${activeMsgId}`;
         }
 
         function sendEmailAlert(epNum, reason) {
