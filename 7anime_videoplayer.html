@@ -6,6 +6,10 @@
     <title id="pageTitle">7ANIME - Watch Anime</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Plyr Video Player CSS -->
+    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+
     <style>
         .spinner {
             width: 45px;
@@ -43,6 +47,15 @@
             display: none;
         }
         .sidebar-overlay.active { display: block; }
+        
+        /* Plyr Custom Theme */
+        :root {
+            --plyr-color-main: #ff5500;
+        }
+        .plyr--video {
+            border-radius: 1rem;
+            overflow: hidden;
+        }
     </style>
 </head>
 <body class="bg-[#0b0c10] text-white font-sans antialiased">
@@ -58,7 +71,7 @@
             </div>
         </div>
         <div class="search-box relative">
-            <input type="text" id="globalSearchInput" placeholder="Search anime..." class="bg-[#1a1a2b] text-xs px-3 py-1.5 rounded-lg border border-gray-700 text-white focus:outline-none w-40 md:w-56">
+            <input type="text" id="globalSearchInput" onkeydown="handleSearch(event)" placeholder="Search anime & press enter..." class="bg-[#1a1a2b] text-xs px-3 py-1.5 rounded-lg border border-gray-700 text-white focus:outline-none w-44 md:w-64">
         </div>
     </header>
 
@@ -96,7 +109,7 @@
                     <span id="activeSeasonBadge" class="bg-[#1a1a2b] text-gray-300 border border-gray-700 px-2.5 py-0.5 rounded">Season 1</span>
                 </div>
                 <p id="animeDescription" class="text-gray-300 text-xs md:text-sm leading-relaxed">
-                    Watch and download high-quality episodes directly from our fast streaming servers.
+                    Watch and download high-quality anime episodes directly from our fast streaming engine.
                 </p>
             </div>
         </div>
@@ -113,13 +126,13 @@
 
                 <!-- Video Frame -->
                 <div class="relative bg-black rounded-2xl overflow-hidden shadow-2xl border border-gray-800">
-                    <div class="relative aspect-video w-full bg-black flex items-center justify-center" id="playerContainer">
+                    <div class="relative aspect-video w-full bg-black" id="playerContainer">
                         <div id="loadingSpinner" class="absolute inset-0 bg-[#0b0c10] flex flex-col items-center justify-center z-20">
                             <div class="spinner mb-3"></div>
                             <p class="text-xs text-gray-400 font-medium tracking-wide">Connecting to Fast Stream Server...</p>
                         </div>
                         
-                        <video id="animeVideoPlayer" controls controlsList="nodownload" preload="metadata" class="w-full h-full object-contain absolute inset-0 z-10 bg-black" onloadeddata="hideSpinner()" oncanplay="hideSpinner()" onplaying="hideSpinner()" onerror="handleVideoError()">
+                        <video id="animeVideoPlayer" playsinline controls preload="metadata" class="w-full h-full object-contain">
                             Your browser does not support HTML5 video streaming.
                         </video>
                     </div>
@@ -154,7 +167,7 @@
             <!-- Audio Dub Switch, Season Selection & Episode Buttons -->
             <div class="bg-[#151522] p-4 rounded-2xl border border-gray-800 space-y-4">
                 
-                <!-- DUBBING SWITCH: OFFICIAL VS UNOFFICIAL -->
+                <!-- DUBBING SWITCH -->
                 <div>
                     <span class="text-xs text-gray-400 font-semibold block mb-2"><i class="fa-solid fa-sliders text-[#ff5500]"></i> Select Audio Version:</span>
                     <div class="grid grid-cols-2 gap-2 bg-[#1a1a2b] p-1.5 rounded-xl border border-gray-800">
@@ -183,14 +196,17 @@
         </div>
     </main>
 
+    <!-- Plyr JS -->
+    <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
+
     <script>
-        // Connection Server updated from videoplayer.html
         const BACKEND_URL = "https://testing-bot1-sj7h.onrender.com";
         const NOTIFICATION_EMAIL = "sumitguptagupta095@gmail.com";
 
+        let plyrPlayer = null;
         let currentAnimeData = null;
         let activeSeason = "1";
-        let activeDubType = "official"; // 'official' or 'unofficial'
+        let activeDubType = "official";
         let activeEpisodeIndex = 0;
         let activeChatId = "";
         let activeMsgId = "";
@@ -211,14 +227,33 @@
             if (spinner) spinner.style.display = 'flex';
         }
 
+        function handleSearch(e) {
+            if (e.key === 'Enter') {
+                const query = e.target.value.trim().toLowerCase().replace(/\s+/g, '_');
+                if (query) {
+                    window.location.href = `?anime=${query}`;
+                }
+            }
+        }
+
         async function initPage() {
+            // Initialize Plyr Video Engine
+            plyrPlayer = new Plyr('#animeVideoPlayer', {
+                controls: ['play-large', 'play', 'progress', 'current-time', 'duration', 'mute', 'volume', 'settings', 'pip', 'fullscreen'],
+                speed: { selected: 1, options: [0.5, 0.75, 1, 1.25, 1.5, 2] }
+            });
+
+            plyrPlayer.on('canplay', hideSpinner);
+            plyrPlayer.on('playing', hideSpinner);
+
+            // Universal Anime Slug Extraction from URL Parameter (?anime=slug)
             const urlParams = new URLSearchParams(window.location.search);
             const animeSlug = urlParams.get('anime') || 'solo_leveling';
 
             try {
                 showSpinner();
-                // Check both single episode endpoint and all-anime API structure
                 let response = await fetch(`${BACKEND_URL}/api/episodes/${animeSlug}`);
+                
                 if (response.ok) {
                     currentAnimeData = await response.json();
                 } else {
@@ -236,7 +271,7 @@
                 selectSeason(activeSeason);
             } catch (err) {
                 console.error("Error fetching anime details:", err);
-                alert("Anime data fetch karne me error aaya.");
+                hideSpinner();
             }
         }
 
@@ -264,7 +299,7 @@
 
             if (!currentAnimeData || !currentAnimeData.seasons) return;
 
-            const seasonKeys = Object.keys(currentAnimeData.seasons);
+            const seasonKeys = Object.keys(currentAnimeData.seasons).sort((a, b) => parseInt(a) - parseInt(b));
             if (seasonKeys.length === 0) {
                 container.innerHTML = `<span class="text-xs text-gray-400">No seasons available</span>`;
                 return;
@@ -312,7 +347,7 @@
             filteredEpisodes.forEach((epItem, index) => {
                 const btn = document.createElement('button');
                 btn.className = `ep-btn py-2.5 rounded-lg text-xs font-medium transition cursor-pointer ${index === activeEpisodeIndex ? 'bg-[#ff5500] text-white border border-[#ff5500] font-bold' : 'bg-[#1a1a2b] hover:bg-[#ff5500]/30 border border-gray-700 text-gray-300'}`;
-                btn.innerText = epItem.ep;
+                btn.innerText = `EP ${epItem.ep}`;
                 btn.onclick = () => playEpisode(index);
                 grid.appendChild(btn);
             });
@@ -336,18 +371,25 @@
 
             showSpinner();
 
-            const cleanChatId = activeChatId.replace(/^@/, '');
-            const streamUrl = `${BACKEND_URL}/stream/${encodeURIComponent(cleanChatId)}/${activeMsgId}.mp4`;
-            const videoPlayer = document.getElementById('animeVideoPlayer');
+            // FIX: Removed encodeURIComponent to prevent string encoding bugs
+            const cleanChatId = activeChatId.replace('@', '');
+            const streamUrl = `${BACKEND_URL}/stream/${cleanChatId}/${activeMsgId}.mp4`;
 
-            videoPlayer.src = streamUrl;
-            videoPlayer.load();
+            // Plyr Engine Dynamic Source Update
+            plyrPlayer.source = {
+                type: 'video',
+                title: `${currentAnimeData?.title || 'Anime'} S${activeSeason} E${epData.ep}`,
+                sources: [
+                    {
+                        src: streamUrl,
+                        type: 'video/mp4'
+                    }
+                ]
+            };
 
-            setTimeout(() => { hideSpinner(); }, 6000);
+            plyrPlayer.play().catch(err => console.log("Autoplay waiting for user action:", err));
 
-            videoPlayer.play().catch((err) => {
-                console.log("Autoplay blocked or waiting for play click:", err);
-            });
+            setTimeout(() => { hideSpinner(); }, 4000);
 
             document.getElementById('currentPlayingText').innerText = `Episode ${epData.ep}`;
             renderEpisodesUIOnly();
@@ -377,38 +419,26 @@
                 alert("Koi video active nahi hai download ke liye.");
                 return;
             }
-            const cleanChatId = activeChatId.replace(/^@/, '');
-            window.location.href = `${BACKEND_URL}/download/${encodeURIComponent(cleanChatId)}/${activeMsgId}`;
-        }
-
-        function sendEmailAlert(epNum, reason) {
-            fetch(`https://formsubmit.co/ajax/${NOTIFICATION_EMAIL}`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json", "Accept": "application/json" },
-                body: JSON.stringify({
-                    _subject: `⚠️ Dead Link / Playback Error Alert`,
-                    Anime: currentAnimeData?.title || "Unknown",
-                    Season: activeSeason,
-                    Type: activeDubType,
-                    Episode: epNum,
-                    Reason: reason,
-                    Time: new Date().toLocaleString()
-                })
-            });
+            const cleanChatId = activeChatId.replace('@', '');
+            window.location.href = `${BACKEND_URL}/download/${cleanChatId}/${activeMsgId}`;
         }
 
         function reportBrokenLink() {
             const epNum = filteredEpisodes[activeEpisodeIndex]?.ep || (activeEpisodeIndex + 1);
             if (confirm(`Episode ${epNum} ko report karein?`)) {
-                sendEmailAlert(epNum, "User Reported Dead Video");
-                alert("Report successfully send ho gayi hai!");
+                fetch(`https://formsubmit.co/ajax/${NOTIFICATION_EMAIL}`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json", "Accept": "application/json" },
+                    body: JSON.stringify({
+                        _subject: `⚠️ Dead Link Alert`,
+                        Anime: currentAnimeData?.title || "Unknown",
+                        Season: activeSeason,
+                        Type: activeDubType,
+                        Episode: epNum
+                    })
+                });
+                alert("Report send ho gayi hai!");
             }
-        }
-
-        function handleVideoError() {
-            hideSpinner();
-            const epNum = filteredEpisodes[activeEpisodeIndex]?.ep || (activeEpisodeIndex + 1);
-            sendEmailAlert(epNum, "Video Loading Failed");
         }
 
         window.onload = initPage;
