@@ -200,7 +200,11 @@
     <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
 
     <script>
-        const BACKEND_URL = "https://testing-bot1-sj7h.onrender.com";
+        // Automatic Dynamic URL Resolution
+        const BACKEND_URL = (window.location.origin && !window.location.origin.includes("null") && !window.location.origin.includes("file://"))
+            ? window.location.origin
+            : "https://sevenanime-http-bot.onrender.com";
+
         const NOTIFICATION_EMAIL = "sumitguptagupta095@gmail.com";
 
         let plyrPlayer = null;
@@ -237,7 +241,6 @@
         }
 
         async function initPage() {
-            // Initialize Plyr Video Engine
             plyrPlayer = new Plyr('#animeVideoPlayer', {
                 controls: ['play-large', 'play', 'progress', 'current-time', 'duration', 'mute', 'volume', 'settings', 'pip', 'fullscreen'],
                 speed: { selected: 1, options: [0.5, 0.75, 1, 1.25, 1.5, 2] }
@@ -246,7 +249,6 @@
             plyrPlayer.on('canplay', hideSpinner);
             plyrPlayer.on('playing', hideSpinner);
 
-            // Universal Anime Slug Extraction from URL Parameter (?anime=slug)
             const urlParams = new URLSearchParams(window.location.search);
             const animeSlug = urlParams.get('anime') || 'solo_leveling';
 
@@ -371,11 +373,9 @@
 
             showSpinner();
 
-            // FIX: Removed encodeURIComponent to prevent string encoding bugs
             const cleanChatId = activeChatId.replace('@', '');
             const streamUrl = `${BACKEND_URL}/stream/${cleanChatId}/${activeMsgId}.mp4`;
 
-            // Plyr Engine Dynamic Source Update
             plyrPlayer.source = {
                 type: 'video',
                 title: `${currentAnimeData?.title || 'Anime'} S${activeSeason} E${epData.ep}`,
