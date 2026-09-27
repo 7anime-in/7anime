@@ -184,7 +184,8 @@
     </main>
 
     <script>
-        const BACKEND_URL = "https://sevenanime-http-bot.onrender.com";
+        // Connection Server updated from videoplayer.html
+        const BACKEND_URL = "https://testing-bot1-sj7h.onrender.com";
         const NOTIFICATION_EMAIL = "sumitguptagupta095@gmail.com";
 
         let currentAnimeData = null;
@@ -216,8 +217,15 @@
 
             try {
                 showSpinner();
-                const response = await fetch(`${BACKEND_URL}/api/episodes/${animeSlug}`);
-                currentAnimeData = await response.json();
+                // Check both single episode endpoint and all-anime API structure
+                let response = await fetch(`${BACKEND_URL}/api/episodes/${animeSlug}`);
+                if (response.ok) {
+                    currentAnimeData = await response.json();
+                } else {
+                    const allRes = await fetch(`${BACKEND_URL}/api/all-anime`);
+                    const allData = await allRes.json();
+                    currentAnimeData = allData[animeSlug] || Object.values(allData)[0];
+                }
 
                 if (currentAnimeData && currentAnimeData.title) {
                     document.getElementById('animeTitleDisplay').innerText = currentAnimeData.title;
@@ -234,7 +242,7 @@
 
         function switchDubType(type) {
             activeDubType = type;
-            activeEpisodeIndex = 0; // Season/Dub change pe episode index reset
+            activeEpisodeIndex = 0;
 
             const officialBtn = document.getElementById('dubOfficialBtn');
             const unofficialBtn = document.getElementById('dubUnofficialBtn');
@@ -277,7 +285,7 @@
 
         function selectSeason(seasonNum) {
             activeSeason = seasonNum;
-            activeEpisodeIndex = 0; // Reset index on season switch
+            activeEpisodeIndex = 0;
             document.getElementById('activeSeasonBadge').innerText = `Season ${seasonNum}`;
             renderSeasons();
             renderEpisodes();
@@ -291,7 +299,6 @@
 
             filteredEpisodes = rawEpList.filter(ep => (ep.type || 'official') === activeDubType);
 
-            // Fallback: Agar filter hone ke baad empty ho par season me episodes hain
             if (filteredEpisodes.length === 0 && rawEpList.length > 0) {
                 filteredEpisodes = rawEpList;
             }
@@ -403,15 +410,6 @@
             const epNum = filteredEpisodes[activeEpisodeIndex]?.ep || (activeEpisodeIndex + 1);
             sendEmailAlert(epNum, "Video Loading Failed");
         }
-
-        document.getElementById('globalSearchInput')?.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                const query = e.target.value.trim();
-                if (query) {
-                    window.location.href = `index.html?search=${encodeURIComponent(query)}`;
-                }
-            }
-        });
 
         window.onload = initPage;
     </script>
