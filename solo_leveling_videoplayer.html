@@ -133,6 +133,11 @@
                     
                     <div class="flex items-center space-x-2">
                         <span id="currentPlayingText" class="font-bold text-gray-200">Episode 1</span>
+                        
+                        <button onclick="downloadCurrentVideo()" class="bg-[#ff5500] hover:bg-[#e04c00] text-white px-3 py-1 rounded-lg text-xs font-bold transition flex items-center space-x-1.5 cursor-pointer shadow">
+                            <i class="fa-solid fa-download text-[11px]"></i>
+                            <span>Download Video</span>
+                        </button>
 
                         <button onclick="reportBrokenLink()" class="bg-red-600/20 hover:bg-red-600/40 text-red-400 border border-red-500/30 px-2.5 py-1 rounded-lg text-xs font-semibold transition flex items-center space-x-1 cursor-pointer">
                             <i class="fa-solid fa-triangle-exclamation text-[11px]"></i>
@@ -184,7 +189,7 @@
 
         let currentAnimeData = null;
         let activeSeason = "1";
-        let activeDubType = "official";
+        let activeDubType = "official"; // 'official' or 'unofficial'
         let activeEpisodeIndex = 0;
         let activeChatId = "";
         let activeMsgId = "";
@@ -223,11 +228,13 @@
                 selectSeason(activeSeason);
             } catch (err) {
                 console.error("Error fetching anime details:", err);
+                alert("Anime data fetch karne me error aaya.");
             }
         }
 
         function switchDubType(type) {
             activeDubType = type;
+            activeEpisodeIndex = 0; // Season/Dub change pe episode index reset
 
             const officialBtn = document.getElementById('dubOfficialBtn');
             const unofficialBtn = document.getElementById('dubUnofficialBtn');
@@ -270,6 +277,7 @@
 
         function selectSeason(seasonNum) {
             activeSeason = seasonNum;
+            activeEpisodeIndex = 0; // Reset index on season switch
             document.getElementById('activeSeasonBadge').innerText = `Season ${seasonNum}`;
             renderSeasons();
             renderEpisodes();
@@ -280,10 +288,16 @@
             grid.innerHTML = "";
 
             const rawEpList = currentAnimeData?.seasons?.[activeSeason] || [];
+
             filteredEpisodes = rawEpList.filter(ep => (ep.type || 'official') === activeDubType);
 
+            // Fallback: Agar filter hone ke baad empty ho par season me episodes hain
+            if (filteredEpisodes.length === 0 && rawEpList.length > 0) {
+                filteredEpisodes = rawEpList;
+            }
+
             if (filteredEpisodes.length === 0) {
-                grid.innerHTML = `<p class="col-span-3 text-xs text-gray-400 py-4 text-center">Is category (${activeDubType.toUpperCase()}) me episodes nahi hain.</p>`;
+                grid.innerHTML = `<p class="col-span-3 text-xs text-gray-400 py-4 text-center">Is category me episodes nahi hain.</p>`;
                 hideSpinner();
                 return;
             }
@@ -297,7 +311,10 @@
             });
 
             if (filteredEpisodes.length > 0) {
-                playEpisode(0);
+                if (activeEpisodeIndex >= filteredEpisodes.length) {
+                    activeEpisodeIndex = 0;
+                }
+                playEpisode(activeEpisodeIndex);
             }
         }
 
@@ -319,10 +336,10 @@
             videoPlayer.src = streamUrl;
             videoPlayer.load();
 
-            setTimeout(() => { hideSpinner(); }, 4000);
+            setTimeout(() => { hideSpinner(); }, 6000);
 
             videoPlayer.play().catch((err) => {
-                console.log("Autoplay waiting for user interaction:", err);
+                console.log("Autoplay blocked or waiting for play click:", err);
             });
 
             document.getElementById('currentPlayingText').innerText = `Episode ${epData.ep}`;
@@ -350,7 +367,7 @@
 
         function downloadCurrentVideo() {
             if (!activeChatId || !activeMsgId) {
-                alert("Video selected nahi hai.");
+                alert("Koi video active nahi hai download ke liye.");
                 return;
             }
             const cleanChatId = activeChatId.replace(/^@/, '');
@@ -377,15 +394,24 @@
             const epNum = filteredEpisodes[activeEpisodeIndex]?.ep || (activeEpisodeIndex + 1);
             if (confirm(`Episode ${epNum} ko report karein?`)) {
                 sendEmailAlert(epNum, "User Reported Dead Video");
-                alert("Report send ho gayi hai!");
+                alert("Report successfully send ho gayi hai!");
             }
         }
 
         function handleVideoError() {
             hideSpinner();
             const epNum = filteredEpisodes[activeEpisodeIndex]?.ep || (activeEpisodeIndex + 1);
-            sendEmailAlert(epNum, "Video Stream Playback Error");
+            sendEmailAlert(epNum, "Video Loading Failed");
         }
+
+        document.getElementById('globalSearchInput')?.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                const query = e.target.value.trim();
+                if (query) {
+                    window.location.href = `index.html?search=${encodeURIComponent(query)}`;
+                }
+            }
+        });
 
         window.onload = initPage;
     </script>
