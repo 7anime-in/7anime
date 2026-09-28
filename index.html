@@ -34,7 +34,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 15px 30px;
+            padding: 12px 20px;
             background: #12131a;
             position: sticky;
             top: 0;
@@ -48,24 +48,16 @@
             gap: 15px;
         }
 
-        .hamburger-btn {
-            background: none;
-            border: none;
-            color: #ffffff;
-            font-size: 22px;
-            cursor: pointer;
-        }
-
         .logo {
             cursor: pointer;
             font-weight: 800;
-            font-size: 22px;
+            font-size: 20px;
             letter-spacing: 1px;
         }
 
         .fire-seven {
             color: var(--accent-orange);
-            font-size: 26px;
+            font-size: 24px;
         }
 
         .fire-text {
@@ -104,6 +96,7 @@
             border-radius: 20px;
             color: #fff;
             outline: none;
+            font-size: 13px;
         }
 
         .search-box i {
@@ -116,9 +109,9 @@
         /* Hero Banner */
         .hero {
             position: relative;
-            padding: 80px 30px;
+            padding: 50px 20px;
             background: linear-gradient(to right, rgba(11, 12, 16, 0.95), rgba(11, 12, 16, 0.4)), url('https://lh3.googleusercontent.com/d/1DrYU7Rcf8h1JHkkakd6ks9MAiFYsnj4V') center/cover;
-            min-height: 400px;
+            min-height: 300px;
             display: flex;
             align-items: center;
         }
@@ -129,36 +122,32 @@
 
         .badge {
             background: var(--accent-orange);
-            padding: 5px 10px;
+            padding: 4px 8px;
             border-radius: 4px;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: bold;
         }
 
         .hero-title {
-            font-size: 42px;
-            margin: 15px 0 10px;
+            font-size: 32px;
+            margin: 10px 0 8px;
         }
 
         .hero-desc {
             color: #ddd;
-            font-size: 15px;
-            line-height: 1.5;
-            margin-bottom: 20px;
-        }
-
-        .hero-buttons {
-            display: flex;
-            gap: 15px;
+            font-size: 13px;
+            line-height: 1.4;
+            margin-bottom: 15px;
         }
 
         /* Buttons */
         .btn {
-            padding: 10px 20px;
+            padding: 8px 18px;
             border: none;
             border-radius: 6px;
             cursor: pointer;
             font-weight: 600;
+            font-size: 13px;
             transition: 0.3s;
         }
 
@@ -171,40 +160,35 @@
             background: #e04b00;
         }
 
-        .btn-secondary {
-            background: #333;
-            color: #ccc;
-        }
-
-        /* Main Anime Grid */
+        /* Main Anime Grid Desktop */
         .container {
-            padding: 40px 30px;
+            padding: 25px 20px;
         }
 
         .section-title {
-            font-size: 22px;
-            margin-bottom: 25px;
+            font-size: 18px;
+            margin-bottom: 18px;
             border-left: 4px solid var(--accent-orange);
             padding-left: 10px;
         }
 
         .grid-container {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 15px;
         }
 
         .anime-card {
             background: var(--card-bg);
-            border-radius: 10px;
+            border-radius: 8px;
             overflow: hidden;
             cursor: pointer;
             transition: transform 0.3s, box-shadow 0.3s;
         }
 
         .anime-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(255, 85, 0, 0.3);
+            transform: translateY(-4px);
+            box-shadow: 0 6px 15px rgba(255, 85, 0, 0.3);
         }
 
         .card-img-container {
@@ -224,36 +208,105 @@
 
         .rating-badge {
             position: absolute;
-            top: 10px;
-            right: 10px;
+            top: 6px;
+            right: 6px;
             background: rgba(0, 0, 0, 0.8);
             color: #ffca28;
-            padding: 4px 8px;
+            padding: 3px 6px;
             border-radius: 4px;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: bold;
         }
 
         .card-info {
-            padding: 15px;
+            padding: 10px;
         }
 
         .card-title {
             font-weight: 600;
-            font-size: 16px;
-            margin-bottom: 5px;
+            font-size: 14px;
+            margin-bottom: 3px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .card-tags {
-            font-size: 12px;
+            font-size: 11px;
             color: #888;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* MOBILE RESPONSIVE FIX (3 Cards Per Row) */
+        @media (max-width: 600px) {
+            .main-header {
+                padding: 10px 12px;
+            }
+
+            .logo {
+                font-size: 17px;
+            }
+
+            .search-box input {
+                width: 140px;
+                padding: 6px 28px 6px 10px;
+                font-size: 11px;
+            }
+
+            .container {
+                padding: 15px 10px;
+            }
+
+            .grid-container {
+                grid-template-columns: repeat(3, 1fr); /* Mobile screen par 3 cards aayenge */
+                gap: 8px;
+            }
+
+            .card-info {
+                padding: 6px 4px;
+            }
+
+            .card-title {
+                font-size: 11px;
+                line-height: 1.2;
+            }
+
+            .card-tags {
+                font-size: 9px;
+            }
+
+            .rating-badge {
+                font-size: 9px;
+                padding: 2px 4px;
+                top: 4px;
+                right: 4px;
+            }
+
+            .hero {
+                padding: 30px 15px;
+                min-height: 220px;
+            }
+
+            .hero-title {
+                font-size: 22px;
+            }
+
+            .hero-desc {
+                font-size: 11px;
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+            }
         }
 
         footer {
             background: #12131a;
-            padding: 30px;
+            padding: 20px;
             text-align: center;
-            margin-top: 50px;
+            margin-top: 40px;
             border-top: 1px solid #222;
         }
     </style>
@@ -268,14 +321,8 @@
             </div>
         </div>
 
-        <nav class="desktop-nav">
-            <ul>
-                <li><a href="index.html" class="active"><i class="fa-solid fa-house"></i> Home</a></li>
-            </ul>
-        </nav>
-
         <div class="search-box">
-            <input type="text" id="globalSearchInput" onkeydown="handleSearch(event)" placeholder="Search anime & press enter...">
+            <input type="text" id="globalSearchInput" onkeydown="handleSearch(event)" placeholder="Search anime...">
             <i class="fa-solid fa-magnifying-glass"></i>
         </div>
     </header>
@@ -285,7 +332,7 @@
         <div class="hero-content">
             <span class="badge"><i class="fa-solid fa-fire"></i> Trending #1</span>
             <h1 class="hero-title">Solo Leveling</h1>
-            <p class="hero-desc">Sung Jin-Woo continues his journey to become the strongest hunter in a world full of monsters and hidden secrets.</p>
+            <p class="hero-desc">Sung Jin-Woo continues his journey to become the strongest hunter in a world full of monsters.</p>
             <div class="hero-buttons">
                 <button class="btn btn-primary" onclick="openAnimePage('solo_leveling')">
                     <i class="fa-solid fa-play"></i> Watch Now
@@ -296,10 +343,11 @@
 
     <!-- Main Anime Grid -->
     <main class="container">
-        <h2 class="section-title"><i class="fa-solid fa-fire-flame-curated"></i> Trending This Week</h2>
+        <h2 class="section-title"><i class="fa-solid fa-fire-flame-curated"></i> Trending Anime</h2>
 
         <div class="grid-container" id="animeGrid">
-            <!-- Anime Cards -->
+            
+            <!-- 1. Solo Leveling Card -->
             <div class="anime-card" onclick="openAnimePage('solo_leveling')">
                 <div class="card-img-container">
                     <img src="https://lh3.googleusercontent.com/d/1DrYU7Rcf8h1JHkkakd6ks9MAiFYsnj4V" alt="Solo Leveling">
@@ -307,9 +355,34 @@
                 </div>
                 <div class="card-info">
                     <div class="card-title">Solo Leveling</div>
-                    <div class="card-tags">Action, Fantasy, Sci-Fi</div>
+                    <div class="card-tags">Action, Fantasy</div>
                 </div>
             </div>
+
+            <!-- 2. Hell Mode Card -->
+            <div class="anime-card" onclick="openAnimePage('hell_mode')">
+                <div class="card-img-container">
+                    <img src="https://lh3.googleusercontent.com/d/1hZPMLLUNMOVG8DmSd1eGd5Nmdgh6AUYZ" alt="Hell Mode">
+                    <span class="rating-badge"><i class="fa-solid fa-star"></i> 8.8</span>
+                </div>
+                <div class="card-info">
+                    <div class="card-title">Hell Mode</div>
+                    <div class="card-tags">Isekai, Action</div>
+                </div>
+            </div>
+
+            <!-- 3. One Piece Card -->
+            <div class="anime-card" onclick="openAnimePage('one_piece')">
+                <div class="card-img-container">
+                    <img src="https://lh3.googleusercontent.com/d/1DrYU7Rcf8h1JHkkakd6ks9MAiFYsnj4V" alt="One Piece">
+                    <span class="rating-badge"><i class="fa-solid fa-star"></i> 9.6</span>
+                </div>
+                <div class="card-info">
+                    <div class="card-title">One Piece</div>
+                    <div class="card-tags">Action, Adventure</div>
+                </div>
+            </div>
+
         </div>
     </main>
 
@@ -318,9 +391,9 @@
     </footer>
 
     <script>
-        // NAVIGATION FLOW FIX
+        // REDIRECTION FIX: Directly pointing to 7anime_videoplayer.html
         function openAnimePage(animeSlug) {
-            window.location.href = `videoplayer.html?anime=${encodeURIComponent(animeSlug)}`;
+            window.location.href = `7anime_videoplayer.html?anime=${encodeURIComponent(animeSlug)}`;
         }
 
         function handleSearch(e) {
