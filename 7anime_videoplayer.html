@@ -10,9 +10,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
 
-    <!-- ⚡ P2P MESH NETWORK ENGINE FOR MP4 RANGE STREAMING -->
-    <script src="https://cdn.jsdelivr.net/npm/cdnbye-mp4@latest/dist/index.min.js"></script>
-
     <style>
         .spinner {
             width: 48px;
@@ -128,11 +125,11 @@
                         <i class="fa-solid fa-star text-[10px]"></i> <span id="animeRatingDisplay">9.4/10</span>
                     </span>
                     <span id="activeSeasonBadge" class="bg-[#1a1a2b] text-gray-300 border border-gray-700 px-2.5 py-1 rounded-md font-medium">Season 1</span>
-                    <span class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2.5 py-1 rounded-md font-bold"><i class="fa-solid fa-bolt mr-1"></i> P2P 5G Accelerated</span>
+                    <span class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2.5 py-1 rounded-md font-bold"><i class="fa-solid fa-bolt mr-1"></i> Direct Range Streaming</span>
                 </div>
 
                 <p id="animeDescription" class="text-gray-400 text-xs md:text-sm leading-relaxed max-w-4xl">
-                    Stream high-definition anime directly with 5G Peer-to-Peer Mesh acceleration and multi-audio dub support.
+                    Stream high-definition anime directly with fast chunked data package acceleration.
                 </p>
             </div>
         </div>
@@ -143,10 +140,10 @@
                 
                 <div class="flex items-center justify-between bg-[#151522] px-4 py-2.5 rounded-xl border border-gray-800 text-xs">
                     <div class="flex items-center space-x-2">
-                        <span class="text-gray-400 font-semibold"><i class="fa-solid fa-server text-[#ff5500] mr-1"></i> Streaming Mode:</span>
-                        <span class="bg-[#ff5500]/10 text-[#ff5500] border border-[#ff5500]/30 px-2.5 py-0.5 rounded-md font-bold">5G P2P Data Packages</span>
+                        <span class="text-gray-400 font-semibold"><i class="fa-solid fa-server text-[#ff5500] mr-1"></i> Engine Status:</span>
+                        <span class="bg-[#ff5500]/10 text-[#ff5500] border border-[#ff5500]/30 px-2.5 py-0.5 rounded-md font-bold">Fast Chunk Packages</span>
                     </div>
-                    <div id="p2pStats" class="text-emerald-400 text-xs font-semibold">⚡ Peer Mesh Active</div>
+                    <div id="p2pStats" class="text-emerald-400 text-xs font-semibold">⚡ Player Ready</div>
                 </div>
 
                 <div class="relative bg-black rounded-2xl overflow-hidden shadow-2xl border border-gray-800">
@@ -154,10 +151,11 @@
                         
                         <div id="loadingSpinner" class="absolute inset-0 bg-[#0b0c10] flex flex-col items-center justify-center z-20 transition-opacity">
                             <div class="spinner mb-3"></div>
-                            <p class="text-xs text-gray-400 font-medium tracking-wide animate-pulse">Fetching 5G Data Package...</p>
+                            <p class="text-xs text-gray-400 font-medium tracking-wide animate-pulse">Connecting Stream Server...</p>
                         </div>
                         
-                        <video id="animeVideoPlayer" crossorigin="anonymous" playsinline controls preload="metadata" class="w-full h-full object-contain">
+                        <!-- Fixed Video Tag: Removed crossorigin="anonymous" which was blocking playback -->
+                        <video id="animeVideoPlayer" playsinline controls preload="metadata" class="w-full h-full object-contain">
                             Your browser does not support HTML5 video streaming.
                         </video>
                     </div>
@@ -209,7 +207,7 @@
     </main>
 
     <footer class="bg-[#151522] border-t border-gray-800 py-4 text-center text-xs text-gray-500 mt-8">
-        <p>&copy; 2026 7ANIME Engine. Fast 5G P2P Stream Architecture.</p>
+        <p>&copy; 2026 7ANIME Engine. Standard HTML5 Chunk Streaming.</p>
     </footer>
 
     <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
@@ -218,7 +216,6 @@
         const BACKEND_URL = "https://sevenanime-http-bot.onrender.com";
 
         let plyrPlayer = null;
-        let p2pEngine = null;
         let currentAnimeData = null;
         let activeSeason = "1";
         let activeDubType = "official";
@@ -281,27 +278,20 @@
             }
         }
 
-        function initP2PEngine() {
-            if (window.P2PEngineMP4 && P2PEngineMP4.isSupported()) {
-                p2pEngine = new P2PEngineMP4({
-                    segmentSize: 2 * 1024 * 1024, // 2MB Chunk Packages
-                    announceLocation: 'hk'
-                });
-                console.log("🚀 P2P Engine MP4 Ready!");
-            }
-        }
-
         async function initPage() {
-            initP2PEngine();
+            const videoElem = document.getElementById('animeVideoPlayer');
 
-            plyrPlayer = new Plyr('#animeVideoPlayer', {
+            plyrPlayer = new Plyr(videoElem, {
                 controls: ['play-large', 'play', 'progress', 'current-time', 'duration', 'mute', 'volume', 'settings', 'pip', 'fullscreen'],
                 speed: { selected: 1, options: [0.5, 0.75, 1, 1.25, 1.5, 2] }
             });
 
-            plyrPlayer.on('canplay', hideSpinner);
-            plyrPlayer.on('playing', hideSpinner);
-            plyrPlayer.on('error', () => hideSpinner());
+            videoElem.addEventListener('canplay', hideSpinner);
+            videoElem.addEventListener('playing', hideSpinner);
+            videoElem.addEventListener('error', (e) => {
+                console.error("Video Load Error:", e);
+                hideSpinner();
+            });
 
             const urlParams = new URLSearchParams(window.location.search);
             let animeSlug = urlParams.get('anime') || 'solo_leveling';
@@ -431,20 +421,17 @@
             const cleanChatId = activeChatId.replace('@', '');
             const streamUrl = `${BACKEND_URL}/stream/${cleanChatId}/${activeMsgId}.mp4`;
 
-            plyrPlayer.source = {
-                type: 'video',
-                title: `${currentAnimeData?.title || 'Anime'} S${activeSeason} E${epData.ep}`,
-                sources: [
-                    {
-                        src: streamUrl,
-                        type: 'video/mp4'
-                    }
-                ]
-            };
-
-            plyrPlayer.play().catch(err => console.log("Autoplay waiting for user gesture:", err));
-
-            setTimeout(() => { hideSpinner(); }, 1800);
+            // Native source change for standard HTTP Range chunk streaming
+            const videoElem = document.getElementById('animeVideoPlayer');
+            videoElem.src = streamUrl;
+            videoElem.load();
+            
+            videoElem.play().then(() => {
+                hideSpinner();
+            }).catch(err => {
+                console.log("Autoplay waiting for user interaction:", err);
+                hideSpinner();
+            });
 
             document.getElementById('currentPlayingText').innerText = `Episode ${epData.ep}`;
             renderEpisodesUIOnly();
