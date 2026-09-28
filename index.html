@@ -3,102 +3,306 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>7Anime - Watch Your Favorite Anime</title>
+    <title>7Anime Pro - Watch Your Favorite Anime</title>
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- External CSS -->
-    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        :root {
+            --bg-color: #0b0c10;
+            --card-bg: #1f2833;
+            --text-color: #ffffff;
+            --accent-orange: #ff5500;
+            --accent-red: #ff0055;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            overflow-x: hidden;
+        }
+
+        /* Header / Navbar */
+        .main-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 30px;
+            background: #12131a;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .hamburger-btn {
+            background: none;
+            border: none;
+            color: #ffffff;
+            font-size: 22px;
+            cursor: pointer;
+        }
+
+        .logo {
+            cursor: pointer;
+            font-weight: 800;
+            font-size: 22px;
+            letter-spacing: 1px;
+        }
+
+        .fire-seven {
+            color: var(--accent-orange);
+            font-size: 26px;
+        }
+
+        .fire-text {
+            background: linear-gradient(45deg, var(--accent-orange), var(--accent-red));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .desktop-nav ul {
+            display: flex;
+            list-style: none;
+            gap: 20px;
+        }
+
+        .desktop-nav a {
+            color: #ccc;
+            text-decoration: none;
+            font-weight: 500;
+            transition: 0.3s;
+        }
+
+        .desktop-nav a:hover, .desktop-nav a.active {
+            color: var(--accent-orange);
+        }
+
+        .search-box {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-box input {
+            background: var(--card-bg);
+            border: 1px solid #333;
+            padding: 8px 35px 8px 15px;
+            border-radius: 20px;
+            color: #fff;
+            outline: none;
+        }
+
+        .search-box i {
+            position: absolute;
+            right: 12px;
+            color: #888;
+            cursor: pointer;
+        }
+
+        /* Hero Banner */
+        .hero {
+            position: relative;
+            padding: 80px 30px;
+            background: linear-gradient(to right, rgba(11, 12, 16, 0.95), rgba(11, 12, 16, 0.4)), url('https://lh3.googleusercontent.com/d/1DrYU7Rcf8h1JHkkakd6ks9MAiFYsnj4V') center/cover;
+            min-height: 400px;
+            display: flex;
+            align-items: center;
+        }
+
+        .hero-content {
+            max-width: 600px;
+        }
+
+        .badge {
+            background: var(--accent-orange);
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .hero-title {
+            font-size: 42px;
+            margin: 15px 0 10px;
+        }
+
+        .hero-desc {
+            color: #ddd;
+            font-size: 15px;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        .btn-primary {
+            background: var(--accent-orange);
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: #e04b00;
+        }
+
+        .btn-secondary {
+            background: #333;
+            color: #ccc;
+        }
+
+        /* Main Anime Grid */
+        .container {
+            padding: 40px 30px;
+        }
+
+        .section-title {
+            font-size: 22px;
+            margin-bottom: 25px;
+            border-left: 4px solid var(--accent-orange);
+            padding-left: 10px;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .anime-card {
+            background: var(--card-bg);
+            border-radius: 10px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .anime-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(255, 85, 0, 0.3);
+        }
+
+        .card-img-container {
+            position: relative;
+            width: 100%;
+            padding-top: 140%;
+        }
+
+        .card-img-container img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .rating-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            color: #ffca28;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .card-info {
+            padding: 15px;
+        }
+
+        .card-title {
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        .card-tags {
+            font-size: 12px;
+            color: #888;
+        }
+
+        footer {
+            background: #12131a;
+            padding: 30px;
+            text-align: center;
+            margin-top: 50px;
+            border-top: 1px solid #222;
+        }
+    </style>
 </head>
 <body>
 
     <!-- Header / Navbar -->
     <header class="main-header">
         <div class="header-left">
-            <!-- 3 Line Hamburger Menu Icon -->
-            <button class="hamburger-btn" id="menuBtn" onclick="toggleSidebar()" aria-label="Toggle Menu">
-                <i class="fa-solid fa-bars"></i>
-            </button>
-            
-            <!-- Fire Style Logo -->
             <div class="logo fire-logo" onclick="window.location.href='index.html'">
-                <span class="fire-seven">7</span><span class="fire-text">ANIME 🔥</span>
+                <span class="fire-seven">7</span><span class="fire-text">ANIME PRO 🔥</span>
             </div>
         </div>
 
         <nav class="desktop-nav">
             <ul>
                 <li><a href="index.html" class="active"><i class="fa-solid fa-house"></i> Home</a></li>
-                <li><a href="#"><i class="fa-solid fa-compass"></i> Explore</a></li>
-                <li><a href="#"><i class="fa-solid fa-film"></i> Movies</a></li>
-                <li><a href="#"><i class="fa-solid fa-tv"></i> TV Series</a></li>
             </ul>
         </nav>
 
         <div class="search-box">
-            <input type="text" id="globalSearchInput" placeholder="Search anime...">
-            <i class="fa-solid fa-magnifying-glass" id="globalSearchBtn"></i>
-            <!-- Live Search Dropdown Box -->
-            <div id="searchResultsDropdown" class="search-dropdown" style="display: none;"></div>
+            <input type="text" id="globalSearchInput" onkeydown="handleSearch(event)" placeholder="Search anime & press enter...">
+            <i class="fa-solid fa-magnifying-glass"></i>
         </div>
     </header>
 
-    <!-- Slide-out Sidebar Drawer (Hidden by default) -->
-    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
-    <aside class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <h3><i class="fa-solid fa-fire" style="color: #ff5500;"></i> Menu</h3>
-            <span class="close-btn" onclick="toggleSidebar()">&times;</span>
-        </div>
-        <ul class="sidebar-links">
-            <li><a href="index.html"><i class="fa-solid fa-house"></i> HOME</a></li>
-            <li><a href="javascript:void(0)" onclick="openAgeModal()"><i class="fa-solid fa-triangle-exclamation"></i> HENTAI (18+)</a></li>
-            <li>
-                <a href="https://www.instagram.com/7anime_offical?stkn=c3c0aTNjaW9nZWJ3" target="_blank" rel="noopener noreferrer">
-                    <i class="fa-solid fa-headset"></i> WEBSITE SUPPORT TEAM CONTACT
-                </a>
-            </li>
-        </ul>
-    </aside>
-
-    <!-- 18+ Age Limit Verification Modal (Hidden by default) -->
-    <div class="modal-overlay" id="ageModal">
-        <div class="modal-box">
-            <i class="fa-solid fa-triangle-exclamation modal-icon"></i>
-            <h2>Age Verification Required</h2>
-            <p>Is section ko dekhne ke liye aapki umar 18+ honi chahiye. Kya aap 18 saal ya usse zyada ke hain?</p>
-            <div class="modal-buttons">
-                <button class="btn btn-primary" onclick="confirmAge(true)">I AM 18+</button>
-                <button class="btn btn-secondary" onclick="confirmAge(false)">Exit / Cancel</button>
-            </div>
-        </div>
-    </div>
-
     <!-- Hero Banner -->
-    <section class="hero" id="heroSection">
+    <section class="hero">
         <div class="hero-content">
             <span class="badge"><i class="fa-solid fa-fire"></i> Trending #1</span>
             <h1 class="hero-title">Solo Leveling</h1>
-            <div class="hero-meta">Action • Fantasy • Sci-Fi | Ep 12 Available</div>
             <p class="hero-desc">Sung Jin-Woo continues his journey to become the strongest hunter in a world full of monsters and hidden secrets.</p>
             <div class="hero-buttons">
                 <button class="btn btn-primary" onclick="openAnimePage('solo_leveling')">
                     <i class="fa-solid fa-play"></i> Watch Now
                 </button>
-                <button class="btn btn-secondary"><i class="fa-solid fa-plus"></i> Add to Watchlist</button>
             </div>
         </div>
     </section>
 
     <!-- Main Anime Grid -->
     <main class="container">
-        <h2 class="section-title" id="sectionTitle"><i class="fa-solid fa-fire-flame-curated"></i> Trending This Week</h2>
+        <h2 class="section-title"><i class="fa-solid fa-fire-flame-curated"></i> Trending This Week</h2>
 
         <div class="grid-container" id="animeGrid">
-            
-            <!-- Solo Leveling Card -->
-            <div class="anime-card" data-tags="Action, Fantasy, Sci-Fi" onclick="openAnimePage('solo_leveling')">
+            <!-- Anime Cards -->
+            <div class="anime-card" onclick="openAnimePage('solo_leveling')">
                 <div class="card-img-container">
-                    <img src="https://lh3.googleusercontent.com/d/1DrYU7Rcf8h1JHkkakd6ks9MAiFYsnj4V" alt="Solo Leveling" loading="lazy">
+                    <img src="https://lh3.googleusercontent.com/d/1DrYU7Rcf8h1JHkkakd6ks9MAiFYsnj4V" alt="Solo Leveling">
                     <span class="rating-badge"><i class="fa-solid fa-star"></i> 9.4</span>
                 </div>
                 <div class="card-info">
@@ -106,99 +310,27 @@
                     <div class="card-tags">Action, Fantasy, Sci-Fi</div>
                 </div>
             </div>
-
-            <!-- One Piece Card -->
-            <div class="anime-card" data-tags="Action, Adventure, Comedy" onclick="openAnimePage('one_piece')">
-                <div class="card-img-container">
-                    <img src="https://lh3.googleusercontent.com/d/1wkSteRmquT7BZezkr-HJ9evPLioapODU" alt="One Piece" loading="lazy">
-                    <span class="rating-badge"><i class="fa-solid fa-star"></i> 9.3</span>
-                </div>
-                <div class="card-info">
-                    <div class="card-title">One Piece</div>
-                    <div class="card-tags">Action, Adventure, Comedy</div>
-                </div>
-            </div>
-
-            <!-- Demon Slayer Card -->
-            <div class="anime-card" data-tags="Action, Fantasy, Supernatural" onclick="openAnimePage('demon_slayer')">
-                <div class="card-img-container">
-                    <img src="https://lh3.googleusercontent.com/d/1TYC722ZdHTuVgsF_1aOmDA3sV3awwQ2b" alt="Demon Slayer" loading="lazy">
-                    <span class="rating-badge"><i class="fa-solid fa-star"></i> 9.1</span>
-                </div>
-                <div class="card-info">
-                    <div class="card-title">Demon Slayer</div>
-                    <div class="card-tags">Action, Fantasy, Supernatural</div>
-                </div>
-            </div>
-
-            <!-- Jujutsu Kaisen Card -->
-            <div class="anime-card" data-tags="Action, Supernatural, Fantasy" onclick="openAnimePage('jujutsu_kaisen')">
-                <div class="card-img-container">
-                    <img src="https://lh3.googleusercontent.com/d/1ji9UpculbqZoreDoLGxqG4WAIf1h-gv0" alt="Jujutsu Kaisen" loading="lazy">
-                    <span class="rating-badge"><i class="fa-solid fa-star"></i> 9.2</span>
-                </div>
-                <div class="card-info">
-                    <div class="card-title">Jujutsu Kaisen</div>
-                    <div class="card-tags">Action, Supernatural, Fantasy</div>
-                </div>
-            </div>
-
-            <!-- Classroom of the Elite Card -->
-            <div class="anime-card" data-tags="Drama, Psychological, School" onclick="openAnimePage('classroom_of_the_elite')">
-                <div class="card-img-container">
-                    <img src="https://lh3.googleusercontent.com/d/1J0za-zSCfOStt-bs8dzV7j4YlmVBOHuF" alt="Classroom of the Elite" loading="lazy">
-                    <span class="rating-badge"><i class="fa-solid fa-star"></i> 9.0</span>
-                </div>
-                <div class="card-info">
-                    <div class="card-title">Classroom of the Elite</div>
-                    <div class="card-tags">Drama, Psychological, School</div>
-                </div>
-            </div>
-
-            <!-- Dr. Stone Card -->
-            <div class="anime-card" data-tags="Sci-Fi, Adventure, Comedy" onclick="openAnimePage('dr_stone')">
-                <div class="card-img-container">
-                    <img src="https://drive.google.com/thumbnail?id=1lHwUC54qEv2FANAnBjQA4q8hIkoA_qON&sz=w1000" alt="Dr. Stone" loading="lazy">
-                    <span class="rating-badge"><i class="fa-solid fa-star"></i> 8.9</span>
-                </div>
-                <div class="card-info">
-                    <div class="card-title">Dr. Stone</div>
-                    <div class="card-tags">Sci-Fi, Adventure, Comedy</div>
-                </div>
-            </div>
-
-            <!-- Hell Mode (Hentai Tagged Card) -->
-            <div class="anime-card hentai-card" data-tags="Hentai, Fantasy, Isekai" onclick="window.location.href='Hell_mode_videoplayer.html'">
-                <div class="card-img-container">
-                    <img src="https://t.me/sevenanimehaintai/4" alt="Hell Mode" loading="lazy">
-                    <span class="rating-badge"><i class="fa-solid fa-star"></i> 8.8</span>
-                </div>
-                <div class="card-info">
-                    <div class="card-title">Hell Mode: Hentai Special</div>
-                    <div class="card-tags">Hentai, Fantasy, Isekai</div>
-                </div>
-            </div>
-
-            <div id="noResults" class="no-results">No anime found matching your search.</div>
         </div>
     </main>
 
-    <!-- Footer -->
     <footer>
-        <div class="logo fire-logo" onclick="window.location.href='index.html'">
-            <span class="fire-seven">7</span><span class="fire-text">ANIME 🔥</span>
-        </div>
-        <div class="footer-links">
-            <a href="index.html">Home</a>
-            <a href="#">Explore</a>
-            <a href="#">Terms & Conditions</a>
-            <a href="https://www.instagram.com/7anime_offical?stkn=c3c0aTNjaW9nZWJ3" target="_blank">Contact Support</a>
-        </div>
-        <p style="color: #666; font-size: 12px; margin-top: 10px;">© 7Anime. All rights reserved.</p>
+        <p style="color: #666; font-size: 12px;">© 7Anime Pro. All rights reserved.</p>
     </footer>
 
-    <!-- Modular External JavaScript Files -->
-    <script src="script.js"></script>
-    <script src="searchengine.js"></script>
+    <script>
+        // NAVIGATION FLOW FIX
+        function openAnimePage(animeSlug) {
+            window.location.href = `videoplayer.html?anime=${encodeURIComponent(animeSlug)}`;
+        }
+
+        function handleSearch(e) {
+            if (e.key === 'Enter') {
+                const query = e.target.value.trim().toLowerCase().replace(/\s+/g, '_');
+                if (query) {
+                    openAnimePage(query);
+                }
+            }
+        }
+    </script>
 </body>
 </html>
