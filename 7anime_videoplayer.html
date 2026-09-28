@@ -77,7 +77,6 @@
         </div>
 
         <div class="flex items-center gap-3">
-            <!-- Select Anime Dropdown -->
             <select id="allAnimeDropdown" onchange="switchAnimeFromDropdown(this.value)" class="bg-[#1a1a2b] text-xs md:text-sm px-3 py-2 rounded-xl border border-gray-700 text-white focus:outline-none focus:border-[#ff5500]">
                 <option value="">Loading All Anime...</option>
             </select>
@@ -104,7 +103,6 @@
     <!-- Main Container -->
     <main class="max-w-7xl mx-auto px-4 py-6 space-y-6 w-full flex-grow">
         
-        <!-- Anime Details Banner -->
         <div class="bg-[#151522] border border-gray-800/80 rounded-2xl p-4 md:p-6 flex flex-col md:flex-row gap-6 items-start shadow-2xl relative overflow-hidden">
             <div class="w-full md:w-44 flex-shrink-0 aspect-[3/4] rounded-xl overflow-hidden border border-gray-700 shadow-xl relative mx-auto md:mx-0">
                 <img id="animePoster" src="https://lh3.googleusercontent.com/d/1DrYU7Rcf8h1JHkkakd6ks9MAiFYsnj4V" alt="Anime Poster" class="w-full h-full object-cover">
@@ -133,10 +131,8 @@
             </div>
         </div>
 
-        <!-- Player & Controls Grid -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             
-            <!-- Video Stream Player Section -->
             <div class="lg:col-span-2 space-y-4">
                 
                 <div class="flex items-center justify-between bg-[#151522] px-4 py-2.5 rounded-xl border border-gray-800 text-xs">
@@ -146,24 +142,20 @@
                     </div>
                 </div>
 
-                <!-- Main Video Frame Container -->
                 <div class="relative bg-black rounded-2xl overflow-hidden shadow-2xl border border-gray-800">
                     <div class="relative aspect-video w-full bg-black" id="playerContainer">
                         
-                        <!-- Loading Overlay Spinner -->
                         <div id="loadingSpinner" class="absolute inset-0 bg-[#0b0c10] flex flex-col items-center justify-center z-20 transition-opacity">
                             <div class="spinner mb-3"></div>
                             <p class="text-xs text-gray-400 font-medium tracking-wide animate-pulse">Connecting to Fast Stream Engine...</p>
                         </div>
                         
-                        <!-- HTML5 Video Tag -->
                         <video id="animeVideoPlayer" playsinline controls preload="metadata" class="w-full h-full object-contain">
                             Your browser does not support HTML5 video streaming.
                         </video>
                     </div>
                 </div>
 
-                <!-- Bottom Navigation Controls -->
                 <div class="flex flex-wrap items-center justify-between bg-[#151522] px-4 py-3 rounded-xl border border-gray-800 text-xs md:text-sm gap-3">
                     <button onclick="changeEpisode('prev')" class="flex items-center space-x-2 font-semibold text-gray-300 hover:text-white transition cursor-pointer bg-[#1a1a2b] px-3 py-1.5 rounded-lg border border-gray-700">
                         <i class="fa-solid fa-chevron-left text-[10px]"></i> <span>Prev</span>
@@ -184,10 +176,8 @@
                 </div>
             </div>
 
-            <!-- Audio Switch, Seasons & Episode Selector Sidebar -->
             <div class="bg-[#151522] p-4 md:p-5 rounded-2xl border border-gray-800 space-y-5">
                 
-                <!-- Audio Dub Switching -->
                 <div>
                     <span class="text-xs text-gray-400 font-semibold block mb-2"><i class="fa-solid fa-sliders text-[#ff5500] mr-1"></i> Audio Version:</span>
                     <div class="grid grid-cols-2 gap-2 bg-[#1a1a2b] p-1.5 rounded-xl border border-gray-800">
@@ -202,7 +192,6 @@
 
                 <hr class="border-gray-800">
 
-                <!-- Season Selection -->
                 <div>
                     <span class="text-xs text-gray-400 font-semibold block mb-2"><i class="fa-solid fa-layer-group text-[#ff5500] mr-1"></i> Select Season:</span>
                     <div id="seasonButtonsContainer" class="flex flex-wrap gap-2"></div>
@@ -210,7 +199,6 @@
 
                 <hr class="border-gray-800">
 
-                <!-- Episode Grid List -->
                 <div>
                     <h3 class="font-bold text-sm text-gray-200 mb-3"><i class="fa-solid fa-list-ul text-[#ff5500] mr-1.5"></i> Episodes List</h3>
                     <div class="grid grid-cols-3 gap-2 overflow-y-auto max-h-[320px] pr-1 custom-scroll" id="episodeGridButtons"></div>
@@ -220,7 +208,6 @@
         </div>
     </main>
 
-    <!-- Footer -->
     <footer class="bg-[#151522] border-t border-gray-800 py-4 text-center text-xs text-gray-500 mt-8">
         <p>&copy; 2026 7ANIME Engine. Fast & Direct Video Streaming.</p>
     </footer>
@@ -228,7 +215,6 @@
     <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
 
     <script>
-        // FIXED BACKEND URL: Render deployment domain
         const BACKEND_URL = "https://sevenanime-http-bot.onrender.com";
 
         let plyrPlayer = null;
@@ -302,6 +288,7 @@
 
             plyrPlayer.on('canplay', hideSpinner);
             plyrPlayer.on('playing', hideSpinner);
+            plyrPlayer.on('error', () => hideSpinner());
 
             const urlParams = new URLSearchParams(window.location.search);
             let animeSlug = urlParams.get('anime') || 'solo_leveling';
@@ -442,9 +429,9 @@
                 ]
             };
 
-            plyrPlayer.play().catch(err => console.log("Autoplay waiting for interaction:", err));
+            plyrPlayer.play().catch(err => console.log("Autoplay waiting for user gesture:", err));
 
-            setTimeout(() => { hideSpinner(); }, 3500);
+            setTimeout(() => { hideSpinner(); }, 2500);
 
             document.getElementById('currentPlayingText').innerText = `Episode ${epData.ep}`;
             renderEpisodesUIOnly();
