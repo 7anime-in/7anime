@@ -154,8 +154,8 @@
                             <p class="text-xs text-gray-400 font-medium tracking-wide animate-pulse">Connecting Stream Server...</p>
                         </div>
                         
-                        <!-- Fixed Video Tag: Removed crossorigin="anonymous" which was blocking playback -->
-                        <video id="animeVideoPlayer" playsinline controls preload="metadata" class="w-full h-full object-contain">
+                        <!-- Video Player Tag -->
+                        <video id="animeVideoPlayer" playsinline controls preload="auto" class="w-full h-full object-contain">
                             Your browser does not support HTML5 video streaming.
                         </video>
                     </div>
@@ -421,7 +421,6 @@
             const cleanChatId = activeChatId.replace('@', '');
             const streamUrl = `${BACKEND_URL}/stream/${cleanChatId}/${activeMsgId}.mp4`;
 
-            // Native source change for standard HTTP Range chunk streaming
             const videoElem = document.getElementById('animeVideoPlayer');
             videoElem.src = streamUrl;
             videoElem.load();
