@@ -272,13 +272,13 @@
             if (e.key === 'Enter') {
                 const query = e.target.value.trim().toLowerCase().replace(/\s+/g, '_');
                 if (query) {
-                    window.location.href = `videoplayer.html?anime=${query}`;
+                    // Redirect to 7anime_videoplayer.html
+                    window.location.href = `7anime_videoplayer.html?anime=${query}`;
                 }
             }
         }
 
         async function initPage() {
-            // ORIGINAL Plyr Player Code Preserved
             plyrPlayer = new Plyr('#animeVideoPlayer', {
                 controls: ['play-large', 'play', 'progress', 'current-time', 'duration', 'mute', 'volume', 'settings', 'pip', 'fullscreen'],
                 speed: { selected: 1, options: [0.5, 0.75, 1, 1.25, 1.5, 2] }
@@ -399,7 +399,6 @@
             }
         }
 
-        // ORIGINAL VIDEO PLAY CODE PRESERVED (EXACT SAME logic)
         function playEpisode(index) {
             if (!filteredEpisodes[index]) return;
 
@@ -414,7 +413,6 @@
             const cleanChatId = activeChatId.replace('@', '');
             const streamUrl = `${BACKEND_URL}/stream/${cleanChatId}/${activeMsgId}.mp4`;
 
-            // Plyr Engine Dynamic Source Update (SAME AS ORIGINAL)
             plyrPlayer.source = {
                 type: 'video',
                 title: `${currentAnimeData?.title || 'Anime'} S${activeSeason} E${epData.ep}`,
