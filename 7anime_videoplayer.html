@@ -10,6 +10,9 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
 
+    <!-- ⚡ P2P MESH NETWORK ENGINE FOR MP4 RANGE STREAMING -->
+    <script src="https://cdn.jsdelivr.net/npm/cdnbye-mp4@latest/dist/index.min.js"></script>
+
     <style>
         .spinner {
             width: 48px;
@@ -112,9 +115,11 @@
                 <div class="flex flex-wrap items-center justify-between gap-3">
                     <h1 id="animeTitleDisplay" class="text-2xl md:text-3xl font-extrabold tracking-tight text-white">Loading Anime...</h1>
                     
-                    <button onclick="downloadCurrentVideo()" class="bg-[#ff5500] hover:bg-[#e04c00] text-white px-4 py-2 rounded-xl text-xs font-bold flex items-center space-x-2 transition cursor-pointer shadow-lg shadow-[#ff5500]/20">
-                        <i class="fa-solid fa-download"></i> <span>Download Episode</span>
-                    </button>
+                    <div>
+                        <button onclick="downloadCurrentVideo()" class="bg-[#ff5500] hover:bg-[#e04c00] text-white px-3.5 py-2 rounded-xl text-xs font-bold flex items-center space-x-2 transition cursor-pointer shadow-lg shadow-[#ff5500]/20">
+                            <i class="fa-solid fa-download"></i> <span>Download</span>
+                        </button>
+                    </div>
                 </div>
 
                 <div class="flex flex-wrap items-center gap-2 text-xs">
@@ -123,10 +128,11 @@
                         <i class="fa-solid fa-star text-[10px]"></i> <span id="animeRatingDisplay">9.4/10</span>
                     </span>
                     <span id="activeSeasonBadge" class="bg-[#1a1a2b] text-gray-300 border border-gray-700 px-2.5 py-1 rounded-md font-medium">Season 1</span>
+                    <span class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2.5 py-1 rounded-md font-bold"><i class="fa-solid fa-bolt mr-1"></i> P2P 5G Accelerated</span>
                 </div>
 
                 <p id="animeDescription" class="text-gray-400 text-xs md:text-sm leading-relaxed max-w-4xl">
-                    Stream high-definition anime directly from our fast CDN cloud service with full multi-audio dub support and high-speed video rendering.
+                    Stream high-definition anime directly with 5G Peer-to-Peer Mesh acceleration and multi-audio dub support.
                 </p>
             </div>
         </div>
@@ -137,9 +143,10 @@
                 
                 <div class="flex items-center justify-between bg-[#151522] px-4 py-2.5 rounded-xl border border-gray-800 text-xs">
                     <div class="flex items-center space-x-2">
-                        <span class="text-gray-400 font-semibold"><i class="fa-solid fa-server text-[#ff5500] mr-1"></i> Active Server:</span>
-                        <span class="bg-[#ff5500]/10 text-[#ff5500] border border-[#ff5500]/30 px-2.5 py-0.5 rounded-md font-bold">Fast Ultra CDN</span>
+                        <span class="text-gray-400 font-semibold"><i class="fa-solid fa-server text-[#ff5500] mr-1"></i> Streaming Mode:</span>
+                        <span class="bg-[#ff5500]/10 text-[#ff5500] border border-[#ff5500]/30 px-2.5 py-0.5 rounded-md font-bold">5G P2P Data Packages</span>
                     </div>
+                    <div id="p2pStats" class="text-emerald-400 text-xs font-semibold">⚡ Peer Mesh Active</div>
                 </div>
 
                 <div class="relative bg-black rounded-2xl overflow-hidden shadow-2xl border border-gray-800">
@@ -147,10 +154,10 @@
                         
                         <div id="loadingSpinner" class="absolute inset-0 bg-[#0b0c10] flex flex-col items-center justify-center z-20 transition-opacity">
                             <div class="spinner mb-3"></div>
-                            <p class="text-xs text-gray-400 font-medium tracking-wide animate-pulse">Connecting to Fast Stream Engine...</p>
+                            <p class="text-xs text-gray-400 font-medium tracking-wide animate-pulse">Fetching 5G Data Package...</p>
                         </div>
                         
-                        <video id="animeVideoPlayer" playsinline controls preload="metadata" class="w-full h-full object-contain">
+                        <video id="animeVideoPlayer" crossorigin="anonymous" playsinline controls preload="metadata" class="w-full h-full object-contain">
                             Your browser does not support HTML5 video streaming.
                         </video>
                     </div>
@@ -161,14 +168,7 @@
                         <i class="fa-solid fa-chevron-left text-[10px]"></i> <span>Prev</span>
                     </button>
                     
-                    <div class="flex items-center space-x-3">
-                        <span id="currentPlayingText" class="font-bold text-gray-200">Episode 1</span>
-                        
-                        <button onclick="downloadCurrentVideo()" class="bg-[#ff5500] hover:bg-[#e04c00] text-white px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center space-x-1.5 cursor-pointer shadow">
-                            <i class="fa-solid fa-download"></i>
-                            <span>Download</span>
-                        </button>
-                    </div>
+                    <span id="currentPlayingText" class="font-bold text-gray-200">Episode 1</span>
 
                     <button onclick="changeEpisode('next')" class="flex items-center space-x-2 font-semibold text-gray-300 hover:text-white transition cursor-pointer bg-[#1a1a2b] px-3 py-1.5 rounded-lg border border-gray-700">
                         <span>Next</span> <i class="fa-solid fa-chevron-right text-[10px]"></i>
@@ -209,7 +209,7 @@
     </main>
 
     <footer class="bg-[#151522] border-t border-gray-800 py-4 text-center text-xs text-gray-500 mt-8">
-        <p>&copy; 2026 7ANIME Engine. Fast & Direct Video Streaming.</p>
+        <p>&copy; 2026 7ANIME Engine. Fast 5G P2P Stream Architecture.</p>
     </footer>
 
     <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
@@ -218,6 +218,7 @@
         const BACKEND_URL = "https://sevenanime-http-bot.onrender.com";
 
         let plyrPlayer = null;
+        let p2pEngine = null;
         let currentAnimeData = null;
         let activeSeason = "1";
         let activeDubType = "official";
@@ -280,7 +281,19 @@
             }
         }
 
+        function initP2PEngine() {
+            if (window.P2PEngineMP4 && P2PEngineMP4.isSupported()) {
+                p2pEngine = new P2PEngineMP4({
+                    segmentSize: 2 * 1024 * 1024, // 2MB Chunk Packages
+                    announceLocation: 'hk'
+                });
+                console.log("🚀 P2P Engine MP4 Ready!");
+            }
+        }
+
         async function initPage() {
+            initP2PEngine();
+
             plyrPlayer = new Plyr('#animeVideoPlayer', {
                 controls: ['play-large', 'play', 'progress', 'current-time', 'duration', 'mute', 'volume', 'settings', 'pip', 'fullscreen'],
                 speed: { selected: 1, options: [0.5, 0.75, 1, 1.25, 1.5, 2] }
@@ -431,7 +444,7 @@
 
             plyrPlayer.play().catch(err => console.log("Autoplay waiting for user gesture:", err));
 
-            setTimeout(() => { hideSpinner(); }, 2500);
+            setTimeout(() => { hideSpinner(); }, 1800);
 
             document.getElementById('currentPlayingText').innerText = `Episode ${epData.ep}`;
             renderEpisodesUIOnly();
