@@ -117,7 +117,7 @@
         <!-- Anime Details Banner -->
         <div class="bg-[#151522] border border-gray-800/80 rounded-2xl p-4 md:p-6 flex flex-col md:flex-row gap-6 items-start shadow-2xl relative overflow-hidden">
             <div class="w-full md:w-44 flex-shrink-0 aspect-[3/4] rounded-xl overflow-hidden border border-gray-700 shadow-xl relative mx-auto md:mx-0">
-                <img id="animePoster" src="https://lh3.googleusercontent.com/d/1hZPMLLUNMOVG8DmSd1eGd5Nmdgh6AUYZ" alt="Anime Poster" class="w-full h-full object-cover">
+                <img id="animePoster" src="https://lh3.googleusercontent.com/d/1DrYU7Rcf8h1JHkkakd6ks9MAiFYsnj4V" alt="Anime Poster" class="w-full h-full object-cover">
             </div>
             
             <div class="flex-1 space-y-3 w-full">
@@ -132,7 +132,7 @@
                 <div class="flex flex-wrap items-center gap-2 text-xs">
                     <span class="bg-purple-600/20 text-purple-300 border border-purple-500/30 px-2.5 py-1 rounded-md font-semibold"><i class="fa-solid fa-microphone mr-1"></i> Hindi Dub</span>
                     <span class="bg-amber-500/20 text-amber-400 border border-amber-500/30 px-2.5 py-1 rounded-md font-bold flex items-center gap-1">
-                        <i class="fa-solid fa-star text-[10px]"></i> <span>9.4/10</span>
+                        <i class="fa-solid fa-star text-[10px]"></i> <span id="animeRatingDisplay">9.4/10</span>
                     </span>
                     <span id="activeSeasonBadge" class="bg-[#1a1a2b] text-gray-300 border border-gray-700 px-2.5 py-1 rounded-md font-medium">Season 1</span>
                 </div>
@@ -239,6 +239,34 @@
     <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
 
     <script>
+        // Frontend Instant Metadata Dictionary
+        const ANIME_METADATA = {
+            "solo_leveling": {
+                title: "Solo Leveling",
+                poster: "https://lh3.googleusercontent.com/d/1DrYU7Rcf8h1JHkkakd6ks9MAiFYsnj4V",
+                rating: "9.4/10",
+                desc: "Sung Jin-Woo continues his journey to become the strongest hunter in a world full of monsters."
+            },
+            "hell_mode": {
+                title: "Hell Mode",
+                poster: "https://lh3.googleusercontent.com/d/1hZPMLLUNMOVG8DmSd1eGd5Nmdgh6AUYZ",
+                rating: "8.8/10",
+                desc: "A hardcore gamer reincarnates into another world with extreme difficulty settings."
+            },
+            "classroom_of_the_elite": {
+                title: "Classroom of the Elite",
+                poster: "https://lh3.googleusercontent.com/d/1DrYU7Rcf8h1JHkkakd6ks9MAiFYsnj4V",
+                rating: "9.1/10",
+                desc: "Kiyotaka Ayanokoji navigates through the elite and competitive Advanced Nurturing High School."
+            },
+            "dr_stone": {
+                title: "Dr. STONE",
+                poster: "https://lh3.googleusercontent.com/d/1DrYU7Rcf8h1JHkkakd6ks9MAiFYsnj4V",
+                rating: "8.9/10",
+                desc: "Senku Ishigami aims to rebuild human civilization using science after humanity turns into stone."
+            }
+        };
+
         // Auto Backend Detection
         const BACKEND_URL = (window.location.origin && !window.location.origin.includes("null") && !window.location.origin.includes("file://"))
             ? window.location.origin
@@ -272,7 +300,6 @@
             if (e.key === 'Enter') {
                 const query = e.target.value.trim().toLowerCase().replace(/\s+/g, '_');
                 if (query) {
-                    // Redirect to 7anime_videoplayer.html
                     window.location.href = `7anime_videoplayer.html?anime=${query}`;
                 }
             }
@@ -290,6 +317,31 @@
             const urlParams = new URLSearchParams(window.location.search);
             const animeSlug = urlParams.get('anime') || 'solo_leveling';
 
+            // ⚡ Instant Local Setup (No waiting for Backend)
+            const meta = ANIME_METADATA[animeSlug] || {
+                title: animeSlug.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+                poster: "https://lh3.googleusercontent.com/d/1DrYU7Rcf8h1JHkkakd6ks9MAiFYsnj4V",
+                rating: "9.0/10",
+                desc: "Stream high-definition anime directly from our fast CDN cloud service with full multi-audio dub support."
+            };
+
+            document.getElementById('animeTitleDisplay').innerText = meta.title;
+            document.getElementById('pageTitle').innerText = `${meta.title} - 7ANIME`;
+            
+            const posterImg = document.getElementById('animePoster');
+            posterImg.src = meta.poster;
+            posterImg.onerror = function() {
+                this.src = "https://lh3.googleusercontent.com/d/1DrYU7Rcf8h1JHkkakd6ks9MAiFYsnj4V";
+            };
+
+            if (document.getElementById('animeDescription')) {
+                document.getElementById('animeDescription').innerText = meta.desc;
+            }
+            if (document.getElementById('animeRatingDisplay')) {
+                document.getElementById('animeRatingDisplay').innerText = meta.rating;
+            }
+
+            // Fetch episodes from backend
             try {
                 showSpinner();
                 let response = await fetch(`${BACKEND_URL}/api/episodes/${animeSlug}`);
