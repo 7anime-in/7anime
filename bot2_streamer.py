@@ -14,11 +14,12 @@ from pyrogram.errors import FloodWait, RPCError
 # ==================== ENVIRONMENT VARIABLES ====================
 API_ID = int(os.getenv("API_ID", "31169133"))
 API_HASH = os.getenv("API_HASH", "b836f4b836df4cf83c2d475a5ad3b285")
-BOT_TOKEN = os.getenv("BOT_TOKEN", "8946650986:AAGy6rYE-C42f7jcgeyS8Xl4-j9UAyIEwEk")
+# Supports BOT2_TOKEN with fallback to BOT_TOKEN
+BOT_TOKEN = os.getenv("BOT2_TOKEN") or os.getenv("BOT_TOKEN", "8946650986:AAGy6rYE-C42f7jcgeyS8Xl4-j9UAyIEwEk")
 
 # ==================== CHUNK CONFIGURATION ====================
-# Minimum Chunk Size set to 200 KB for fast loading on low networks
-MIN_STREAM_CHUNK_SIZE = 200 * 1024        # 200 KB Minimum
+# Minimum Chunk Size set to 1 KB for instant playback start
+MIN_STREAM_CHUNK_SIZE = 1 * 1024          # 1 KB Minimum
 MAX_STREAM_CHUNK_SIZE = 10 * 1024 * 1024  # 10 MB Maximum
 DEFAULT_CHUNK_SIZE = 2 * 1024 * 1024      # 2 MB Standard Chunk
 
@@ -49,10 +50,12 @@ async def lifespan(app: FastAPI):
         bot_token=BOT_TOKEN,
     )
 
-    await pyro_client.start()
-    print("✅ Bot 2 Pyrogram Engine Active!")
+    # Background task for instant Render Port binding (prevents Port Scan Timeout)
+    asyncio.create_task(pyro_client.start())
+    print("✅ Bot 2 Pyrogram Engine Initiated!")
     yield
-    await pyro_client.stop()
+    if pyro_client and pyro_client.is_connected:
+        await pyro_client.stop()
 
 app = FastAPI(title="Bot 2 - Streamer Engine", lifespan=lifespan)
 
@@ -109,7 +112,7 @@ async def get_stream_response(
     else:
         until_bytes = from_bytes + DEFAULT_CHUNK_SIZE - 1
 
-    # Enforce Minimum 200 KB and Maximum 10 MB per chunk response
+    # Enforce Minimum 1 KB and Maximum 10 MB per chunk response
     requested_length = until_bytes - from_bytes + 1
 
     if requested_length > MAX_STREAM_CHUNK_SIZE:
@@ -185,4 +188,4 @@ def home():
 @app.api_route("/stream/{chat_id}/{message_id}.mp4", methods=["GET", "HEAD", "OPTIONS"])
 async def stream_video(chat_id: str, message_id: str, request: Request, range: str = Header(None)):
     return await get_stream_response(chat_id, message_id, request, range)
-      
+    
