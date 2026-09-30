@@ -13,11 +13,12 @@ from pyrogram.types import Message
 # ==================== ENVIRONMENT VARIABLES ====================
 API_ID = int(os.getenv("API_ID", "31169133"))
 API_HASH = os.getenv("API_HASH", "b836f4b836df4cf83c2d475a5ad3b285")
-BOT_TOKEN = os.getenv("BOT_TOKEN", "8854095839:AAH8pFz3ZszE7Gyp0AY1if7JY2NoC18bNJg")
+# Supports BOT4_TOKEN with fallback to BOT_TOKEN
+BOT_TOKEN = os.getenv("BOT4_TOKEN") or os.getenv("BOT_TOKEN", "8854095839:AAH8pFz3ZszE7Gyp0AY1if7JY2NoC18bNJg")
 
 pyro_client = None
 
-# Default Site Data (Memory Database for index.html)
+# Default Site Data (In-Memory Database for index.html)
 site_data: Dict[str, Any] = {
     "banner": {
         "title": "Solo Leveling",
@@ -178,10 +179,12 @@ async def lifespan(app: FastAPI):
             quote=True
         )
 
-    await pyro_client.start()
+    # Fast port binding setup to avoid Render port timeout
+    asyncio.create_task(pyro_client.start())
     print("✅ Bot 4 Active & Ready!")
     yield
-    await pyro_client.stop()
+    if pyro_client and pyro_client.is_connected:
+        await pyro_client.stop()
 
 app = FastAPI(title="Bot 4 - Admin Content Manager API", lifespan=lifespan)
 
@@ -194,7 +197,7 @@ app.add_middleware(
 )
 
 # ==================== API ENDPOINTS FOR FRONTEND ====================
-@app.get("/")
+@app.api_route("/", methods=["GET", "HEAD"])
 def home():
     return {"status": "Bot 4 Admin API Active 🚀"}
 
@@ -213,3 +216,4 @@ def get_banner():
 @app.get("/api/cards")
 def get_cards():
     return list(site_data["cards"].values())
+    
