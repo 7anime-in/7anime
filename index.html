@@ -1,409 +1,235 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>7Anime Pro - Watch Your Favorite Anime</title>
-    <!-- Font Awesome Icons -->
+    <title>7anime - Watch & Download Anime Free</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <style>
-        :root {
-            --bg-color: #0b0c10;
-            --card-bg: #1f2833;
-            --text-color: #ffffff;
-            --accent-orange: #ff5500;
-            --accent-red: #ff0055;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        body {
+            background-color: #0b0c10;
+            color: #c5c6c7;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            overflow-x: hidden;
+        .hero-gradient {
+            background: linear-gradient(0deg, #0b0c10 0%, rgba(11,12,16,0.7) 50%, rgba(11,12,16,0.3) 100%);
         }
-
-        /* Header / Navbar */
-        .main-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 12px 20px;
-            background: #12131a;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-        }
-
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .logo {
-            cursor: pointer;
-            font-weight: 800;
-            font-size: 20px;
-            letter-spacing: 1px;
-        }
-
-        .fire-seven {
-            color: var(--accent-orange);
-            font-size: 24px;
-        }
-
-        .fire-text {
-            background: linear-gradient(45deg, var(--accent-orange), var(--accent-red));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .desktop-nav ul {
-            display: flex;
-            list-style: none;
-            gap: 20px;
-        }
-
-        .desktop-nav a {
-            color: #ccc;
-            text-decoration: none;
-            font-weight: 500;
-            transition: 0.3s;
-        }
-
-        .desktop-nav a:hover, .desktop-nav a.active {
-            color: var(--accent-orange);
-        }
-
-        .search-box {
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
-
-        .search-box input {
-            background: var(--card-bg);
-            border: 1px solid #333;
-            padding: 8px 35px 8px 15px;
-            border-radius: 20px;
-            color: #fff;
-            outline: none;
-            font-size: 13px;
-        }
-
-        .search-box i {
-            position: absolute;
-            right: 12px;
-            color: #888;
-            cursor: pointer;
-        }
-
-        /* Hero Banner */
-        .hero {
-            position: relative;
-            padding: 50px 20px;
-            background: linear-gradient(to right, rgba(11, 12, 16, 0.95), rgba(11, 12, 16, 0.4)), url('https://lh3.googleusercontent.com/d/1DrYU7Rcf8h1JHkkakd6ks9MAiFYsnj4V') center/cover;
-            min-height: 300px;
-            display: flex;
-            align-items: center;
-        }
-
-        .hero-content {
-            max-width: 600px;
-        }
-
-        .badge {
-            background: var(--accent-orange);
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 11px;
-            font-weight: bold;
-        }
-
-        .hero-title {
-            font-size: 32px;
-            margin: 10px 0 8px;
-        }
-
-        .hero-desc {
-            color: #ddd;
-            font-size: 13px;
-            line-height: 1.4;
-            margin-bottom: 15px;
-        }
-
-        /* Buttons */
-        .btn {
-            padding: 8px 18px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 13px;
-            transition: 0.3s;
-        }
-
-        .btn-primary {
-            background: var(--accent-orange);
-            color: #fff;
-        }
-
-        .btn-primary:hover {
-            background: #e04b00;
-        }
-
-        /* Main Anime Grid Desktop */
-        .container {
-            padding: 25px 20px;
-        }
-
-        .section-title {
-            font-size: 18px;
-            margin-bottom: 18px;
-            border-left: 4px solid var(--accent-orange);
-            padding-left: 10px;
-        }
-
-        .grid-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 15px;
-        }
-
-        .anime-card {
-            background: var(--card-bg);
-            border-radius: 8px;
-            overflow: hidden;
-            cursor: pointer;
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
-
-        .anime-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 6px 15px rgba(255, 85, 0, 0.3);
-        }
-
-        .card-img-container {
-            position: relative;
-            width: 100%;
-            padding-top: 140%;
-        }
-
-        .card-img-container img {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .rating-badge {
-            position: absolute;
-            top: 6px;
-            right: 6px;
-            background: rgba(0, 0, 0, 0.8);
-            color: #ffca28;
-            padding: 3px 6px;
-            border-radius: 4px;
-            font-size: 11px;
-            font-weight: bold;
-        }
-
-        .card-info {
-            padding: 10px;
-        }
-
-        .card-title {
-            font-weight: 600;
-            font-size: 14px;
-            margin-bottom: 3px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .card-tags {
-            font-size: 11px;
-            color: #888;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        /* MOBILE RESPONSIVE FIX (3 Cards Per Row) */
-        @media (max-width: 600px) {
-            .main-header {
-                padding: 10px 12px;
-            }
-
-            .logo {
-                font-size: 17px;
-            }
-
-            .search-box input {
-                width: 140px;
-                padding: 6px 28px 6px 10px;
-                font-size: 11px;
-            }
-
-            .container {
-                padding: 15px 10px;
-            }
-
-            .grid-container {
-                grid-template-columns: repeat(3, 1fr); /* Mobile screen par 3 cards aayenge */
-                gap: 8px;
-            }
-
-            .card-info {
-                padding: 6px 4px;
-            }
-
-            .card-title {
-                font-size: 11px;
-                line-height: 1.2;
-            }
-
-            .card-tags {
-                font-size: 9px;
-            }
-
-            .rating-badge {
-                font-size: 9px;
-                padding: 2px 4px;
-                top: 4px;
-                right: 4px;
-            }
-
-            .hero {
-                padding: 30px 15px;
-                min-height: 220px;
-            }
-
-            .hero-title {
-                font-size: 22px;
-            }
-
-            .hero-desc {
-                font-size: 11px;
-                display: -webkit-box;
-                -webkit-line-clamp: 2;
-                -webkit-box-orient: vertical;
-                overflow: hidden;
-            }
-        }
-
-        footer {
-            background: #12131a;
-            padding: 20px;
-            text-align: center;
-            margin-top: 40px;
-            border-top: 1px solid #222;
+        .card-hover:hover {
+            transform: translateY(-6px);
+            transition: all 0.3s ease;
         }
     </style>
 </head>
-<body>
+<body class="min-h-screen flex flex-col">
 
-    <!-- Header / Navbar -->
-    <header class="main-header">
-        <div class="header-left">
-            <div class="logo fire-logo" onclick="window.location.href='index.html'">
-                <span class="fire-seven">7</span><span class="fire-text">ANIME PRO 🔥</span>
+    <!-- ==================== NAVBAR ==================== -->
+    <nav class="sticky top-0 z-50 bg-[#1f2833]/90 backdrop-blur-md border-b border-gray-800 px-4 py-3 shadow-lg">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-3">
+            <!-- Logo -->
+            <div class="flex items-center justify-between w-full md:w-auto">
+                <a href="index.html" class="flex items-center gap-2 text-2xl font-extrabold text-[#66fcf1]">
+                    <i class="fa-solid fa-play-circle text-3xl"></i>
+                    <span>7<span class="text-white">anime</span></span>
+                </a>
+                <span class="text-xs bg-[#45a29e] text-black px-2 py-0.5 rounded font-bold md:hidden">v2.0</span>
+            </div>
+
+            <!-- Search Bar -->
+            <div class="relative w-full md:w-96">
+                <input 
+                    type="text" 
+                    id="searchInput" 
+                    oninput="handleSearch()"
+                    placeholder="Search anime (e.g. Solo Leveling, Naruto)..." 
+                    class="w-full bg-[#0b0c10] border border-gray-700 rounded-full py-2 px-4 pl-10 text-sm text-white focus:outline-none focus:border-[#66fcf1]"
+                >
+                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-gray-400 text-sm"></i>
             </div>
         </div>
+    </nav>
 
-        <div class="search-box">
-            <input type="text" id="globalSearchInput" onkeydown="handleSearch(event)" placeholder="Search anime...">
-            <i class="fa-solid fa-magnifying-glass"></i>
-        </div>
-    </header>
-
-    <!-- Hero Banner -->
-    <section class="hero">
-        <div class="hero-content">
-            <span class="badge"><i class="fa-solid fa-fire"></i> Trending #1</span>
-            <h1 class="hero-title">Solo Leveling</h1>
-            <p class="hero-desc">Sung Jin-Woo continues his journey to become the strongest hunter in a world full of monsters.</p>
-            <div class="hero-buttons">
-                <button class="btn btn-primary" onclick="openAnimePage('solo_leveling')">
+    <!-- ==================== HERO BANNER ==================== -->
+    <section id="heroSection" class="relative w-full h-[400px] md:h-[500px] bg-cover bg-center flex items-end">
+        <div class="absolute inset-0 hero-gradient"></div>
+        <div class="relative max-w-7xl mx-auto px-4 pb-8 w-full z-10 flex flex-col gap-3">
+            <span class="bg-[#66fcf1] text-black font-bold text-xs uppercase px-2.5 py-1 rounded w-fit">Featured Anime</span>
+            <h1 id="bannerTitle" class="text-3xl md:text-5xl font-black text-white drop-shadow-md">Loading Hero Banner...</h1>
+            <p id="bannerDesc" class="text-sm md:text-base text-gray-300 max-w-2xl line-clamp-3">Please wait while content loads from server...</p>
+            
+            <div class="flex items-center gap-4 mt-2">
+                <a id="bannerPlayBtn" href="#" class="bg-[#66fcf1] hover:bg-[#45a29e] text-black font-bold px-6 py-2.5 rounded-lg flex items-center gap-2 transition">
                     <i class="fa-solid fa-play"></i> Watch Now
-                </button>
+                </a>
+                <a id="bannerDownloadBtn" href="#" class="bg-gray-800 hover:bg-gray-700 text-white font-semibold px-5 py-2.5 rounded-lg flex items-center gap-2 transition border border-gray-700">
+                    <i class="fa-solid fa-download"></i> Download
+                </a>
             </div>
         </div>
     </section>
 
-    <!-- Main Anime Grid -->
-    <main class="container">
-        <h2 class="section-title"><i class="fa-solid fa-fire-flame-curated"></i> Trending Anime</h2>
+    <!-- ==================== ANIME CARDS GRID ==================== -->
+    <main class="max-w-7xl mx-auto px-4 py-8 flex-1 w-full">
+        <div class="flex items-center justify-between mb-6">
+            <h2 class="text-xl md:text-2xl font-bold text-white border-l-4 border-[#66fcf1] pl-3">Explore Anime</h2>
+            <span id="totalCardsCount" class="text-xs text-gray-400">Loading library...</span>
+        </div>
 
-        <div class="grid-container" id="animeGrid">
-            
-            <!-- 1. Solo Leveling Card -->
-            <div class="anime-card" onclick="openAnimePage('solo_leveling')">
-                <div class="card-img-container">
-                    <img src="https://lh3.googleusercontent.com/d/1DrYU7Rcf8h1JHkkakd6ks9MAiFYsnj4V" alt="Solo Leveling">
-                    <span class="rating-badge"><i class="fa-solid fa-star"></i> 9.4</span>
-                </div>
-                <div class="card-info">
-                    <div class="card-title">Solo Leveling</div>
-                    <div class="card-tags">Action, Fantasy</div>
-                </div>
-            </div>
-
-            <!-- 2. Hell Mode Card -->
-            <div class="anime-card" onclick="openAnimePage('hell_mode')">
-                <div class="card-img-container">
-                    <img src="https://lh3.googleusercontent.com/d/1hZPMLLUNMOVG8DmSd1eGd5Nmdgh6AUYZ" alt="Hell Mode">
-                    <span class="rating-badge"><i class="fa-solid fa-star"></i> 8.8</span>
-                </div>
-                <div class="card-info">
-                    <div class="card-title">Hell Mode</div>
-                    <div class="card-tags">Isekai, Action</div>
-                </div>
-            </div>
-
-            <!-- 3. One Piece Card -->
-            <div class="anime-card" onclick="openAnimePage('one_piece')">
-                <div class="card-img-container">
-                    <img src="https://lh3.googleusercontent.com/d/1DrYU7Rcf8h1JHkkakd6ks9MAiFYsnj4V" alt="One Piece">
-                    <span class="rating-badge"><i class="fa-solid fa-star"></i> 9.6</span>
-                </div>
-                <div class="card-info">
-                    <div class="card-title">One Piece</div>
-                    <div class="card-tags">Action, Adventure</div>
-                </div>
-            </div>
-
+        <!-- Grid Container -->
+        <div id="animeGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
+            <!-- Skeleton Loading Placeholders -->
+            <div class="animate-pulse bg-[#1f2833] h-64 rounded-xl"></div>
+            <div class="animate-pulse bg-[#1f2833] h-64 rounded-xl"></div>
+            <div class="animate-pulse bg-[#1f2833] h-64 rounded-xl"></div>
+            <div class="animate-pulse bg-[#1f2833] h-64 rounded-xl"></div>
+            <div class="animate-pulse bg-[#1f2833] h-64 rounded-xl"></div>
         </div>
     </main>
 
-    <footer>
-        <p style="color: #666; font-size: 12px;">© 7Anime Pro. All rights reserved.</p>
+    <!-- ==================== FOOTER ==================== -->
+    <footer class="bg-[#1f2833] border-t border-gray-800 text-center py-6 text-sm text-gray-400 mt-auto">
+        <p>© 2026 7anime Engine. Powered by Telegram Stream Engine.</p>
     </footer>
 
+    <!-- ==================== JS LOGIC ==================== -->
     <script>
-        // REDIRECTION FIX: Directly pointing to 7anime_videoplayer.html
-        function openAnimePage(animeSlug) {
-            window.location.href = `7anime_videoplayer.html?anime=${encodeURIComponent(animeSlug)}`;
+        // Render Web Service Base URLs (Update these after Render deployment)
+        const BOT1_API = "https://7anime-bot1-scanner.onrender.com";
+        const BOT4_API = "https://7anime-bot4-admin.onrender.com";
+
+        let allAnimeCards = [];
+
+        // Fallback Default Banner Data
+        const defaultBanner = {
+            title: "Solo Leveling",
+            image: "https://m.media-amazon.com/images/M/MV5BODlhM2RmM2ItM2FkYi00ZGY2LTg2NzAtNjg4NTgwOGVhMDFkXkEyXkFqcGdeQXVyMTI1NDEyNTM5._V1_.jpg",
+            description: "In a world where hunters must battle deadly monsters, Sung Jinwoo is known as the weakest hunter of all mankind.",
+            play_slug: "solo_leveling"
+        };
+
+        // Initialize Page Data
+        async function initPage() {
+            await Promise.all([loadBannerAndAdminCards(), loadScannedAnime()]);
         }
 
-        function handleSearch(e) {
-            if (e.key === 'Enter') {
-                const query = e.target.value.trim().toLowerCase().replace(/\s+/g, '_');
-                if (query) {
-                    openAnimePage(query);
+        // Fetch Hero Banner & Admin Cards from Bot 4
+        async function loadBannerAndAdminCards() {
+            try {
+                const res = await fetch(`${BOT4_API}/api/site-data`);
+                if (!res.ok) throw new Error("Bot 4 Offline");
+                const data = await res.json();
+
+                renderHeroBanner(data.banner || defaultBanner);
+                if (data.cards && data.cards.length > 0) {
+                    mergeCards(data.cards);
                 }
+            } catch (err) {
+                console.warn("Using Default Banner due to Bot 4 offline:", err);
+                renderHeroBanner(defaultBanner);
             }
         }
+
+        // Fetch Channel Scanned Animes from Bot 1
+        async function loadScannedAnime() {
+            try {
+                const res = await fetch(`${BOT1_API}/api/all-anime`);
+                if (!res.ok) throw new Error("Bot 1 Offline");
+                const scannedData = await res.json();
+
+                const formattedCards = Object.keys(scannedData).map(slug => {
+                    const item = scannedData[slug];
+                    return {
+                        title: item.title,
+                        image: "https://via.placeholder.com/300x420/1f2833/66fcf1?text=" + encodeURIComponent(item.title),
+                        genres: "Action, Anime",
+                        rating: "8.5",
+                        slug: slug
+                    };
+                });
+
+                mergeCards(formattedCards);
+            } catch (err) {
+                console.warn("Could not fetch scanned anime from Bot 1:", err);
+            }
+        }
+
+        // Merge and Render Cards uniquely
+        function mergeCards(newCards) {
+            newCards.forEach(card => {
+                if (!allAnimeCards.some(c => c.slug === card.slug)) {
+                    allAnimeCards.push(card);
+                }
+            });
+            renderCardsGrid(allAnimeCards);
+        }
+
+        // Render Hero Banner UI
+        function renderHeroBanner(banner) {
+            document.getElementById("heroSection").style.backgroundImage = `url('${banner.image}')`;
+            document.getElementById("bannerTitle").innerText = banner.title;
+            document.getElementById("bannerDesc").innerText = banner.description;
+            document.getElementById("bannerPlayBtn").href = `7anime_videoplayer.html?anime=${banner.play_slug}`;
+            document.getElementById("bannerDownloadBtn").href = `download.html?anime=${banner.play_slug}`;
+        }
+
+        // Render Anime Cards Grid UI
+        function renderCardsGrid(cards) {
+            const grid = document.getElementById("animeGrid");
+            document.getElementById("totalCardsCount").innerText = `${cards.length} Titles Available`;
+
+            if (cards.length === 0) {
+                grid.innerHTML = `<div class="col-span-full text-center py-12 text-gray-500">No anime cards found. Add via Bot 4 command <code>/addcard</code></div>`;
+                return;
+            }
+
+            grid.innerHTML = cards.map(card => `
+                <div class="bg-[#1f2833] rounded-xl overflow-hidden shadow-lg border border-gray-800 card-hover flex flex-col justify-between">
+                    <a href="7anime_videoplayer.html?anime=${card.slug}">
+                        <div class="relative aspect-[3/4] w-full overflow-hidden bg-gray-900">
+                            <img src="${card.image}" alt="${card.title}" class="w-full h-full object-cover" onerror="this.src='https://via.placeholder.com/300x420/1f2833/ffffff?text=7anime'">
+                            <span class="absolute top-2 right-2 bg-black/80 text-[#66fcf1] font-bold text-xs px-2 py-0.5 rounded flex items-center gap-1">
+                                <i class="fa-solid fa-star text-yellow-400"></i> ${card.rating || '8.0'}
+                            </span>
+                        </div>
+                    </a>
+                    <div class="p-3 flex flex-col justify-between flex-1">
+                        <div>
+                            <a href="7anime_videoplayer.html?anime=${card.slug}" class="font-bold text-white text-sm hover:text-[#66fcf1] line-clamp-1">
+                                ${card.title}
+                            </a>
+                            <p class="text-xs text-gray-400 mt-1 line-clamp-1">${card.genres || 'Action, Series'}</p>
+                        </div>
+                        <div class="flex items-center justify-between gap-2 mt-3 pt-2 border-t border-gray-700/50">
+                            <a href="7anime_videoplayer.html?anime=${card.slug}" class="flex-1 bg-[#66fcf1] hover:bg-[#45a29e] text-black text-xs font-bold py-1.5 rounded text-center transition">
+                                Watch
+                            </a>
+                            <a href="download.html?anime=${card.slug}" class="bg-gray-800 hover:bg-gray-700 text-white text-xs p-1.5 rounded transition border border-gray-700" title="Download">
+                                <i class="fa-solid fa-download"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            `).join("");
+        }
+
+        // Real-time Search Handler
+        function handleSearch() {
+            const query = document.getElementById("searchInput").value.toLowerCase().trim();
+            if (!query) {
+                renderCardsGrid(allAnimeCards);
+                return;
+            }
+            const filtered = allAnimeCards.filter(card => 
+                card.title.toLowerCase().includes(query) || 
+                (card.genres && card.genres.toLowerCase().includes(query))
+            );
+            renderCardsGrid(filtered);
+        }
+
+        // Start execution on page load
+        window.addEventListener("DOMContentLoaded", initPage);
     </script>
 </body>
 </html>
