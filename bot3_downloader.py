@@ -14,7 +14,8 @@ from pyrogram.errors import RPCError, FloodWait
 # ==================== ENVIRONMENT VARIABLES ====================
 API_ID = int(os.getenv("API_ID", "31169133"))
 API_HASH = os.getenv("API_HASH", "b836f4b836df4cf83c2d475a5ad3b285")
-BOT_TOKEN = os.getenv("BOT_TOKEN", "8646261177:AAGmVPIzmduiLhZ5AJbiJGMb0kh4vbn7n6E")
+# Supports BOT3_TOKEN with fallback to BOT_TOKEN
+BOT_TOKEN = os.getenv("BOT3_TOKEN") or os.getenv("BOT_TOKEN", "8646261177:AAGmVPIzmduiLhZ5AJbiJGMb0kh4vbn7n6E")
 
 # Download chunk size (2MB per chunk for high-speed file transfer)
 DOWNLOAD_CHUNK_SIZE = 2 * 1024 * 1024
@@ -52,8 +53,8 @@ def extract_filename(message, default_id: int) -> str:
     if not filename:
         filename = f"7anime_Episode_{default_id}.mp4"
 
-    # Sanitize filename for headers
-    filename = re.sub(r'[\r\n]', '', filename)
+    # Sanitize filename for headers (Remove quotes and newlines)
+    filename = re.sub(r'[\r\n"]', '', filename)
     return filename
 
 # ==================== LIFECYCLE HANDLER ====================
@@ -69,10 +70,12 @@ async def lifespan(app: FastAPI):
         bot_token=BOT_TOKEN,
     )
 
-    await pyro_client.start()
-    print("✅ Bot 3 Pyrogram Engine Active!")
+    # Fast port binding ke liye background task me start kar rahe hain
+    asyncio.create_task(pyro_client.start())
+    print("✅ Bot 3 Pyrogram Engine Initiated!")
     yield
-    await pyro_client.stop()
+    if pyro_client and pyro_client.is_connected:
+        await pyro_client.stop()
 
 app = FastAPI(title="Bot 3 - Downloader Engine", lifespan=lifespan)
 
@@ -109,7 +112,7 @@ async def download_file(chat_id: str, message_id: str, request: Request):
     file_size = media.file_size
     file_name = extract_filename(msg, msg_id_clean)
 
-    # Safe URL Encoding for Filenames containing Special/Hindi Characters
+    # Safe URL Encoding for Filenames containing Special Characters
     encoded_filename = urllib.parse.quote(file_name)
 
     headers = {
@@ -135,6 +138,7 @@ async def download_file(chat_id: str, message_id: str, request: Request):
     return StreamingResponse(file_downloader(), status_code=200, headers=headers)
 
 # ==================== ENDPOINTS ====================
-@app.get("/")
+@app.api_route("/", methods=["GET", "HEAD"])
 def home():
     return {"status": "Bot 3 Downloader Engine Active 🚀"}
+    
