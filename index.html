@@ -12,18 +12,25 @@
         body {
             background-color: #0b0c10;
             color: #c5c6c7;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
         .hero-gradient {
-            background: linear-gradient(0deg, #0b0c10 0%, rgba(11,12,16,0.7) 50%, rgba(11,12,16,0.3) 100%);
+            background: linear-gradient(180deg, rgba(11,12,16,0.2) 0%, rgba(11,12,16,0.8) 70%, #0b0c10 100%);
         }
-        .card-hover:hover {
-            transform: translateY(-6px);
-            transition: all 0.3s ease;
+        .card-hover:active, .card-hover:hover {
+            transform: scale(0.98);
+            transition: all 0.2s ease;
         }
-        /* Custom scrollbar for search dropdown */
+        /* Hide scrollbar for category tabs on mobile */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
         #searchDropdown::-webkit-scrollbar {
-            width: 6px;
+            width: 4px;
         }
         #searchDropdown::-webkit-scrollbar-thumb {
             background: #45a29e;
@@ -31,56 +38,53 @@
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col">
+<body class="min-h-screen flex flex-col selection:bg-[#66fcf1] selection:text-black">
 
     <!-- ==================== NAVBAR ==================== -->
-    <nav class="sticky top-0 z-50 bg-[#1f2833]/95 backdrop-blur-md border-b border-gray-800 px-4 py-3 shadow-lg">
-        <div class="max-w-7xl mx-auto flex flex-col gap-3">
+    <nav class="sticky top-0 z-50 bg-[#1f2833]/95 backdrop-blur-md border-b border-gray-800 px-3 py-2">
+        <div class="max-w-7xl mx-auto flex flex-col gap-2">
             
-            <!-- Top Header: Logo + Search Bar -->
-            <div class="flex flex-col md:flex-row items-center justify-between gap-3">
+            <!-- Top Row: Logo + Search -->
+            <div class="flex items-center justify-between gap-2">
                 <!-- Logo -->
-                <div class="flex items-center justify-between w-full md:w-auto">
-                    <a href="index.html" class="flex items-center gap-2 text-2xl font-extrabold text-[#66fcf1]">
-                        <i class="fa-solid fa-play-circle text-3xl"></i>
-                        <span>7<span class="text-white">anime</span></span>
-                    </a>
-                    <span class="text-xs bg-[#45a29e] text-black px-2 py-0.5 rounded font-bold md:hidden">v2.0</span>
-                </div>
+                <a href="index.html" class="flex items-center gap-1.5 text-xl font-extrabold text-[#66fcf1] shrink-0">
+                    <i class="fa-solid fa-circle-play text-2xl"></i>
+                    <span>7<span class="text-white">anime</span></span>
+                </a>
 
-                <!-- Search Bar Container with Dropdown -->
-                <div class="relative w-full md:w-96">
+                <!-- Compact Search Input -->
+                <div class="relative flex-1 max-w-md">
                     <input 
                         type="text" 
                         id="searchInput" 
                         oninput="handleSearch()"
                         onfocus="handleSearch()"
-                        placeholder="Search anime, movie, hentai..." 
-                        class="w-full bg-[#0b0c10] border border-gray-700 rounded-full py-2 px-4 pl-10 text-sm text-white focus:outline-none focus:border-[#66fcf1]"
+                        placeholder="Search anime, movie..." 
+                        class="w-full bg-[#0b0c10] border border-gray-700/80 rounded-full py-1.5 px-3 pl-8 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-[#66fcf1]"
                         autocomplete="off"
                     >
-                    <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-gray-400 text-sm"></i>
+                    <i class="fa-solid fa-magnifying-glass absolute left-2.5 top-2 text-gray-400 text-xs"></i>
 
                     <!-- LIVE SEARCH DROPDOWN BOX -->
-                    <div id="searchDropdown" class="hidden absolute left-0 right-0 top-full mt-2 bg-[#1f2833] border border-gray-700 rounded-xl shadow-2xl z-50 max-h-80 overflow-y-auto">
+                    <div id="searchDropdown" class="hidden absolute left-0 right-0 top-full mt-2 bg-[#1f2833] border border-gray-700 rounded-xl shadow-2xl z-50 max-h-72 overflow-y-auto">
                         <!-- Search items rendered dynamically -->
                     </div>
                 </div>
             </div>
 
-            <!-- SEARCH BAR KE NECHE 4 FUNCTIONAL CATEGORY BUTTONS -->
-            <div class="flex items-center justify-center md:justify-start gap-2 pt-1 border-t border-gray-800/80 overflow-x-auto pb-1">
-                <button onclick="filterCategory('all')" id="btn-all" class="cat-btn bg-[#66fcf1] text-black font-bold text-xs px-4 py-1.5 rounded-full transition flex items-center gap-1.5 whitespace-nowrap">
-                    <i class="fa-solid fa-house"></i> Home
+            <!-- Horizontal Scrollable Category Tabs -->
+            <div class="flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
+                <button onclick="filterCategory('all')" id="btn-all" class="cat-btn bg-[#66fcf1] text-black font-bold text-[11px] px-3 py-1 rounded-full transition shrink-0 flex items-center gap-1">
+                    <i class="fa-solid fa-house text-[10px]"></i> Home
                 </button>
-                <button onclick="filterCategory('series')" id="btn-series" class="cat-btn bg-gray-800 hover:bg-gray-700 text-gray-300 font-semibold text-xs px-4 py-1.5 rounded-full border border-gray-700 transition flex items-center gap-1.5 whitespace-nowrap">
-                    <i class="fa-solid fa-tv"></i> Series
+                <button onclick="filterCategory('series')" id="btn-series" class="cat-btn bg-gray-800/80 text-gray-300 font-medium text-[11px] px-3 py-1 rounded-full border border-gray-700 transition shrink-0 flex items-center gap-1">
+                    <i class="fa-solid fa-tv text-[10px]"></i> Series
                 </button>
-                <button onclick="filterCategory('movie')" id="btn-movie" class="cat-btn bg-gray-800 hover:bg-gray-700 text-gray-300 font-semibold text-xs px-4 py-1.5 rounded-full border border-gray-700 transition flex items-center gap-1.5 whitespace-nowrap">
-                    <i class="fa-solid fa-film"></i> Movie
+                <button onclick="filterCategory('movie')" id="btn-movie" class="cat-btn bg-gray-800/80 text-gray-300 font-medium text-[11px] px-3 py-1 rounded-full border border-gray-700 transition shrink-0 flex items-center gap-1">
+                    <i class="fa-solid fa-film text-[10px]"></i> Movie
                 </button>
-                <button onclick="filterCategory('hentai')" id="btn-hentai" class="cat-btn bg-red-950/50 hover:bg-red-900/60 text-red-400 font-bold text-xs px-4 py-1.5 rounded-full border border-red-800/60 transition flex items-center gap-1.5 whitespace-nowrap">
-                    <i class="fa-solid fa-triangle-exclamation"></i> Hentai (18+ Only)
+                <button onclick="filterCategory('hentai')" id="btn-hentai" class="cat-btn bg-red-950/40 text-red-400 font-semibold text-[11px] px-3 py-1 rounded-full border border-red-800/50 transition shrink-0 flex items-center gap-1">
+                    <i class="fa-solid fa-triangle-exclamation text-[10px]"></i> Hentai 18+
                 </button>
             </div>
 
@@ -88,18 +92,20 @@
     </nav>
 
     <!-- ==================== HERO BANNER ==================== -->
-    <section id="heroSection" class="relative w-full h-[380px] md:h-[480px] bg-cover bg-center flex items-end">
+    <section id="heroSection" class="relative w-full h-[250px] sm:h-[340px] md:h-[420px] bg-cover bg-center flex items-end">
         <div class="absolute inset-0 hero-gradient"></div>
-        <div class="relative max-w-7xl mx-auto px-4 pb-8 w-full z-10 flex flex-col gap-3">
-            <span class="bg-[#66fcf1] text-black font-bold text-xs uppercase px-2.5 py-1 rounded w-fit">Featured Anime</span>
-            <h1 id="bannerTitle" class="text-3xl md:text-5xl font-black text-white drop-shadow-md">Loading Hero Banner...</h1>
-            <p id="bannerDesc" class="text-sm md:text-base text-gray-300 max-w-2xl line-clamp-3">Please wait while content loads...</p>
+        
+        <div class="relative max-w-7xl mx-auto px-4 pb-4 sm:pb-6 w-full z-10 flex flex-col gap-1.5">
+            <span class="bg-[#66fcf1] text-black font-extrabold text-[10px] uppercase px-2 py-0.5 rounded w-fit tracking-wider">FEATURED</span>
             
-            <div class="flex items-center gap-4 mt-2">
-                <a id="bannerPlayBtn" href="#" class="bg-[#66fcf1] hover:bg-[#45a29e] text-black font-bold px-6 py-2.5 rounded-lg flex items-center gap-2 transition">
+            <h1 id="bannerTitle" class="text-2xl sm:text-4xl font-black text-white leading-tight drop-shadow-md">Loading...</h1>
+            <p id="bannerDesc" class="text-xs sm:text-sm text-gray-300 max-w-xl line-clamp-2 text-ellipsis">Loading banner description...</p>
+            
+            <div class="flex items-center gap-2.5 mt-1">
+                <a id="bannerPlayBtn" href="#" class="bg-[#66fcf1] hover:bg-[#45a29e] text-black font-bold px-4 py-1.5 rounded-lg text-xs flex items-center gap-1.5 transition">
                     <i class="fa-solid fa-play"></i> Watch Now
                 </a>
-                <a id="bannerDownloadBtn" href="#" class="bg-gray-800 hover:bg-gray-700 text-white font-semibold px-5 py-2.5 rounded-lg flex items-center gap-2 transition border border-gray-700">
+                <a id="bannerDownloadBtn" href="#" class="bg-gray-800/90 hover:bg-gray-700 text-white font-medium px-3.5 py-1.5 rounded-lg text-xs flex items-center gap-1.5 border border-gray-700 transition">
                     <i class="fa-solid fa-download"></i> Download
                 </a>
             </div>
@@ -107,26 +113,23 @@
     </section>
 
     <!-- ==================== ANIME CARDS GRID ==================== -->
-    <main class="max-w-7xl mx-auto px-4 py-8 flex-1 w-full">
-        <div class="flex items-center justify-between mb-6">
-            <h2 id="gridTitle" class="text-xl md:text-2xl font-bold text-white border-l-4 border-[#66fcf1] pl-3">Explore Anime</h2>
-            <span id="totalCardsCount" class="text-xs text-gray-400">Loading library...</span>
+    <main class="max-w-7xl mx-auto px-3 sm:px-4 py-5 flex-1 w-full">
+        <div class="flex items-center justify-between mb-4">
+            <h2 id="gridTitle" class="text-base sm:text-xl font-bold text-white border-l-4 border-[#66fcf1] pl-2.5">Explore Anime</h2>
+            <span id="totalCardsCount" class="text-[11px] text-gray-400">Loading...</span>
         </div>
 
-        <!-- Grid Container -->
-        <div id="animeGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
-            <!-- Skeleton Loading Placeholders -->
-            <div class="animate-pulse bg-[#1f2833] h-64 rounded-xl"></div>
-            <div class="animate-pulse bg-[#1f2833] h-64 rounded-xl"></div>
-            <div class="animate-pulse bg-[#1f2833] h-64 rounded-xl"></div>
-            <div class="animate-pulse bg-[#1f2833] h-64 rounded-xl"></div>
-            <div class="animate-pulse bg-[#1f2833] h-64 rounded-xl"></div>
+        <!-- 2-Column Grid on Mobile, 3 on Tablet, 5 on Desktop -->
+        <div id="animeGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
+            <!-- Skeleton Loading -->
+            <div class="animate-pulse bg-[#1f2833] aspect-[2/3] rounded-xl"></div>
+            <div class="animate-pulse bg-[#1f2833] aspect-[2/3] rounded-xl"></div>
         </div>
     </main>
 
     <!-- ==================== FOOTER ==================== -->
-    <footer class="bg-[#1f2833] border-t border-gray-800 text-center py-6 text-sm text-gray-400 mt-auto">
-        <p>© 2026 7anime Engine. Powered by Telegram Stream Engine.</p>
+    <footer class="bg-[#1f2833] border-t border-gray-800 text-center py-4 text-xs text-gray-400 mt-auto">
+        <p>© 2026 7anime Engine</p>
     </footer>
 
     <!-- ==================== JS LOGIC ==================== -->
@@ -139,11 +142,10 @@
         const defaultBanner = {
             title: "Solo Leveling",
             image: "https://m.media-amazon.com/images/M/MV5BODlhM2RmM2ItM2FkYi00ZGY2LTg2NzAtNjg4NTgwOGVhMDFkXkEyXkFqcGdeQXVyMTI1NDEyNTM5._V1_.jpg",
-            description: "In a world where hunters must battle deadly monsters, Sung Jinwoo is known as the weakest hunter of all mankind.",
+            description: "In a world where hunters battle monsters, Sung Jinwoo is known as the weakest hunter of all mankind.",
             play_slug: "solo_leveling"
         };
 
-        // Convert Google Drive Links to Direct Display Images
         function formatImageUrl(url) {
             if (!url) return "https://via.placeholder.com/300x420/1f2833/ffffff?text=7anime";
             const driveMatch = url.match(/\/d\/([a-zA-Z0-9_-]+)/) || url.match(/id=([a-zA-Z0-9_-]+)/);
@@ -153,22 +155,20 @@
             return url;
         }
 
-        // Return Styled Type Badge for Movie / Hentai / Series
         function getTypeBadge(type) {
             const normalizedType = (type || 'series').toLowerCase();
             if (normalizedType === 'movie') {
-                return `<span class="bg-purple-500/20 text-purple-400 border border-purple-500/40 font-bold text-[10px] px-2 py-0.5 rounded uppercase">Movie</span>`;
+                return `<span class="bg-purple-600/80 backdrop-blur-md text-white font-bold text-[9px] px-1.5 py-0.5 rounded uppercase">Movie</span>`;
             } else if (normalizedType === 'hentai') {
-                return `<span class="bg-red-500/20 text-red-400 border border-red-500/40 font-bold text-[10px] px-2 py-0.5 rounded uppercase">18+ Hentai</span>`;
+                return `<span class="bg-red-600/80 backdrop-blur-md text-white font-bold text-[9px] px-1.5 py-0.5 rounded uppercase">18+</span>`;
             }
-            return `<span class="bg-cyan-500/20 text-[#66fcf1] border border-cyan-500/40 font-bold text-[10px] px-2 py-0.5 rounded uppercase">Series</span>`;
+            return `<span class="bg-cyan-600/80 backdrop-blur-md text-white font-bold text-[9px] px-1.5 py-0.5 rounded uppercase">Series</span>`;
         }
 
         async function initPage() {
             await Promise.all([loadBannerAndAdminCards(), loadScannedAnime()]);
         }
 
-        // Direct Fetch from site_data.json
         async function loadBannerAndAdminCards() {
             try {
                 const res = await fetch(`./site_data.json?v=${Date.now()}`);
@@ -182,12 +182,11 @@
                     mergeCards(cardsList);
                 }
             } catch (err) {
-                console.warn("Fallback to default banner:", err);
+                console.warn("Fallback banner loaded:", err);
                 renderHeroBanner(defaultBanner);
             }
         }
 
-        // Fetch Scanned Anime from Bot 1
         async function loadScannedAnime() {
             try {
                 const res = await fetch(`${BOT1_API}/api/all-anime`);
@@ -208,15 +207,13 @@
 
                 mergeCards(formattedCards);
             } catch (err) {
-                console.warn("Could not fetch scanned anime from Bot 1:", err);
+                console.warn("Could not fetch scanned anime:", err);
             }
         }
 
         function mergeCards(newCards) {
             newCards.forEach(card => {
-                // Ensure default type is 'series' if not specified
                 if (!card.type) card.type = 'series';
-
                 const existingIndex = allAnimeCards.findIndex(c => c.slug === card.slug);
                 if (existingIndex > -1) {
                     allAnimeCards[existingIndex] = { ...allAnimeCards[existingIndex], ...card };
@@ -227,35 +224,30 @@
             filterCategory(activeCategory);
         }
 
-        // ==================== CATEGORY FILTER LOGIC ====================
         function filterCategory(cat) {
             activeCategory = cat;
 
-            // Reset All Button Styles
             document.querySelectorAll('.cat-btn').forEach(btn => {
-                btn.className = "cat-btn bg-gray-800 hover:bg-gray-700 text-gray-300 font-semibold text-xs px-4 py-1.5 rounded-full border border-gray-700 transition flex items-center gap-1.5 whitespace-nowrap";
+                btn.className = "cat-btn bg-gray-800/80 text-gray-300 font-medium text-[11px] px-3 py-1 rounded-full border border-gray-700 transition shrink-0 flex items-center gap-1";
             });
 
-            // Highlight Active Button
             const activeBtn = document.getElementById(`btn-${cat}`);
             if (activeBtn) {
                 if (cat === 'hentai') {
-                    activeBtn.className = "cat-btn bg-red-600 text-white font-bold text-xs px-4 py-1.5 rounded-full border border-red-500 transition flex items-center gap-1.5 whitespace-nowrap shadow-lg shadow-red-900/40";
+                    activeBtn.className = "cat-btn bg-red-600 text-white font-bold text-[11px] px-3 py-1 rounded-full transition shrink-0 flex items-center gap-1 shadow-sm";
                 } else {
-                    activeBtn.className = "cat-btn bg-[#66fcf1] text-black font-bold text-xs px-4 py-1.5 rounded-full transition flex items-center gap-1.5 whitespace-nowrap shadow-md";
+                    activeBtn.className = "cat-btn bg-[#66fcf1] text-black font-bold text-[11px] px-3 py-1 rounded-full transition shrink-0 flex items-center gap-1 shadow-sm";
                 }
             }
 
-            // Update Section Title
             const titles = {
                 'all': 'Explore Anime',
-                'series': 'Anime Series & Seasons',
+                'series': 'Anime Series',
                 'movie': 'Anime Movies',
-                'hentai': '18+ Hentai Content'
+                'hentai': '18+ Hentai'
             };
             document.getElementById("gridTitle").innerText = titles[cat] || 'Explore Anime';
 
-            // Filter Array
             let filtered = allAnimeCards;
             if (cat !== 'all') {
                 filtered = allAnimeCards.filter(c => (c.type || 'series').toLowerCase() === cat);
@@ -264,7 +256,6 @@
             renderCardsGrid(filtered);
         }
 
-        // ==================== LIVE SEARCH DROPDOWN LOGIC ====================
         function handleSearch() {
             const query = document.getElementById("searchInput").value.toLowerCase().trim();
             const dropdown = document.getElementById("searchDropdown");
@@ -281,19 +272,18 @@
             );
 
             if (matches.length === 0) {
-                dropdown.innerHTML = `<div class="p-4 text-center text-xs text-gray-400">No matching anime found</div>`;
+                dropdown.innerHTML = `<div class="p-3 text-center text-xs text-gray-400">No matching anime found</div>`;
             } else {
                 dropdown.innerHTML = matches.map(card => `
-                    <a href="7anime_videoplayer.html?anime=${card.slug}" class="flex items-center gap-3 p-2.5 hover:bg-[#0b0c10] border-b border-gray-800/60 transition group">
-                        <img src="${formatImageUrl(card.image)}" class="w-10 h-12 object-cover rounded shadow" onerror="this.src='https://via.placeholder.com/100x120/1f2833/ffffff?text=7A'">
+                    <a href="7anime_videoplayer.html?anime=${card.slug}" class="flex items-center gap-2.5 p-2 hover:bg-[#0b0c10] border-b border-gray-800/60 transition group">
+                        <img src="${formatImageUrl(card.image)}" class="w-8 h-11 object-cover rounded shadow" onerror="this.src='https://via.placeholder.com/100x120/1f2833/ffffff?text=7A'">
                         <div class="flex flex-col flex-1 min-w-0">
-                            <div class="flex items-center gap-2 mb-0.5">
+                            <div class="flex items-center gap-1.5 mb-0.5">
                                 ${getTypeBadge(card.type)}
-                                <span class="text-[11px] text-gray-400 line-clamp-1">${card.genres || 'Anime'}</span>
+                                <span class="text-[10px] text-gray-400 truncate">${card.genres || 'Anime'}</span>
                             </div>
-                            <span class="text-sm font-semibold text-white group-hover:text-[#66fcf1] truncate">${card.title}</span>
+                            <span class="text-xs font-semibold text-white group-hover:text-[#66fcf1] truncate">${card.title}</span>
                         </div>
-                        <i class="fa-solid fa-chevron-right text-gray-500 text-xs pr-2"></i>
                     </a>
                 `).join("");
             }
@@ -301,7 +291,6 @@
             dropdown.classList.remove("hidden");
         }
 
-        // Close search dropdown when clicking outside
         document.addEventListener("click", (e) => {
             const searchInput = document.getElementById("searchInput");
             const dropdown = document.getElementById("searchDropdown");
@@ -321,42 +310,39 @@
 
         function renderCardsGrid(cards) {
             const grid = document.getElementById("animeGrid");
-            document.getElementById("totalCardsCount").innerText = `${cards.length} Titles Available`;
+            document.getElementById("totalCardsCount").innerText = `${cards.length} Titles`;
 
             if (cards.length === 0) {
-                grid.innerHTML = `<div class="col-span-full text-center py-12 text-gray-500">No content found in this category.</div>`;
+                grid.innerHTML = `<div class="col-span-full text-center py-10 text-xs text-gray-500">No content found.</div>`;
                 return;
             }
 
             grid.innerHTML = cards.map(card => `
-                <div class="bg-[#1f2833] rounded-xl overflow-hidden shadow-lg border border-gray-800 card-hover flex flex-col justify-between">
+                <div class="bg-[#1f2833] rounded-lg overflow-hidden shadow border border-gray-800/80 card-hover flex flex-col justify-between">
                     <a href="7anime_videoplayer.html?anime=${card.slug}">
-                        <div class="relative aspect-[3/4] w-full overflow-hidden bg-gray-900">
+                        <div class="relative aspect-[2/3] w-full overflow-hidden bg-gray-900">
                             <img src="${formatImageUrl(card.image)}" alt="${card.title}" class="w-full h-full object-cover" onerror="this.src='https://via.placeholder.com/300x420/1f2833/ffffff?text=7anime'">
                             
-                            <!-- Type Badge -->
-                            <div class="absolute top-2 left-2">
+                            <div class="absolute top-1.5 left-1.5">
                                 ${getTypeBadge(card.type)}
                             </div>
 
-                            <!-- Rating Badge -->
-                            <span class="absolute top-2 right-2 bg-black/80 text-[#66fcf1] font-bold text-xs px-2 py-0.5 rounded flex items-center gap-1">
-                                <i class="fa-solid fa-star text-yellow-400"></i> ${card.rating || '8.0'}
+                            <span class="absolute top-1.5 right-1.5 bg-black/80 text-[#66fcf1] font-bold text-[10px] px-1.5 py-0.5 rounded flex items-center gap-1 backdrop-blur-sm">
+                                <i class="fa-solid fa-star text-yellow-400 text-[9px]"></i> ${card.rating || '8.0'}
                             </span>
                         </div>
                     </a>
-                    <div class="p-3 flex flex-col justify-between flex-1">
+                    <div class="p-2 flex flex-col justify-between flex-1">
                         <div>
-                            <a href="7anime_videoplayer.html?anime=${card.slug}" class="font-bold text-white text-sm hover:text-[#66fcf1] line-clamp-1">
+                            <a href="7anime_videoplayer.html?anime=${card.slug}" class="font-bold text-white text-xs hover:text-[#66fcf1] line-clamp-1">
                                 ${card.title}
                             </a>
-                            <p class="text-xs text-gray-400 mt-1 line-clamp-1">${card.genres || 'Action, Series'}</p>
                         </div>
-                        <div class="flex items-center justify-between gap-2 mt-3 pt-2 border-t border-gray-700/50">
-                            <a href="7anime_videoplayer.html?anime=${card.slug}" class="flex-1 bg-[#66fcf1] hover:bg-[#45a29e] text-black text-xs font-bold py-1.5 rounded text-center transition">
+                        <div class="flex items-center justify-between gap-1.5 mt-2 pt-1.5 border-t border-gray-800">
+                            <a href="7anime_videoplayer.html?anime=${card.slug}" class="flex-1 bg-[#66fcf1] hover:bg-[#45a29e] text-black text-[11px] font-bold py-1 rounded text-center transition">
                                 Watch
                             </a>
-                            <a href="download.html?anime=${card.slug}" class="bg-gray-800 hover:bg-gray-700 text-white text-xs p-1.5 rounded transition border border-gray-700" title="Download">
+                            <a href="download.html?anime=${card.slug}" class="bg-gray-800 hover:bg-gray-700 text-white text-[11px] p-1 rounded transition border border-gray-700" title="Download">
                                 <i class="fa-solid fa-download"></i>
                             </a>
                         </div>
