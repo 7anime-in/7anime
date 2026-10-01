@@ -252,17 +252,22 @@ async def auto_index_media(client, message):
 async def lifespan(app: FastAPI):
     global scanner_task
     print("🚀 Starting Pyrogram Client...")
-    await pyro_client.start()
-    print("✅ Telegram Client Started Successfully!")
+    pyro_started = False
+    try:
+        await pyro_client.start()
+        pyro_started = True
+        print("✅ Telegram Client Started Successfully!")
+        scanner_task = asyncio.create_task(channel_scanner_loop())
+    except Exception as e:
+        print(f"❌ Pyrogram Start Error: {e}")
+        print("⚠️ FastAPI will continue running to keep Render port active.")
 
-    scanner_task = asyncio.create_task(channel_scanner_loop())
-    
     yield
-    
+
     print("🛑 Shutting down Bot 1...")
     if scanner_task:
         scanner_task.cancel()
-    if pyro_client.is_connected:
+    if pyro_started and pyro_client.is_connected:
         await pyro_client.stop()
 
 app = FastAPI(title="Bot 1 - Scanner API", lifespan=lifespan)
@@ -307,3 +312,4 @@ async def rescan_api():
     anime_database.clear()
     asyncio.create_task(auto_scan_channels())
     return {"status": "Rescan initiated"}
+    
