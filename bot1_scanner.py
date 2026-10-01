@@ -8,7 +8,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from pyrogram import Client, filters
-from pyrogram.errors import FloodWait, ChannelPrivate, ChatAdminRequired, PeerIdInvalid
+from pyrogram.types import Message
 
 # ==================== ENVIRONMENT VARIABLES ====================
 API_ID = int(os.getenv("API_ID", "31169133"))
@@ -23,18 +23,10 @@ CHANNEL_IDS = [ch.strip() for ch in CHANNEL_INPUT.split(",") if ch.strip()]
 
 anime_database: Dict[str, Any] = {}
 scanner_task: asyncio.Task = None
-
-# Top-level Pyrogram Client Initialization
-pyro_client = Client(
-    "bot1_scanner_session",
-    api_id=API_ID,
-    api_hash=API_HASH,
-    bot_token=BOT_TOKEN,
-    in_memory=True
-)
+pyro_client: Client = None
 
 # ==================== HELPER FUNCTIONS ====================
-def is_video_message(message) -> bool:
+def is_video_message(message: Message) -> bool:
     if not message or message.empty:
         return False
     if message.video:
@@ -125,8 +117,7 @@ def add_to_database(chat_id: str, msg_id: int, caption: str, forward_title: str)
 
 # ==================== CHANNEL AUTO SCANNER ====================
 async def auto_scan_channels():
-    if not CHANNEL_IDS:
-        print("ℹ No CHANNEL_ID set. Skipping channel scan.")
+    if not CHANNEL_IDS or not pyro_client:
         return
 
     print("🔍 Bot 1 Scanning Telegram Channels...")
@@ -172,14 +163,8 @@ async def auto_scan_channels():
                         empty_count = 0
 
                     current_id += chunk_size
-                    await asyncio.sleep(0.2)  # Rate-limit safety delay
+                    await asyncio.sleep(0.2)
 
-                except FloodWait as e:
-                    print(f"⚠️ Telegram Rate Limit: waiting {e.value}s...")
-                    await asyncio.sleep(e.value + 1)
-                except (ChannelPrivate, ChatAdminRequired, PeerIdInvalid) as e:
-                    print(f"❌ Channel Access Error [{ch_id}]: {e}")
-                    break
                 except Exception:
                     current_id += chunk_size
 
@@ -192,83 +177,90 @@ async def channel_scanner_loop():
         await auto_scan_channels()
         await asyncio.sleep(600)
 
-# ==================== TELEGRAM HANDLERS ====================
-@pyro_client.on_message(filters.command(["start", "ping"]))
-async def start_cmd(client, message):
-    await message.reply_text(
-        "🤖 **Bot 1: Scanner & Master Router Bot Active!**\n\n"
-        "• `/stats` - Total indexed anime count\n"
-        "• `/rescan` - Rescan channels completely\n"
-        "• `/ping` - Check bot response status",
-        quote=True,
-    )
-
-@pyro_client.on_message(filters.command("stats"))
-async def stats_cmd(client, message):
-    total_anime = len(anime_database)
-    total_eps = sum(
-        len(ep_list)
-        for anime in anime_database.values()
-        for ep_list in anime.get("seasons", {}).values()
-    )
-    await message.reply_text(f"📊 **Total Anime:** `{total_anime}` | **Total Episodes:** `{total_eps}`", quote=True)
-
-@pyro_client.on_message(filters.command("rescan"))
-async def rescan_cmd(client, message):
-    anime_database.clear()
-    await message.reply_text("🔄 **Database Reset! Rescanning channels...**", quote=True)
-    asyncio.create_task(auto_scan_channels())
-
-@pyro_client.on_message((filters.video | filters.document) & ~filters.command(["start", "stats", "rescan", "ping"]))
-async def auto_index_media(client, message):
-    if not is_video_message(message):
-        return
-
-    chat = message.chat
-    chat_identifier = f"@{chat.username}" if chat.username else str(chat.id)
-    msg_id = message.id
-
-    caption = message.caption or getattr(message.video or message.document, "file_name", "") or ""
-    forward_title = (
-        message.forward_from_chat.title
-        if message.forward_from_chat
-        else (message.forward_sender_name or "")
-    )
-
-    add_to_database(chat_identifier, msg_id, caption, forward_title)
-    clean_chat = chat_identifier.replace("@", "")
-
-    stream_url = f"{BOT2_STREAM_BASE.rstrip('/')}/stream/{clean_chat}/{msg_id}.mp4"
-    download_url = f"{BOT3_DOWNLOAD_BASE.rstrip('/')}/download/{clean_chat}/{msg_id}"
-
-    await message.reply_text(
-        f"✅ **Video Indexed & Routed Successfully!**\n\n"
-        f"📺 **Bot 2 Stream Link:** `{stream_url}`\n"
-        f"📥 **Bot 3 Download Link:** `{download_url}`",
-        quote=True
-    )
-
-# ==================== LIFECYCLE ====================
+# ==================== LIFECYCLE & BOT COMMANDS (BOT 4 PATTERN) ====================
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    global scanner_task
-    print("🚀 Starting Pyrogram Client...")
-    pyro_started = False
-    try:
-        await pyro_client.start()
-        pyro_started = True
-        print("✅ Telegram Client Started Successfully!")
-        scanner_task = asyncio.create_task(channel_scanner_loop())
-    except Exception as e:
-        print(f"❌ Pyrogram Start Error: {e}")
-        print("⚠️ FastAPI will continue running to keep Render port active.")
+    global pyro_client, scanner_task
+    print("🚀 Starting Bot 1 (Scanner & Master Router Bot)...")
+
+    pyro_client = Client(
+        "bot1_scanner_session",
+        api_id=API_ID,
+        api_hash=API_HASH,
+        bot_token=BOT_TOKEN,
+    )
+
+    # /start & /ping Commands
+    @pyro_client.on_message(filters.command(["start", "ping"]))
+    async def start_cmd(client: Client, message: Message):
+        await message.reply_text(
+            "🤖 **Bot 1: Scanner & Master Router Bot Active!**\n\n"
+            "• `/stats` - Total indexed anime count\n"
+            "• `/rescan` - Rescan channels completely\n"
+            "• `/ping` - Check bot response status",
+            quote=True,
+        )
+
+    # /stats Command
+    @pyro_client.on_message(filters.command("stats"))
+    async def stats_cmd(client: Client, message: Message):
+        total_anime = len(anime_database)
+        total_eps = sum(
+            len(ep_list)
+            for anime in anime_database.values()
+            for ep_list in anime.get("seasons", {}).values()
+        )
+        await message.reply_text(f"📊 **Total Anime:** `{total_anime}` | **Total Episodes:** `{total_eps}`", quote=True)
+
+    # /rescan Command
+    @pyro_client.on_message(filters.command("rescan"))
+    async def rescan_cmd(client: Client, message: Message):
+        anime_database.clear()
+        await message.reply_text("🔄 **Database Reset! Rescanning channels...**", quote=True)
+        asyncio.create_task(auto_scan_channels())
+
+    # Media Auto-Indexing Handler
+    @pyro_client.on_message((filters.video | filters.document) & ~filters.command(["start", "stats", "rescan", "ping"]))
+    async def auto_index_media(client: Client, message: Message):
+        if not is_video_message(message):
+            return
+
+        chat = message.chat
+        chat_identifier = f"@{chat.username}" if chat.username else str(chat.id)
+        msg_id = message.id
+
+        caption = message.caption or getattr(message.video or message.document, "file_name", "") or ""
+        forward_title = (
+            message.forward_from_chat.title
+            if message.forward_from_chat
+            else (message.forward_sender_name or "")
+        )
+
+        add_to_database(chat_identifier, msg_id, caption, forward_title)
+        clean_chat = chat_identifier.replace("@", "")
+
+        stream_url = f"{BOT2_STREAM_BASE.rstrip('/')}/stream/{clean_chat}/{msg_id}.mp4"
+        download_url = f"{BOT3_DOWNLOAD_BASE.rstrip('/')}/download/{clean_chat}/{msg_id}"
+
+        await message.reply_text(
+            f"✅ **Video Indexed & Routed Successfully!**\n\n"
+            f"📺 **Bot 2 Stream Link:** `{stream_url}`\n"
+            f"📥 **Bot 3 Download Link:** `{download_url}`",
+            quote=True
+        )
+
+    # Fast non-blocking startup (Same as Bot 4)
+    asyncio.create_task(pyro_client.start())
+    print("✅ Bot 1 Active & Ready!")
+
+    # Background Scanner Task
+    scanner_task = asyncio.create_task(channel_scanner_loop())
 
     yield
 
-    print("🛑 Shutting down Bot 1...")
     if scanner_task:
         scanner_task.cancel()
-    if pyro_started and pyro_client.is_connected:
+    if pyro_client and pyro_client.is_connected:
         await pyro_client.stop()
 
 app = FastAPI(title="Bot 1 - Scanner API", lifespan=lifespan)
