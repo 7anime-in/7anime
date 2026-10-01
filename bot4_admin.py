@@ -19,7 +19,7 @@ API_HASH = os.getenv("API_HASH", "b836f4b836df4cf83c2d475a5ad3b285")
 BOT_TOKEN = os.getenv("BOT4_TOKEN") or os.getenv("BOT_TOKEN")
 
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN", "")
-GITHUB_REPO = os.getenv("GITHUB_REPO", "")  # Format: "username/repository"
+GITHUB_REPO = os.getenv("GITHUB_REPO", "")
 DATA_FILE_PATH = "site_data.json"
 
 DEFAULT_SITE_DATA = {
@@ -55,7 +55,7 @@ pyro_client = Client(
 def fetch_from_github():
     global site_data
     if not GITHUB_TOKEN or not GITHUB_REPO:
-        print("⚠️ GITHUB_TOKEN or GITHUB_REPO not set. Using default memory.")
+        print("⚠️ GITHUB_TOKEN or GITHUB_REPO not set.", flush=True)
         return
 
     url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{DATA_FILE_PATH}"
@@ -70,13 +70,12 @@ def fetch_from_github():
             data = json.loads(res.read().decode("utf-8"))
             content = base64.b64decode(data["content"]).decode("utf-8")
             site_data = json.loads(content)
-            print("✅ Successfully synced site_data.json from GitHub!")
+            print("✅ Sync site_data.json from GitHub successful!", flush=True)
     except Exception as e:
-        print(f"⚠️ Could not fetch site_data.json from GitHub: {e}")
+        print(f"⚠️ Could not fetch site_data.json from GitHub: {e}", flush=True)
 
 def save_to_github():
     if not GITHUB_TOKEN or not GITHUB_REPO:
-        print("⚠️ GITHUB_TOKEN or GITHUB_REPO missing. Skipping GitHub commit.")
         return
 
     url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{DATA_FILE_PATH}"
@@ -113,102 +112,99 @@ def save_to_github():
             method="PUT"
         )
         with urllib.request.urlopen(req) as res:
-            print("🚀 site_data.json committed directly to GitHub Repo!")
+            print("🚀 site_data.json saved to GitHub Repo!", flush=True)
     except Exception as e:
-        print(f"❌ Error committing to GitHub: {e}")
+        print(f"❌ Error committing to GitHub: {e}", flush=True)
 
 # ==================== TELEGRAM COMMAND HANDLERS ====================
-@pyro_client.on_message(filters.command("start"))
-async def start_cmd(client: Client, message: Message):
-    help_text = (
-        "👑 **Bot 4: Website Content Manager Active!**\n\n"
-        "🔹 `/addcard Title | Image_URL | Genres | Rating`\n"
-        "🔹 `/removecard slug`\n"
-        "🔹 `/setbanner Title | Image_URL | Description | Play_Slug`\n"
-        "🔹 `/listcards` - Active cards list\n"
-        "🔹 `/getbanner` - Current banner info"
-    )
-    await message.reply_text(help_text, quote=True)
+@pyro_client.on_message(filters.private)
+async def debug_all_private_messages(client: Client, message: Message):
+    print(f"📩 Incoming Message in Private: {message.text}", flush=True)
 
-@pyro_client.on_message(filters.command("addcard"))
-async def add_card_cmd(client: Client, message: Message):
-    raw_text = message.text.replace("/addcard", "").strip()
-    parts = [p.strip() for p in raw_text.split("|")]
-    if len(parts) < 4:
-        await message.reply_text("⚠️ Usage: `/addcard Title | Image_URL | Genres | Rating`", quote=True)
-        return
+    if message.text and message.text.startswith("/start"):
+        help_text = (
+            "👑 **Bot 4: Website Content Manager Active!**\n\n"
+            "🔹 `/addcard Title | Image_URL | Genres | Rating`\n"
+            "🔹 `/removecard slug`\n"
+            "🔹 `/setbanner Title | Image_URL | Description | Play_Slug`\n"
+            "🔹 `/listcards` - Active cards list\n"
+            "🔹 `/getbanner` - Current banner info"
+        )
+        await message.reply_text(help_text, quote=True)
 
-    title, img_url, genres, rating = parts[0], parts[1], parts[2], parts[3]
-    slug = re.sub(r'[^a-zA-Z0-9]', '_', title.lower()).strip('_')
+    elif message.text and message.text.startswith("/addcard"):
+        raw_text = message.text.replace("/addcard", "").strip()
+        parts = [p.strip() for p in raw_text.split("|")]
+        if len(parts) < 4:
+            await message.reply_text("⚠️ Usage: `/addcard Title | Image_URL | Genres | Rating`", quote=True)
+            return
 
-    if "cards" not in site_data or not isinstance(site_data["cards"], dict):
-        site_data["cards"] = {}
+        title, img_url, genres, rating = parts[0], parts[1], parts[2], parts[3]
+        slug = re.sub(r'[^a-zA-Z0-9]', '_', title.lower()).strip('_')
 
-    site_data["cards"][slug] = {
-        "title": title,
-        "image": img_url,
-        "genres": genres,
-        "rating": rating,
-        "slug": slug
-    }
-    asyncio.create_task(asyncio.to_thread(save_to_github))
+        if "cards" not in site_data or not isinstance(site_data["cards"], dict):
+            site_data["cards"] = {}
 
-    await message.reply_text(f"✅ **Card Added & Saved to GitHub!**\n📌 **Title:** {title}\n🔗 **Slug:** `{slug}`", quote=True)
-
-@pyro_client.on_message(filters.command("removecard"))
-async def remove_card_cmd(client: Client, message: Message):
-    slug = message.text.replace("/removecard", "").strip().lower()
-    cards = site_data.get("cards", {})
-    if slug in cards:
-        deleted = cards.pop(slug)
+        site_data["cards"][slug] = {
+            "title": title,
+            "image": img_url,
+            "genres": genres,
+            "rating": rating,
+            "slug": slug
+        }
         asyncio.create_task(asyncio.to_thread(save_to_github))
-        await message.reply_text(f"🗑️ Card **{deleted['title']}** removed & saved to GitHub!", quote=True)
-    else:
-        await message.reply_text(f"⚠️ Slug `{slug}` not found!", quote=True)
+        await message.reply_text(f"✅ **Card Added & Saved to GitHub!**\n📌 **Title:** {title}\n🔗 **Slug:** `{slug}`", quote=True)
 
-@pyro_client.on_message(filters.command("setbanner"))
-async def set_banner_cmd(client: Client, message: Message):
-    raw_text = message.text.replace("/setbanner", "").strip()
-    parts = [p.strip() for p in raw_text.split("|")]
-    if len(parts) < 4:
-        await message.reply_text("⚠️ Usage: `/setbanner Title | Image_URL | Description | Play_Slug`", quote=True)
-        return
+    elif message.text and message.text.startswith("/removecard"):
+        slug = message.text.replace("/removecard", "").strip().lower()
+        cards = site_data.get("cards", {})
+        if slug in cards:
+            deleted = cards.pop(slug)
+            asyncio.create_task(asyncio.to_thread(save_to_github))
+            await message.reply_text(f"🗑️ Card **{deleted['title']}** removed!", quote=True)
+        else:
+            await message.reply_text(f"⚠️ Slug `{slug}` not found!", quote=True)
 
-    site_data["banner"] = {
-        "title": parts[0],
-        "image": parts[1],
-        "description": parts[2],
-        "play_slug": parts[3]
-    }
-    asyncio.create_task(asyncio.to_thread(save_to_github))
-    await message.reply_text("🎨 **Hero Banner Updated & Saved to GitHub!**", quote=True)
+    elif message.text and message.text.startswith("/setbanner"):
+        raw_text = message.text.replace("/setbanner", "").strip()
+        parts = [p.strip() for p in raw_text.split("|")]
+        if len(parts) < 4:
+            await message.reply_text("⚠️ Usage: `/setbanner Title | Image_URL | Description | Play_Slug`", quote=True)
+            return
 
-@pyro_client.on_message(filters.command("listcards"))
-async def list_cards_cmd(client: Client, message: Message):
-    cards = site_data.get("cards", {})
-    if not cards:
-        await message.reply_text("📭 No cards listed.", quote=True)
-        return
-    msg = "📜 **Current Anime Cards:\n\n"
-    for slug, card in cards.items():
-        msg += f"• ** | Slug: `{slug}`\n"
-    await message.reply_text(msg, quote=True)
+        site_data["banner"] = {
+            "title": parts[0],
+            "image": parts[1],
+            "description": parts[2],
+            "play_slug": parts[3]
+        }
+        asyncio.create_task(asyncio.to_thread(save_to_github))
+        await message.reply_text("🎨 **Hero Banner Updated & Saved to GitHub!**", quote=True)
 
-@pyro_client.on_message(filters.command("getbanner"))
-async def get_banner_cmd(client: Client, message: Message):
-    b = site_data.get("banner", {})
-    if not b:
-        await message.reply_text("📭 No banner set.", quote=True)
-        return
-    await message.reply_text(f"🖼️ **Hero Banner:** {b.get('title')}\n🔗 **Play Slug:** `{b.get('play_slug')}`", quote=True)
+    elif message.text and message.text.startswith("/listcards"):
+        cards = site_data.get("cards", {})
+        if not cards:
+            await message.reply_text("📭 No cards listed.", quote=True)
+            return
+        msg = "📜 **Current Anime Cards:\n\n"
+        for slug, card in cards.items():
+            msg += f"• ** | Slug: `{slug}`\n"
+        await message.reply_text(msg, quote=True)
+
+    elif message.text and message.text.startswith("/getbanner"):
+        b = site_data.get("banner", {})
+        if not b:
+            await message.reply_text("📭 No banner set.", quote=True)
+            return
+        await message.reply_text(f"🖼️ **Hero Banner:** {b.get('title')}\n🔗 **Play Slug:** `{b.get('play_slug')}`", quote=True)
 
 # ==================== LIFECYCLE ====================
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    print("🚀 Starting Bot 4 (Admin Content Manager)...")
+    print("🚀 Starting Bot 4 (Admin Content Manager)...", flush=True)
     fetch_from_github()
     await pyro_client.start()
-    print("✅ Bot 4 Active & Ready!")
+    print("✅ Bot 4 Active & Listening!", flush=True)
     yield
     if pyro_client and pyro_client.is_connected:
         await pyro_client.stop()
