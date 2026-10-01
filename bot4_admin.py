@@ -16,10 +16,10 @@ from pyrogram.types import Message
 # ==================== ENVIRONMENT VARIABLES ====================
 API_ID = int(os.getenv("API_ID", "31169133"))
 API_HASH = os.getenv("API_HASH", "b836f4b836df4cf83c2d475a5ad3b285")
-BOT_TOKEN = os.getenv("BOT4_TOKEN") or os.getenv("BOT_TOKEN", "8854095839:AAH8pFz3ZszE7Gyp0AY1if7JY2NoC18bNJg")
+BOT_TOKEN = os.getenv("BOT4_TOKEN") or os.getenv("BOT_TOKEN")
 
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN", "")
-GITHUB_REPO = os.getenv("GITHUB_REPO", "")  # Format: "username/repository" (e.g. 7anime-in/7anime)
+GITHUB_REPO = os.getenv("GITHUB_REPO", "")  # Format: "username/repository"
 DATA_FILE_PATH = "site_data.json"
 
 DEFAULT_SITE_DATA = {
@@ -76,7 +76,7 @@ def fetch_from_github():
 
 def save_to_github():
     if not GITHUB_TOKEN or not GITHUB_REPO:
-        print("⚠️️ GITHUB_TOKEN or GITHUB_REPO missing. Skipping GitHub commit.")
+        print("⚠️ GITHUB_TOKEN or GITHUB_REPO missing. Skipping GitHub commit.")
         return
 
     url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{DATA_FILE_PATH}"
@@ -207,7 +207,7 @@ async def get_banner_cmd(client: Client, message: Message):
 async def lifespan(app: FastAPI):
     print("🚀 Starting Bot 4 (Admin Content Manager)...")
     fetch_from_github()
-    asyncio.create_task(pyro_client.start())
+    await pyro_client.start()
     print("✅ Bot 4 Active & Ready!")
     yield
     if pyro_client and pyro_client.is_connected:
@@ -233,4 +233,5 @@ def get_site_data():
     return {
         "banner": site_data.get("banner", DEFAULT_SITE_DATA["banner"]),
         "cards": list(site_data.get("cards", {}).values())
-}
+    }
+    
