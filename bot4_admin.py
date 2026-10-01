@@ -17,7 +17,6 @@ from pyrogram.types import Message
 API_ID = int(os.getenv("API_ID", "31169133"))
 API_HASH = os.getenv("API_HASH", "b836f4b836df4cf83c2d475a5ad3b285")
 
-# Hardcoded direct token to avoid Render Environment Variable overrides
 BOT_TOKEN = "8854095839:AAFKUKA8Bd8Hk-3_DzRKLdKdEvLR4awz5Fw"
 
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN", "").strip()
@@ -37,6 +36,7 @@ DEFAULT_SITE_DATA = {
             "image": "https://m.media-amazon.com/images/M/MV5BODlhM2RmM2ItM2FkYi00ZGY2LTg2NzAtNjg4NTgwOGVhMDFkXkEyXkFqcGdeQXVyMTI1NDEyNTM5._V1_.jpg",
             "genres": "Action, Fantasy",
             "rating": "9.2",
+            "type": "series",
             "slug": "solo_leveling"
         }
     }
@@ -126,33 +126,71 @@ async def lifespan(app: FastAPI):
         in_memory=True
     )
 
-    # /start & /help
+    # Detailed /start & /help Command Guide
     @pyro_client.on_message(filters.command(["start", "help"]))
     async def start_cmd(client: Client, message: Message):
         help_text = (
-            "👑 **Bot 4: Website Content Manager Active!**\n\n"
-            "🔹 `/addcard Title | Image_URL | Genres | Rating`\n"
-            "🔹 `/removecard slug`\n"
-            "🔹 `/setbanner Title | Image_URL | Description | Play_Slug`\n"
-            "🔹 `/listcards` - Active cards list\n"
-            "🔹 `/getbanner` - Current banner info"
+            "👑 **Bot 4: Website Content Manager - Full Command Guide** 🚀\n\n"
+            "Is bot ka use karke tum website (`site_data.json`) ke cards aur banner ko Telegram se hi manage kar sakte ho.\n\n"
+            "━━━━━━━━━━━━━━━━━━━━━━\n"
+            "📌 **CARD MANAGEMENT COMMANDS**\n"
+            "━━━━━━━━━━━━━━━━━━━━━━\n\n"
+            "1️⃣ **/addcard** - Naya Anime Card Add Karein\n"
+            "• **Syntax:** `/addcard Title | Image_URL | Genres | Rating | [Type]`\n"
+            "• **Type Options:** `series`, `movie`, `hentai` (Default: `series`)\n"
+            "• **Examples:**\n"
+            "  - *Series:* `/addcard Solo Leveling | https://link.com/img.jpg | Action, Fantasy | 9.2 | series`\n"
+            "  - *Movie:* `/addcard Your Name | https://link.com/img.jpg | Romance, Drama | 9.0 | movie`\n"
+            "  - *Hentai (18+):* `/addcard Overflow | https://link.com/img.jpg | Romance | 8.5 | hentai`\n\n"
+
+            "2️⃣ **/editcard** - Pehle Se Bane Card Ko Update Karein\n"
+            "• **Syntax:** `/editcard Slug | Title | Image_URL | Genres | Rating | [Type]`\n"
+            "• **Example:**\n"
+            "  `/editcard solo_leveling | Solo Leveling Season 2 | https://link.com/new.jpg | Action | 9.5 | series`\n\n"
+
+            "3️⃣ **/removecard** - Kisi Card Ko Delete Karein\n"
+            "• **Syntax:** `/removecard Slug`\n"
+            "• **Example:** `/removecard solo_leveling`\n\n"
+
+            "4️⃣ **/listcards** - Website Ke Sabhi Active Cards Ki List Dekhein\n"
+            "• **Command:** `/listcards`\n\n"
+
+            "━━━━━━━━━━━━━━━━━━━━━━\n"
+            "🖼️ **HERO BANNER COMMANDS**\n"
+            "━━━━━━━━━━━━━━━━━━━━━━\n\n"
+
+            "5️⃣ **/setbanner** ya **/editbanner** - Website Ka Main Banner Update Karein\n"
+            "• **Syntax:** `/setbanner Title | Image_URL | Description | Play_Slug`\n"
+            "• **Example:**\n"
+            "  `/setbanner Solo Leveling | https://link.com/banner.jpg | 10 years ago gates opened... | solo_leveling`\n\n"
+
+            "6️⃣ **/removebanner** - Current Banner Ko Hatao/Clear Karein\n"
+            "• **Command:** `/removebanner`\n\n"
+
+            "7️⃣ **/getbanner** - Current Set Banner Ki Information Dekhein\n"
+            "• **Command:** `/getbanner`"
         )
         await message.reply_text(help_text, quote=True)
 
-    # /addcard
+    # /addcard (With Category Badge Support)
     @pyro_client.on_message(filters.command("addcard"))
     async def add_card_cmd(client: Client, message: Message):
         split_text = message.text.split(maxsplit=1)
         if len(split_text) < 2:
-            await message.reply_text("⚠️ Usage: `/addcard Title | Image_URL | Genres | Rating`", quote=True)
+            await message.reply_text("⚠️ Usage: `/addcard Title | Image_URL | Genres | Rating | [Type]`", quote=True)
             return
 
         parts = [p.strip() for p in split_text[1].split("|")]
         if len(parts) < 4:
-            await message.reply_text("⚠️ Usage: `/addcard Title | Image_URL | Genres | Rating`", quote=True)
+            await message.reply_text("⚠️ Usage: `/addcard Title | Image_URL | Genres | Rating | [Type]`", quote=True)
             return
 
         title, img_url, genres, rating = parts[0], parts[1], parts[2], parts[3]
+        card_type = parts[4].lower() if len(parts) >= 5 and parts[4].strip() else "series"
+
+        if card_type not in ["series", "movie", "hentai"]:
+            card_type = "series"
+
         slug = re.sub(r'[^a-z0-9_]+', '_', title.lower()).strip('_')
 
         if "cards" not in site_data or not isinstance(site_data["cards"], dict):
@@ -163,10 +201,54 @@ async def lifespan(app: FastAPI):
             "image": img_url,
             "genres": genres,
             "rating": rating,
+            "type": card_type,
             "slug": slug
         }
         asyncio.create_task(asyncio.to_thread(save_to_github))
-        await message.reply_text(f"✅ **Card Added & Saved!**\n📌 **Title:** {title}\n🔗 **Slug:** `{slug}`", quote=True)
+        await message.reply_text(
+            f"✅ **Card Added & Saved!**\n"
+            f"📌 **Title:** {title}\n"
+            f"🏷️ **Type:** `{card_type.upper()}`\n"
+            f"🔗 **Slug:** `{slug}`", 
+            quote=True
+        )
+
+    # /editcard
+    @pyro_client.on_message(filters.command("editcard"))
+    async def edit_card_cmd(client: Client, message: Message):
+        split_text = message.text.split(maxsplit=1)
+        if len(split_text) < 2:
+            await message.reply_text("⚠️ Usage: `/editcard Slug | Title | Image_URL | Genres | Rating | [Type]`", quote=True)
+            return
+
+        parts = [p.strip() for p in split_text[1].split("|")]
+        if len(parts) < 5:
+            await message.reply_text("⚠️ Usage: `/editcard Slug | Title | Image_URL | Genres | Rating | [Type]`", quote=True)
+            return
+
+        target_slug = parts[0].lower().strip()
+        cards = site_data.get("cards", {})
+
+        if target_slug not in cards:
+            await message.reply_text(f"❌ Card with slug `{target_slug}` not found!", quote=True)
+            return
+
+        title, img_url, genres, rating = parts[1], parts[2], parts[3], parts[4]
+        card_type = parts[5].lower() if len(parts) >= 6 and parts[5].strip() else cards[target_slug].get("type", "series")
+
+        if card_type not in ["series", "movie", "hentai"]:
+            card_type = "series"
+
+        cards[target_slug].update({
+            "title": title,
+            "image": img_url,
+            "genres": genres,
+            "rating": rating,
+            "type": card_type
+        })
+
+        asyncio.create_task(asyncio.to_thread(save_to_github))
+        await message.reply_text(f"✏️ **Card Updated & Saved!**\n📌 **Slug:** `{target_slug}`\n🏷️ **Type:** `{card_type.upper()}`", quote=True)
 
     # /removecard
     @pyro_client.on_message(filters.command("removecard"))
@@ -187,8 +269,8 @@ async def lifespan(app: FastAPI):
         else:
             await message.reply_text(f"⚠️ Slug `{slug}` not found!", quote=True)
 
-    # /setbanner
-    @pyro_client.on_message(filters.command("setbanner"))
+    # /setbanner & /editbanner
+    @pyro_client.on_message(filters.command(["setbanner", "editbanner"]))
     async def set_banner_cmd(client: Client, message: Message):
         split_text = message.text.split(maxsplit=1)
         if len(split_text) < 2:
@@ -207,7 +289,14 @@ async def lifespan(app: FastAPI):
             "play_slug": parts[3]
         }
         asyncio.create_task(asyncio.to_thread(save_to_github))
-        await message.reply_text("🎨 **Hero Banner Updated & Saved!**", quote=True)
+        await message.reply_text(f"🎨 **Hero Banner Updated & Saved!**\n📌 **Title:** {parts[0]}", quote=True)
+
+    # /removebanner
+    @pyro_client.on_message(filters.command("removebanner"))
+    async def remove_banner_cmd(client: Client, message: Message):
+        site_data["banner"] = {}
+        asyncio.create_task(asyncio.to_thread(save_to_github))
+        await message.reply_text("🗑️ **Hero Banner Removed & Saved!**", quote=True)
 
     # /listcards
     @pyro_client.on_message(filters.command("listcards"))
@@ -218,7 +307,8 @@ async def lifespan(app: FastAPI):
             return
         msg = "📜 **Current Anime Cards:**\n\n"
         for slug, card in cards.items():
-            msg += f"• **{card.get('title', 'N/A')}** | Slug: `{slug}`\n"
+            card_type = card.get('type', 'series').upper()
+            msg += f"• **{card.get('title', 'N/A')}** `[{card_type}]` | Slug: `{slug}`\n"
         await message.reply_text(msg, quote=True)
 
     # /getbanner
@@ -226,7 +316,7 @@ async def lifespan(app: FastAPI):
     async def get_banner_cmd(client: Client, message: Message):
         b = site_data.get("banner", {})
         if not isinstance(b, dict) or not b:
-            await message.reply_text("📭 No banner set.", quote=True)
+            await message.reply_text("📭 No active banner set.", quote=True)
             return
         await message.reply_text(f"🖼️ **Hero Banner:** {b.get('title')}\n🔗 **Play Slug:** `{b.get('play_slug')}`", quote=True)
 
@@ -265,5 +355,5 @@ def get_site_data():
     return {
         "banner": banner_data,
         "cards": cards_list
-        }
+    }
     
