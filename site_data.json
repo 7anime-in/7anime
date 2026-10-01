@@ -5,5 +5,14 @@
         "description": "10 Years ago, after the Gate connected the real world with the monster world, Sung Jinwoo became the weakest hunter.",
         "play_slug": "solo_leveling"
     },
-    "cards": {}
+    "cards": {
+        "solo_leveling": {
+            "title": "solo leveling",
+            "image": "https://drive.google.com/file/d/1hZPMLLUNMOVG8DmSd1eGd5Nmdgh6AUYZ/view?usp=drivesdk",
+            "genres": "action, fantasy, and adventure",
+            "rating": "9.2",
+            "type": "series",
+            "slug": "solo_leveling"
+        }
+    }
 }
