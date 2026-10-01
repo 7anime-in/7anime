@@ -8,7 +8,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from pyrogram import Client, filters
-from pyrogram.errors import FloodWait
+from pyrogram.errors import FloodWait, ChannelPrivate, ChatAdminRequired, PeerIdInvalid
 
 # ==================== ENVIRONMENT VARIABLES ====================
 API_ID = int(os.getenv("API_ID", "31169133"))
@@ -18,17 +18,19 @@ BOT_TOKEN = os.getenv("BOT_TOKEN", "8517895964:AAHQlTU8BBM2HBRCatn5qh45jW-KeP67q
 BOT2_STREAM_BASE = os.getenv("BOT2_STREAM_BASE", "https://7anime-bot2-streamer.onrender.com")
 BOT3_DOWNLOAD_BASE = os.getenv("BOT3_DOWNLOAD_BASE", "https://7anime-bot3-downloader.onrender.com")
 
-CHANNEL_INPUT = os.getenv("CHANNEL_ID", "-1004315586873,-1004409520918,sevenanime_ch1")
+CHANNEL_INPUT = os.getenv("CHANNEL_ID", "sevenanime_ch1")
 CHANNEL_IDS = [ch.strip() for ch in CHANNEL_INPUT.split(",") if ch.strip()]
 
 anime_database: Dict[str, Any] = {}
+background_task: asyncio.Task = None
 
-# Top-level Pyrogram Client Initialization
+# Top-level Pyrogram Client Initialization (In Memory Session for Render Multi-worker Safety)
 pyro_client = Client(
     "bot1_scanner_session",
     api_id=API_ID,
     api_hash=API_HASH,
     bot_token=BOT_TOKEN,
+    in_memory=True
 )
 
 # ==================== HELPER FUNCTIONS ====================
@@ -124,7 +126,7 @@ def add_to_database(chat_id: str, msg_id: int, caption: str, forward_title: str)
 # ==================== CHANNEL AUTO SCANNER ====================
 async def auto_scan_channels():
     if not CHANNEL_IDS:
-        print("ℹ️ No CHANNEL_ID set. Skipping channel scan.")
+        print("ℹ No CHANNEL_ID set. Skipping channel scan.")
         return
 
     print("🔍 Bot 1 Scanning Telegram Channels...")
@@ -133,7 +135,13 @@ async def auto_scan_channels():
         if not ch_id:
             continue
         try:
-            target_chat = int(ch_id) if (ch_id.startswith("-") or ch_id.isdigit()) else (ch_id if ch_id.startswith("@") else f"@{ch_id}")
+            # Safe Parsing for Numeric Private Channel IDs and Public Usernames
+            if ch_id.startswith("-100") or ch_id.startswith("-"):
+                target_chat = int(ch_id)
+            elif ch_id.isdigit():
+                target_chat = int(f"-100{ch_id}")
+            else:
+                target_chat = ch_id if ch_id.startswith("@") else f"@{ch_id}"
             
             chunk_size = 100
             current_id = 1
@@ -170,6 +178,9 @@ async def auto_scan_channels():
                 except FloodWait as e:
                     print(f"⚠️ Telegram Rate Limit: waiting {e.value}s...")
                     await asyncio.sleep(e.value + 1)
+                except (ChannelPrivate, ChatAdminRequired, PeerIdInvalid) as e:
+                    print(f"❌ Channel Access Error [{ch_id}]: {e}")
+                    break
                 except Exception:
                     current_id += chunk_size
 
@@ -179,11 +190,14 @@ async def auto_scan_channels():
 
 async def start_telegram_bot_and_scanner():
     try:
-        await pyro_client.start()
+        if not pyro_client.is_connected:
+            await pyro_client.start()
         print("✅ Telegram Client Started Successfully!")
         while True:
             await auto_scan_channels()
             await asyncio.sleep(600)
+    except asyncio.CancelledError:
+        print("🛑 Scanner Task Safely Cancelled.")
     except Exception as e:
         print(f"❌ Error starting Pyrogram Client: {e}")
 
@@ -245,9 +259,13 @@ async def auto_index_media(client, message):
 # ==================== LIFECYCLE ====================
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    global background_task
     print("Starting Bot 1 (Scanner Engine)...")
-    asyncio.create_task(start_telegram_bot_and_scanner())
+    background_task = asyncio.create_task(start_telegram_bot_and_scanner())
     yield
+    print("Shutting down Bot 1...")
+    if background_task:
+        background_task.cancel()
     if pyro_client and pyro_client.is_connected:
         await pyro_client.stop()
 
@@ -285,7 +303,9 @@ def get_anime_episodes(anime_slug: str):
         if clean_query in clean_key or clean_key in clean_query:
             return anime_database[key]
 
-    return list(anime_database.values())[0]
+    # SAFE FALLBACK: Crash Prevention
+    default_title = anime_slug.replace("_", " ").title()
+    return list(anime_database.values())[0] if anime_database else {"title": default_title, "seasons": {"1": []}}
 
 @app.get("/api/rescan")
 async def rescan_api():
