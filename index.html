@@ -57,7 +57,7 @@
         <div class="relative max-w-7xl mx-auto px-4 pb-8 w-full z-10 flex flex-col gap-3">
             <span class="bg-[#66fcf1] text-black font-bold text-xs uppercase px-2.5 py-1 rounded w-fit">Featured Anime</span>
             <h1 id="bannerTitle" class="text-3xl md:text-5xl font-black text-white drop-shadow-md">Loading Hero Banner...</h1>
-            <p id="bannerDesc" class="text-sm md:text-base text-gray-300 max-w-2xl line-clamp-3">Please wait while content loads from server...</p>
+            <p id="bannerDesc" class="text-sm md:text-base text-gray-300 max-w-2xl line-clamp-3">Please wait while content loads...</p>
             
             <div class="flex items-center gap-4 mt-2">
                 <a id="bannerPlayBtn" href="#" class="bg-[#66fcf1] hover:bg-[#45a29e] text-black font-bold px-6 py-2.5 rounded-lg flex items-center gap-2 transition">
@@ -95,13 +95,10 @@
 
     <!-- ==================== JS LOGIC ==================== -->
     <script>
-        // Render Web Service Base URLs (Update these after Render deployment)
         const BOT1_API = "https://7anime-bot1-scanner.onrender.com";
-        const BOT4_API = "https://7anime-bot4-admin.onrender.com";
 
         let allAnimeCards = [];
 
-        // Fallback Default Banner Data
         const defaultBanner = {
             title: "Solo Leveling",
             image: "https://m.media-amazon.com/images/M/MV5BODlhM2RmM2ItM2FkYi00ZGY2LTg2NzAtNjg4NTgwOGVhMDFkXkEyXkFqcGdeQXVyMTI1NDEyNTM5._V1_.jpg",
@@ -109,24 +106,36 @@
             play_slug: "solo_leveling"
         };
 
-        // Initialize Page Data
+        // Helper: Convert Google Drive URLs to Direct Displayable Image URLs
+        function formatImageUrl(url) {
+            if (!url) return "https://via.placeholder.com/300x420/1f2833/ffffff?text=7anime";
+            
+            const driveMatch = url.match(/\/d\/([a-zA-Z0-9_-]+)/) || url.match(/id=([a-zA-Z0-9_-]+)/);
+            if (driveMatch && driveMatch[1]) {
+                return `https://lh3.googleusercontent.com/d/${driveMatch[1]}`;
+            }
+            return url;
+        }
+
         async function initPage() {
             await Promise.all([loadBannerAndAdminCards(), loadScannedAnime()]);
         }
 
-        // Fetch Hero Banner & Admin Cards from Bot 4
+        // Direct local fetch from site_data.json (GitHub Pages CDN - Super Fast & Zero Server Load)
         async function loadBannerAndAdminCards() {
             try {
-                const res = await fetch(`${BOT4_API}/api/site-data`);
-                if (!res.ok) throw new Error("Bot 4 Offline");
-                const data = await res.json();
+                const res = await fetch(`./site_data.json?v=${Date.now()}`);
+                if (!res.ok) throw new Error("site_data.json not found");
+                
+                const rawJson = await res.json();
+                const cardsList = rawJson.cards ? Object.values(rawJson.cards) : [];
 
-                renderHeroBanner(data.banner || defaultBanner);
-                if (data.cards && data.cards.length > 0) {
-                    mergeCards(data.cards);
+                renderHeroBanner(rawJson.banner || defaultBanner);
+                if (cardsList.length > 0) {
+                    mergeCards(cardsList);
                 }
             } catch (err) {
-                console.warn("Using Default Banner due to Bot 4 offline:", err);
+                console.warn("Fallback to default banner:", err);
                 renderHeroBanner(defaultBanner);
             }
         }
@@ -155,26 +164,27 @@
             }
         }
 
-        // Merge and Render Cards uniquely
         function mergeCards(newCards) {
             newCards.forEach(card => {
-                if (!allAnimeCards.some(c => c.slug === card.slug)) {
+                const existingIndex = allAnimeCards.findIndex(c => c.slug === card.slug);
+                if (existingIndex > -1) {
+                    allAnimeCards[existingIndex] = { ...allAnimeCards[existingIndex], ...card };
+                } else {
                     allAnimeCards.push(card);
                 }
             });
             renderCardsGrid(allAnimeCards);
         }
 
-        // Render Hero Banner UI
         function renderHeroBanner(banner) {
-            document.getElementById("heroSection").style.backgroundImage = `url('${banner.image}')`;
-            document.getElementById("bannerTitle").innerText = banner.title;
-            document.getElementById("bannerDesc").innerText = banner.description;
-            document.getElementById("bannerPlayBtn").href = `7anime_videoplayer.html?anime=${banner.play_slug}`;
-            document.getElementById("bannerDownloadBtn").href = `download.html?anime=${banner.play_slug}`;
+            const bgImg = formatImageUrl(banner.image);
+            document.getElementById("heroSection").style.backgroundImage = `url('${bgImg}')`;
+            document.getElementById("bannerTitle").innerText = banner.title || "Solo Leveling";
+            document.getElementById("bannerDesc").innerText = banner.description || "";
+            document.getElementById("bannerPlayBtn").href = `7anime_videoplayer.html?anime=${banner.play_slug || 'solo_leveling'}`;
+            document.getElementById("bannerDownloadBtn").href = `download.html?anime=${banner.play_slug || 'solo_leveling'}`;
         }
 
-        // Render Anime Cards Grid UI
         function renderCardsGrid(cards) {
             const grid = document.getElementById("animeGrid");
             document.getElementById("totalCardsCount").innerText = `${cards.length} Titles Available`;
@@ -188,7 +198,7 @@
                 <div class="bg-[#1f2833] rounded-xl overflow-hidden shadow-lg border border-gray-800 card-hover flex flex-col justify-between">
                     <a href="7anime_videoplayer.html?anime=${card.slug}">
                         <div class="relative aspect-[3/4] w-full overflow-hidden bg-gray-900">
-                            <img src="${card.image}" alt="${card.title}" class="w-full h-full object-cover" onerror="this.src='https://via.placeholder.com/300x420/1f2833/ffffff?text=7anime'">
+                            <img src="${formatImageUrl(card.image)}" alt="${card.title}" class="w-full h-full object-cover" onerror="this.src='https://via.placeholder.com/300x420/1f2833/ffffff?text=7anime'">
                             <span class="absolute top-2 right-2 bg-black/80 text-[#66fcf1] font-bold text-xs px-2 py-0.5 rounded flex items-center gap-1">
                                 <i class="fa-solid fa-star text-yellow-400"></i> ${card.rating || '8.0'}
                             </span>
@@ -214,7 +224,6 @@
             `).join("");
         }
 
-        // Real-time Search Handler
         function handleSearch() {
             const query = document.getElementById("searchInput").value.toLowerCase().trim();
             if (!query) {
@@ -228,7 +237,6 @@
             renderCardsGrid(filtered);
         }
 
-        // Start execution on page load
         window.addEventListener("DOMContentLoaded", initPage);
     </script>
 </body>
