@@ -64,7 +64,7 @@ def fetch_from_github():
             site_data = json.loads(content)
             print("✅ Sync site_data.json from GitHub successful!", flush=True)
     except Exception as e:
-        print(f"⚠️ Could not fetch site_data.json from GitHub (Using Default): {e}", flush=True)
+        print(f"⚠️ Could not fetch site_data.json from GitHub: {e}", flush=True)
 
 def save_to_github():
     if not GITHUB_TOKEN or not GITHUB_REPO:
@@ -124,7 +124,6 @@ async def lifespan(app: FastAPI):
         in_memory=True
     )
 
-    # /start & /help Command
     @pyro_client.on_message(filters.command(["start", "help"]))
     async def start_cmd(client: Client, message: Message):
         help_text = (
@@ -137,7 +136,6 @@ async def lifespan(app: FastAPI):
         )
         await message.reply_text(help_text, quote=True)
 
-    # /addcard Command
     @pyro_client.on_message(filters.command("addcard"))
     async def add_card_cmd(client: Client, message: Message):
         raw_text = message.text.replace("/addcard", "").strip()
@@ -162,7 +160,6 @@ async def lifespan(app: FastAPI):
         asyncio.create_task(asyncio.to_thread(save_to_github))
         await message.reply_text(f"✅ **Card Added & Saved to GitHub!**\n📌 **Title:** {title}\n🔗 **Slug:** `{slug}`", quote=True)
 
-    # /removecard Command
     @pyro_client.on_message(filters.command("removecard"))
     async def remove_card_cmd(client: Client, message: Message):
         slug = message.text.replace("/removecard", "").strip().lower()
@@ -174,7 +171,6 @@ async def lifespan(app: FastAPI):
         else:
             await message.reply_text(f"⚠️ Slug `{slug}` not found!", quote=True)
 
-    # /setbanner Command
     @pyro_client.on_message(filters.command("setbanner"))
     async def set_banner_cmd(client: Client, message: Message):
         raw_text = message.text.replace("/setbanner", "").strip()
@@ -192,7 +188,6 @@ async def lifespan(app: FastAPI):
         asyncio.create_task(asyncio.to_thread(save_to_github))
         await message.reply_text("🎨 **Hero Banner Updated & Saved to GitHub!**", quote=True)
 
-    # /listcards Command
     @pyro_client.on_message(filters.command("listcards"))
     async def list_cards_cmd(client: Client, message: Message):
         cards = site_data.get("cards", {})
@@ -204,7 +199,6 @@ async def lifespan(app: FastAPI):
             msg += f"• ** | Slug: `{slug}`\n"
         await message.reply_text(msg, quote=True)
 
-    # /getbanner Command
     @pyro_client.on_message(filters.command("getbanner"))
     async def get_banner_cmd(client: Client, message: Message):
         b = site_data.get("banner", {})
@@ -213,7 +207,7 @@ async def lifespan(app: FastAPI):
             return
         await message.reply_text(f"🖼️ **Hero Banner:** {b.get('title')}\n🔗 **Play Slug:** `{b.get('play_slug')}`", quote=True)
 
-    # Non-blocking start on Uvicorn event loop (Exact Bot 1 method)
+    # Non-blocking Pyrogram Start (Exactly like Bot 1)
     asyncio.create_task(pyro_client.start())
     print("✅ Bot 4 Active & Ready!", flush=True)
 
@@ -243,4 +237,4 @@ def get_site_data():
         "banner": site_data.get("banner", DEFAULT_SITE_DATA["banner"]),
         "cards": list(site_data.get("cards", {}).values())
     }
-    
+        
