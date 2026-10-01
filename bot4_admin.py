@@ -16,7 +16,7 @@ from pyrogram.types import Message
 # ==================== ENVIRONMENT VARIABLES ====================
 API_ID = int(os.getenv("API_ID", "31169133"))
 API_HASH = os.getenv("API_HASH", "b836f4b836df4cf83c2d475a5ad3b285")
-BOT_TOKEN = os.getenv("BOT4_TOKEN") or os.getenv("BOT_TOKEN")
+BOT_TOKEN = os.getenv("BOT4_TOKEN") or os.getenv("BOT_TOKEN") or "8854095839:AAFKUKA8Bd8Hk-3_DzRKLdKdEvLR4awz5Fw"
 
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN", "")
 GITHUB_REPO = os.getenv("GITHUB_REPO", "")
@@ -41,15 +41,7 @@ DEFAULT_SITE_DATA = {
 }
 
 site_data: Dict[str, Any] = DEFAULT_SITE_DATA.copy()
-
-# ==================== PYROGRAM CLIENT SETUP ====================
-pyro_client = Client(
-    "bot4_admin_session",
-    api_id=API_ID,
-    api_hash=API_HASH,
-    bot_token=BOT_TOKEN,
-    in_memory=True
-)
+pyro_client: Client = None
 
 # ==================== GITHUB AUTO-COMMIT LOGIC ====================
 def fetch_from_github():
@@ -72,7 +64,7 @@ def fetch_from_github():
             site_data = json.loads(content)
             print("✅ Sync site_data.json from GitHub successful!", flush=True)
     except Exception as e:
-        print(f"⚠️ Could not fetch site_data.json from GitHub: {e}", flush=True)
+        print(f"⚠️ Could not fetch site_data.json from GitHub (Using Default): {e}", flush=True)
 
 def save_to_github():
     if not GITHUB_TOKEN or not GITHUB_REPO:
@@ -116,12 +108,25 @@ def save_to_github():
     except Exception as e:
         print(f"❌ Error committing to GitHub: {e}", flush=True)
 
-# ==================== TELEGRAM COMMAND HANDLERS ====================
-@pyro_client.on_message(filters.private)
-async def debug_all_private_messages(client: Client, message: Message):
-    print(f"📩 Incoming Message in Private: {message.text}", flush=True)
+# ==================== LIFECYCLE & COMMAND HANDLERS ====================
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    global pyro_client
+    print("🚀 Starting Bot 4 (Admin Content Manager)...", flush=True)
 
-    if message.text and message.text.startswith("/start"):
+    fetch_from_github()
+
+    pyro_client = Client(
+        "bot4_admin_session",
+        api_id=API_ID,
+        api_hash=API_HASH,
+        bot_token=BOT_TOKEN,
+        in_memory=True
+    )
+
+    # /start & /help Command
+    @pyro_client.on_message(filters.command(["start", "help"]))
+    async def start_cmd(client: Client, message: Message):
         help_text = (
             "👑 **Bot 4: Website Content Manager Active!**\n\n"
             "🔹 `/addcard Title | Image_URL | Genres | Rating`\n"
@@ -132,7 +137,9 @@ async def debug_all_private_messages(client: Client, message: Message):
         )
         await message.reply_text(help_text, quote=True)
 
-    elif message.text and message.text.startswith("/addcard"):
+    # /addcard Command
+    @pyro_client.on_message(filters.command("addcard"))
+    async def add_card_cmd(client: Client, message: Message):
         raw_text = message.text.replace("/addcard", "").strip()
         parts = [p.strip() for p in raw_text.split("|")]
         if len(parts) < 4:
@@ -155,7 +162,9 @@ async def debug_all_private_messages(client: Client, message: Message):
         asyncio.create_task(asyncio.to_thread(save_to_github))
         await message.reply_text(f"✅ **Card Added & Saved to GitHub!**\n📌 **Title:** {title}\n🔗 **Slug:** `{slug}`", quote=True)
 
-    elif message.text and message.text.startswith("/removecard"):
+    # /removecard Command
+    @pyro_client.on_message(filters.command("removecard"))
+    async def remove_card_cmd(client: Client, message: Message):
         slug = message.text.replace("/removecard", "").strip().lower()
         cards = site_data.get("cards", {})
         if slug in cards:
@@ -165,7 +174,9 @@ async def debug_all_private_messages(client: Client, message: Message):
         else:
             await message.reply_text(f"⚠️ Slug `{slug}` not found!", quote=True)
 
-    elif message.text and message.text.startswith("/setbanner"):
+    # /setbanner Command
+    @pyro_client.on_message(filters.command("setbanner"))
+    async def set_banner_cmd(client: Client, message: Message):
         raw_text = message.text.replace("/setbanner", "").strip()
         parts = [p.strip() for p in raw_text.split("|")]
         if len(parts) < 4:
@@ -181,7 +192,9 @@ async def debug_all_private_messages(client: Client, message: Message):
         asyncio.create_task(asyncio.to_thread(save_to_github))
         await message.reply_text("🎨 **Hero Banner Updated & Saved to GitHub!**", quote=True)
 
-    elif message.text and message.text.startswith("/listcards"):
+    # /listcards Command
+    @pyro_client.on_message(filters.command("listcards"))
+    async def list_cards_cmd(client: Client, message: Message):
         cards = site_data.get("cards", {})
         if not cards:
             await message.reply_text("📭 No cards listed.", quote=True)
@@ -191,21 +204,21 @@ async def debug_all_private_messages(client: Client, message: Message):
             msg += f"• ** | Slug: `{slug}`\n"
         await message.reply_text(msg, quote=True)
 
-    elif message.text and message.text.startswith("/getbanner"):
+    # /getbanner Command
+    @pyro_client.on_message(filters.command("getbanner"))
+    async def get_banner_cmd(client: Client, message: Message):
         b = site_data.get("banner", {})
         if not b:
             await message.reply_text("📭 No banner set.", quote=True)
             return
         await message.reply_text(f"🖼️ **Hero Banner:** {b.get('title')}\n🔗 **Play Slug:** `{b.get('play_slug')}`", quote=True)
 
-# ==================== LIFECYCLE ====================
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    print("🚀 Starting Bot 4 (Admin Content Manager)...", flush=True)
-    fetch_from_github()
-    await pyro_client.start()
-    print("✅ Bot 4 Active & Listening!", flush=True)
+    # Non-blocking start on Uvicorn event loop (Exact Bot 1 method)
+    asyncio.create_task(pyro_client.start())
+    print("✅ Bot 4 Active & Ready!", flush=True)
+
     yield
+
     if pyro_client and pyro_client.is_connected:
         await pyro_client.stop()
 
