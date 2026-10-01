@@ -13,13 +13,15 @@ from fastapi.middleware.cors import CORSMiddleware
 from pyrogram import Client, filters
 from pyrogram.types import Message
 
-# ==================== ENVIRONMENT VARIABLES ====================
+# ==================== CONFIGURATION ====================
 API_ID = int(os.getenv("API_ID", "31169133"))
 API_HASH = os.getenv("API_HASH", "b836f4b836df4cf83c2d475a5ad3b285")
-BOT_TOKEN = os.getenv("BOT4_TOKEN") or os.getenv("BOT_TOKEN") or "8854095839:AAFKUKA8Bd8Hk-3_DzRKLdKdEvLR4awz5Fw"
 
-GITHUB_TOKEN = os.getenv("GITHUB_TOKEN", "")
-GITHUB_REPO = os.getenv("GITHUB_REPO", "")
+# Hardcoded direct token to avoid Render Environment Variable overrides
+BOT_TOKEN = "8854095839:AAFKUKA8Bd8Hk-3_DzRKLdKdEvLR4awz5Fw"
+
+GITHUB_TOKEN = os.getenv("GITHUB_TOKEN", "").strip()
+GITHUB_REPO = os.getenv("GITHUB_REPO", "").strip()
 DATA_FILE_PATH = "site_data.json"
 
 DEFAULT_SITE_DATA = {
@@ -47,7 +49,7 @@ pyro_client: Client = None
 def fetch_from_github():
     global site_data
     if not GITHUB_TOKEN or not GITHUB_REPO:
-        print("⚠️ GITHUB_TOKEN or GITHUB_REPO not set.", flush=True)
+        print("⚠️ GITHUB_TOKEN or GITHUB_REPO not set. Using default site_data.", flush=True)
         return
 
     url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{DATA_FILE_PATH}"
@@ -62,9 +64,9 @@ def fetch_from_github():
             data = json.loads(res.read().decode("utf-8"))
             content = base64.b64decode(data["content"]).decode("utf-8")
             site_data = json.loads(content)
-            print("✅ Sync site_data.json from GitHub successful!", flush=True)
+            print("✅ site_data.json fetched successfully from GitHub!", flush=True)
     except Exception as e:
-        print(f"⚠️ Could not fetch site_data.json from GitHub: {e}", flush=True)
+        print(f"⚠️ GitHub fetch warning: {e}. Using default site_data.", flush=True)
 
 def save_to_github():
     if not GITHUB_TOKEN or not GITHUB_REPO:
@@ -124,6 +126,7 @@ async def lifespan(app: FastAPI):
         in_memory=True
     )
 
+    # /start & /help
     @pyro_client.on_message(filters.command(["start", "help"]))
     async def start_cmd(client: Client, message: Message):
         help_text = (
@@ -136,16 +139,21 @@ async def lifespan(app: FastAPI):
         )
         await message.reply_text(help_text, quote=True)
 
+    # /addcard
     @pyro_client.on_message(filters.command("addcard"))
     async def add_card_cmd(client: Client, message: Message):
-        raw_text = message.text.replace("/addcard", "").strip()
-        parts = [p.strip() for p in raw_text.split("|")]
+        split_text = message.text.split(maxsplit=1)
+        if len(split_text) < 2:
+            await message.reply_text("⚠️ Usage: `/addcard Title | Image_URL | Genres | Rating`", quote=True)
+            return
+
+        parts = [p.strip() for p in split_text[1].split("|")]
         if len(parts) < 4:
             await message.reply_text("⚠️ Usage: `/addcard Title | Image_URL | Genres | Rating`", quote=True)
             return
 
         title, img_url, genres, rating = parts[0], parts[1], parts[2], parts[3]
-        slug = re.sub(r'[^a-zA-Z0-9]', '_', title.lower()).strip('_')
+        slug = re.sub(r'[^a-z0-9_]+', '_', title.lower()).strip('_')
 
         if "cards" not in site_data or not isinstance(site_data["cards"], dict):
             site_data["cards"] = {}
@@ -158,23 +166,36 @@ async def lifespan(app: FastAPI):
             "slug": slug
         }
         asyncio.create_task(asyncio.to_thread(save_to_github))
-        await message.reply_text(f"✅ **Card Added & Saved to GitHub!**\n📌 **Title:** {title}\n🔗 **Slug:** `{slug}`", quote=True)
+        await message.reply_text(f"✅ **Card Added & Saved!**\n📌 **Title:** {title}\n🔗 **Slug:** `{slug}`", quote=True)
 
+    # /removecard
     @pyro_client.on_message(filters.command("removecard"))
     async def remove_card_cmd(client: Client, message: Message):
-        slug = message.text.replace("/removecard", "").strip().lower()
+        split_text = message.text.split(maxsplit=1)
+        if len(split_text) < 2:
+            await message.reply_text("⚠️ Usage: `/removecard slug`", quote=True)
+            return
+
+        raw_slug = split_text[1].strip().lower()
+        slug = re.sub(r'[^a-z0-9_]+', '_', raw_slug).strip('_')
+
         cards = site_data.get("cards", {})
-        if slug in cards:
+        if isinstance(cards, dict) and slug in cards:
             deleted = cards.pop(slug)
             asyncio.create_task(asyncio.to_thread(save_to_github))
             await message.reply_text(f"🗑️ Card **{deleted['title']}** removed!", quote=True)
         else:
             await message.reply_text(f"⚠️ Slug `{slug}` not found!", quote=True)
 
+    # /setbanner
     @pyro_client.on_message(filters.command("setbanner"))
     async def set_banner_cmd(client: Client, message: Message):
-        raw_text = message.text.replace("/setbanner", "").strip()
-        parts = [p.strip() for p in raw_text.split("|")]
+        split_text = message.text.split(maxsplit=1)
+        if len(split_text) < 2:
+            await message.reply_text("⚠️ Usage: `/setbanner Title | Image_URL | Description | Play_Slug`", quote=True)
+            return
+
+        parts = [p.strip() for p in split_text[1].split("|")]
         if len(parts) < 4:
             await message.reply_text("⚠️ Usage: `/setbanner Title | Image_URL | Description | Play_Slug`", quote=True)
             return
@@ -186,30 +207,32 @@ async def lifespan(app: FastAPI):
             "play_slug": parts[3]
         }
         asyncio.create_task(asyncio.to_thread(save_to_github))
-        await message.reply_text("🎨 **Hero Banner Updated & Saved to GitHub!**", quote=True)
+        await message.reply_text("🎨 **Hero Banner Updated & Saved!**", quote=True)
 
+    # /listcards
     @pyro_client.on_message(filters.command("listcards"))
     async def list_cards_cmd(client: Client, message: Message):
         cards = site_data.get("cards", {})
-        if not cards:
+        if not isinstance(cards, dict) or not cards:
             await message.reply_text("📭 No cards listed.", quote=True)
             return
-        msg = "📜 **Current Anime Cards:\n\n"
+        msg = "📜 **Current Anime Cards:**\n\n"
         for slug, card in cards.items():
-            msg += f"• ** | Slug: `{slug}`\n"
+            msg += f"• **{card.get('title', 'N/A')}** | Slug: `{slug}`\n"
         await message.reply_text(msg, quote=True)
 
+    # /getbanner
     @pyro_client.on_message(filters.command("getbanner"))
     async def get_banner_cmd(client: Client, message: Message):
         b = site_data.get("banner", {})
-        if not b:
+        if not isinstance(b, dict) or not b:
             await message.reply_text("📭 No banner set.", quote=True)
             return
         await message.reply_text(f"🖼️ **Hero Banner:** {b.get('title')}\n🔗 **Play Slug:** `{b.get('play_slug')}`", quote=True)
 
-    # Non-blocking Pyrogram Start (Exactly like Bot 1)
+    # Non-blocking startup
     asyncio.create_task(pyro_client.start())
-    print("✅ Bot 4 Active & Ready!", flush=True)
+    print("✅ Bot 4 Connected & Listening!", flush=True)
 
     yield
 
@@ -233,8 +256,14 @@ def home():
 
 @app.get("/api/site-data")
 def get_site_data():
+    raw_cards = site_data.get("cards", {})
+    cards_list = list(raw_cards.values()) if isinstance(raw_cards, dict) else []
+    
+    raw_banner = site_data.get("banner", {})
+    banner_data = raw_banner if isinstance(raw_banner, dict) else DEFAULT_SITE_DATA["banner"]
+
     return {
-        "banner": site_data.get("banner", DEFAULT_SITE_DATA["banner"]),
-        "cards": list(site_data.get("cards", {}).values())
-    }
-        
+        "banner": banner_data,
+        "cards": cards_list
+        }
+    
