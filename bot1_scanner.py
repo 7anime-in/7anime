@@ -13,7 +13,7 @@ from pyrogram.errors import FloodWait, ChannelPrivate, ChatAdminRequired, PeerId
 # ==================== ENVIRONMENT VARIABLES ====================
 API_ID = int(os.getenv("API_ID", "31169133"))
 API_HASH = os.getenv("API_HASH", "b836f4b836df4cf83c2d475a5ad3b285")
-BOT_TOKEN = os.getenv("BOT_TOKEN", "8517895964:AAHQlTU8BBM2HBRCatn5qh45jW-KeP67q3o")
+BOT_TOKEN = os.getenv("BOT_TOKEN", "8517895964:AAEx3rrj9dGS-EdFX5X20ehXmHRafqJlSrM")
 
 BOT2_STREAM_BASE = os.getenv("BOT2_STREAM_BASE", "https://7anime-bot2-streamer.onrender.com")
 BOT3_DOWNLOAD_BASE = os.getenv("BOT3_DOWNLOAD_BASE", "https://7anime-bot3-downloader.onrender.com")
