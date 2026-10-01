@@ -172,7 +172,7 @@ async def auto_scan_channels():
                         empty_count = 0
 
                     current_id += chunk_size
-                    await asyncio.sleep(0.05)
+                    await asyncio.sleep(0.2)  # Rate-limit safety delay
 
                 except FloodWait as e:
                     print(f"⚠️ Telegram Rate Limit: waiting {e.value}s...")
@@ -256,8 +256,6 @@ async def lifespan(app: FastAPI):
     pyro_started = False
     try:
         await pyro_client.start()
-        # Old webhook delete kar rahe hain taaki DM direct receive hon
-        await pyro_client.delete_webhook(drop_pending_updates=True)
         pyro_started = True
         print("✅ Telegram Client Started Successfully!")
         scanner_task = asyncio.create_task(channel_scanner_loop())
