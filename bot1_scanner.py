@@ -22,9 +22,9 @@ CHANNEL_INPUT = os.getenv("CHANNEL_ID", "sevenanime_ch1")
 CHANNEL_IDS = [ch.strip() for ch in CHANNEL_INPUT.split(",") if ch.strip()]
 
 anime_database: Dict[str, Any] = {}
-background_task: asyncio.Task = None
+scanner_task: asyncio.Task = None
 
-# Top-level Pyrogram Client Initialization (In Memory Session for Render Multi-worker Safety)
+# Top-level Pyrogram Client Initialization
 pyro_client = Client(
     "bot1_scanner_session",
     api_id=API_ID,
@@ -135,7 +135,6 @@ async def auto_scan_channels():
         if not ch_id:
             continue
         try:
-            # Safe Parsing for Numeric Private Channel IDs and Public Usernames
             if ch_id.startswith("-100") or ch_id.startswith("-"):
                 target_chat = int(ch_id)
             elif ch_id.isdigit():
@@ -188,18 +187,10 @@ async def auto_scan_channels():
         except Exception as e:
             print(f"⚠️ Error scanning channel {ch_id}: {e}")
 
-async def start_telegram_bot_and_scanner():
-    try:
-        if not pyro_client.is_connected:
-            await pyro_client.start()
-        print("✅ Telegram Client Started Successfully!")
-        while True:
-            await auto_scan_channels()
-            await asyncio.sleep(600)
-    except asyncio.CancelledError:
-        print("🛑 Scanner Task Safely Cancelled.")
-    except Exception as e:
-        print(f"❌ Error starting Pyrogram Client: {e}")
+async def channel_scanner_loop():
+    while True:
+        await auto_scan_channels()
+        await asyncio.sleep(600)
 
 # ==================== TELEGRAM HANDLERS ====================
 @pyro_client.on_message(filters.command("start"))
@@ -259,14 +250,19 @@ async def auto_index_media(client, message):
 # ==================== LIFECYCLE ====================
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    global background_task
-    print("Starting Bot 1 (Scanner Engine)...")
-    background_task = asyncio.create_task(start_telegram_bot_and_scanner())
+    global scanner_task
+    print("🚀 Starting Pyrogram Client...")
+    await pyro_client.start()
+    print("✅ Telegram Client Started Successfully!")
+
+    scanner_task = asyncio.create_task(channel_scanner_loop())
+    
     yield
-    print("Shutting down Bot 1...")
-    if background_task:
-        background_task.cancel()
-    if pyro_client and pyro_client.is_connected:
+    
+    print("🛑 Shutting down Bot 1...")
+    if scanner_task:
+        scanner_task.cancel()
+    if pyro_client.is_connected:
         await pyro_client.stop()
 
 app = FastAPI(title="Bot 1 - Scanner API", lifespan=lifespan)
@@ -303,7 +299,6 @@ def get_anime_episodes(anime_slug: str):
         if clean_query in clean_key or clean_key in clean_query:
             return anime_database[key]
 
-    # SAFE FALLBACK: Crash Prevention
     default_title = anime_slug.replace("_", " ").title()
     return list(anime_database.values())[0] if anime_database else {"title": default_title, "seasons": {"1": []}}
 
@@ -312,4 +307,3 @@ async def rescan_api():
     anime_database.clear()
     asyncio.create_task(auto_scan_channels())
     return {"status": "Rescan initiated"}
-    
