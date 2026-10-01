@@ -193,12 +193,13 @@ async def channel_scanner_loop():
         await asyncio.sleep(600)
 
 # ==================== TELEGRAM HANDLERS ====================
-@pyro_client.on_message(filters.command("start"))
+@pyro_client.on_message(filters.command(["start", "ping"]))
 async def start_cmd(client, message):
     await message.reply_text(
         "🤖 **Bot 1: Scanner & Master Router Bot Active!**\n\n"
         "• `/stats` - Total indexed anime count\n"
-        "• `/rescan` - Rescan channels completely",
+        "• `/rescan` - Rescan channels completely\n"
+        "• `/ping` - Check bot response status",
         quote=True,
     )
 
@@ -218,7 +219,7 @@ async def rescan_cmd(client, message):
     await message.reply_text("🔄 **Database Reset! Rescanning channels...**", quote=True)
     asyncio.create_task(auto_scan_channels())
 
-@pyro_client.on_message((filters.video | filters.document) & ~filters.command(["start", "stats", "rescan"]))
+@pyro_client.on_message((filters.video | filters.document) & ~filters.command(["start", "stats", "rescan", "ping"]))
 async def auto_index_media(client, message):
     if not is_video_message(message):
         return
@@ -255,6 +256,8 @@ async def lifespan(app: FastAPI):
     pyro_started = False
     try:
         await pyro_client.start()
+        # Old webhook delete kar rahe hain taaki DM direct receive hon
+        await pyro_client.delete_webhook(drop_pending_updates=True)
         pyro_started = True
         print("✅ Telegram Client Started Successfully!")
         scanner_task = asyncio.create_task(channel_scanner_loop())
