@@ -301,3 +301,4 @@ async def rescan_api():
     anime_database.clear()
     asyncio.create_task(auto_scan_channels())
     return {"status": "Rescan initiated"}
+    
