@@ -12,6 +12,9 @@
     <!-- ArtPlayer CDN CSS & JS -->
     <script src="https://cdn.jsdelivr.net/npm/artplayer/dist/artplayer.js"></script>
 
+    <!-- SwarmCloud / CDNBye MP4 P2P Engine Script -->
+    <script src="https://cdn.jsdelivr.net/npm/cdnbye-mp4@latest/dist/index.min.js"></script>
+
     <style>
         body {
             background-color: #0b0c10;
@@ -64,9 +67,13 @@
         <!-- ==================== VIDEO DETAILS & CONTROLS ==================== -->
         <div class="bg-[#1f2833] p-4 md:p-6 rounded-xl border border-gray-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-                <div class="flex items-center gap-2 mb-1">
+                <div class="flex items-center gap-2 mb-1 flex-wrap">
                     <span id="dubBadge" class="bg-emerald-500/20 text-emerald-400 text-xs font-bold px-2.5 py-0.5 rounded border border-emerald-500/30 uppercase">Official Dub</span>
                     <span id="seasonBadge" class="bg-gray-800 text-gray-300 text-xs font-bold px-2.5 py-0.5 rounded border border-gray-700">Season 1</span>
+                    <!-- P2P Live Status Badge -->
+                    <span id="p2pStatusBadge" class="bg-cyan-500/20 text-cyan-400 text-xs font-bold px-2.5 py-0.5 rounded border border-cyan-500/30">
+                        <i class="fa-solid fa-network-wired mr-1"></i> P2P Active: <span id="p2pPeersCount">0 Peers</span>
+                    </span>
                 </div>
                 <h1 id="animeTitleDisplay" class="text-xl md:text-2xl font-bold text-white">Loading Anime Details...</h1>
                 <p id="currentEpTitle" class="text-sm text-gray-400 mt-0.5">Episode 1</p>
@@ -130,7 +137,7 @@
 
     <!-- ==================== FOOTER ==================== -->
     <footer class="bg-[#1f2833] border-t border-gray-800 text-center py-6 text-sm text-gray-400 mt-auto">
-        <p>© 2026 7anime Engine. Streaming via Bot 2 | Downloads via Bot 3.</p>
+        <p>© 2026 7anime Engine. Streaming via Bot 2 | Downloads via Bot 3 | WebRTC P2P Enabled.</p>
     </footer>
 
     <!-- ==================== JS LOGIC ==================== -->
@@ -144,6 +151,7 @@
         let currentEpNum = 1;
         let activeEpisodeObj = null;
         let art = null;
+        let p2pEngine = null; // P2P Instance Holder
 
         const urlParams = new URLSearchParams(window.location.search);
         const animeSlug = urlParams.get('anime') || 'solo_leveling';
@@ -158,12 +166,19 @@
             }
         }
 
-        // Optimized Mobile-Friendly ArtPlayer Setup
+        // Optimized ArtPlayer Setup with WebRTC P2P
         function setupArtPlayer(videoUrl) {
             errorOverlay.classList.add("hidden");
 
+            // Clean up previous ArtPlayer instance
             if (art) {
                 art.destroy(false);
+            }
+
+            // Clean up previous P2P Engine instance
+            if (p2pEngine && typeof p2pEngine.destroy === 'function') {
+                p2pEngine.destroy();
+                p2pEngine = null;
             }
 
             art = new Artplayer({
@@ -188,12 +203,35 @@
                 }
             });
 
-            // Hide error banner when video buffers properly
-            art.on('video:canplay', () => {
+            // Initialize SwarmCloud WebRTC P2P Engine when Player is Ready
+            art.on('ready', () => {
                 errorOverlay.classList.add("hidden");
+
+                if (window.P2pEngineMp4 && P2pEngineMp4.isSupported()) {
+                    p2pEngine = new P2pEngineMp4({
+                        video: art.video,
+                        segmentId: videoUrl, // Unique Identifier for peers watching same stream
+                        trackerZone: 'global',
+                    });
+
+                    // Update Peer Count in UI
+                    p2pEngine.on('peers', (peers) => {
+                        const count = peers.length;
+                        const peerBadge = document.getElementById("p2pPeersCount");
+                        if (peerBadge) {
+                            peerBadge.innerText = `${count} ${count === 1 ? 'Peer' : 'Peers'}`;
+                        }
+                    });
+
+                    // Log Data Stats
+                    p2pEngine.on('stats', (stats) => {
+                        console.log(`[P2P Stats] P2P: ${(stats.totalP2PDownloaded / 1024 / 1024).toFixed(2)} MB | HTTP: ${(stats.totalHttpDownloaded / 1024 / 1024).toFixed(2)} MB`);
+                    });
+                }
             });
 
-            art.on('ready', () => {
+            // Hide error banner when video buffers properly
+            art.on('video:canplay', () => {
                 errorOverlay.classList.add("hidden");
             });
 
@@ -347,7 +385,7 @@
                 downloadUrl = `${BOT3_DOWNLOAD_BASE}/download/${epObj.chat_id}/${epObj.msg_id}`;
             }
 
-            // Load Video inside ArtPlayer
+            // Load Video inside ArtPlayer + P2P Engine
             setupArtPlayer(streamUrl);
 
             // Update Download Button
