@@ -18,6 +18,7 @@
             background-color: #66fcf1 !important;
             color: #000000 !important;
             font-weight: bold;
+            border-color: #66fcf1 !important;
         }
     </style>
 </head>
@@ -40,7 +41,7 @@
     <main class="max-w-6xl mx-auto px-4 py-6 flex-1 w-full flex flex-col gap-6">
 
         <!-- ==================== VIDEO PLAYER CONTAINER ==================== -->
-        <div class="bg-black rounded-2xl overflow-hidden shadow-2xl border border-gray-800 aspect-video relative">
+        <div class="bg-black rounded-2xl overflow-hidden shadow-2xl border border-gray-800 aspect-video relative flex items-center justify-center">
             <video 
                 id="videoPlayer" 
                 controls 
@@ -52,9 +53,19 @@
                 <source id="videoSource" src="" type="video/mp4">
                 Aapka browser HTML5 video tag support nahi karta.
             </video>
+            
+            <!-- Error Banner Overlay -->
+            <div id="playerErrorOverlay" class="hidden absolute inset-0 bg-black/90 flex flex-col items-center justify-center p-6 text-center z-10">
+                <i class="fa-solid fa-triangle-exclamation text-amber-400 text-4xl mb-2"></i>
+                <h3 class="text-white font-bold text-lg">Video Playback Error</h3>
+                <p class="text-xs text-gray-400 max-w-md mt-1">Video stream load hone me dikkat ho rahi hai. Kripya dubaara try karein ya server switch karein.</p>
+                <button onclick="retryCurrentEpisode()" class="mt-4 bg-[#66fcf1] text-black font-bold text-xs px-4 py-2 rounded-lg hover:bg-[#45a29e] transition">
+                    <i class="fa-solid fa-rotate-right mr-1"></i> Retry Stream
+                </button>
+            </div>
         </div>
 
-        <!-- ==================== VIDEO DETAILS & BOT 3 DOWNLOAD BAR ==================== -->
+        <!-- ==================== VIDEO DETAILS & CONTROLS ==================== -->
         <div class="bg-[#1f2833] p-4 md:p-6 rounded-xl border border-gray-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
                 <div class="flex items-center gap-2 mb-1">
@@ -65,24 +76,40 @@
                 <p id="currentEpTitle" class="text-sm text-gray-400 mt-0.5">Episode 1</p>
             </div>
 
-            <!-- BOT 3 CONNECTED DOWNLOAD BUTTONS -->
-            <div class="flex items-center gap-3 w-full md:w-auto">
+            <!-- BOT 3 DOWNLOAD & PREV/NEXT BUTTONS -->
+            <div class="flex flex-wrap items-center gap-2.5 w-full md:w-auto">
+                <!-- Navigation Controls -->
+                <button 
+                    id="prevEpBtn" 
+                    onclick="playNextOrPrev(-1)" 
+                    class="bg-gray-800 hover:bg-gray-700 text-white font-semibold px-3 py-2.5 rounded-lg border border-gray-700 text-xs transition flex items-center gap-1 disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                    <i class="fa-solid fa-backward-step"></i> Prev
+                </button>
+                <button 
+                    id="nextEpBtn" 
+                    onclick="playNextOrPrev(1)" 
+                    class="bg-gray-800 hover:bg-gray-700 text-white font-semibold px-3 py-2.5 rounded-lg border border-gray-700 text-xs transition flex items-center gap-1 disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                    Next <i class="fa-solid fa-forward-step"></i>
+                </button>
+
                 <!-- Direct Single Episode Download (Connected to Bot 3) -->
                 <a 
                     id="bot3DownloadBtn" 
                     href="#" 
                     target="_blank" 
-                    class="flex-1 md:flex-initial bg-[#66fcf1] hover:bg-[#45a29e] text-black font-extrabold px-6 py-3 rounded-lg flex items-center justify-center gap-2 transition shadow-lg text-sm"
+                    class="bg-[#66fcf1] hover:bg-[#45a29e] text-black font-extrabold px-5 py-2.5 rounded-lg flex items-center justify-center gap-2 transition shadow-lg text-xs"
                 >
-                    <i class="fa-solid fa-cloud-arrow-down text-lg"></i>
-                    <span>Download Episode</span>
+                    <i class="fa-solid fa-cloud-arrow-down text-sm"></i>
+                    <span>Download</span>
                 </a>
 
                 <!-- Multi-Episode / Full Season Download Page -->
                 <a 
                     id="fullDownloadPageBtn" 
                     href="#" 
-                    class="bg-gray-800 hover:bg-gray-700 text-white font-semibold px-4 py-3 rounded-lg flex items-center justify-center gap-2 transition border border-gray-700 text-sm"
+                    class="bg-gray-800 hover:bg-gray-700 text-white font-semibold px-3.5 py-2.5 rounded-lg flex items-center justify-center gap-2 transition border border-gray-700 text-xs"
                     title="All Episodes Download Page"
                 >
                     <i class="fa-solid fa-list-check"></i>
@@ -121,16 +148,21 @@
     <script>
         // Render Web Services Base Endpoints
         const BOT1_API = "https://7anime-bot1-scanner.onrender.com";
-        const BOT2_STREAM_BASE = "https://7anime-bot2-streamer.onrender.com";
+        const BOT2_STREAM_BASE = "https://sevenanime-bot2-streamer.onrender.com";
         const BOT3_DOWNLOAD_BASE = "https://7anime-bot3-downloader.onrender.com";
 
         let animeData = null;
         let currentSeason = "1";
         let currentEpNum = 1;
+        let activeEpisodeObj = null;
 
         // URL query parameter parse karein (e.g. ?anime=solo_leveling)
         const urlParams = new URLSearchParams(window.location.search);
         const animeSlug = urlParams.get('anime') || 'solo_leveling';
+
+        const player = document.getElementById("videoPlayer");
+        const source = document.getElementById("videoSource");
+        const errorOverlay = document.getElementById("playerErrorOverlay");
 
         // Initialize Player Page
         async function initPlayer() {
@@ -145,7 +177,7 @@
 
                 renderSeasonTabs();
                 
-                // Select first season & episode
+                // Select first available season & episode
                 const seasons = Object.keys(animeData.seasons || {});
                 if(seasons.length > 0) {
                     currentSeason = seasons[0];
@@ -153,7 +185,7 @@
                     
                     const firstEpList = animeData.seasons[currentSeason];
                     if(firstEpList && firstEpList.length > 0) {
-                        playEpisode(firstEpList[0]);
+                        playEpisodeByNum(firstEpList[0].ep);
                     }
                 }
             } catch(err) {
@@ -193,7 +225,7 @@
             
             const epList = animeData.seasons[seasonNum];
             if(epList && epList.length > 0) {
-                playEpisode(epList[0]);
+                playEpisodeByNum(epList[0].ep);
             }
         }
 
@@ -224,7 +256,7 @@
             epGrid.innerHTML = episodes.map(ep => `
                 <button 
                     id="ep-btn-${ep.ep}" 
-                    onclick='playEpisode(${JSON.stringify(ep)})'
+                    onclick="playEpisodeByNum(${ep.ep})"
                     class="ep-card bg-gray-800/80 hover:bg-gray-700 border border-gray-700 text-white text-xs font-bold py-2.5 rounded-lg text-center transition flex flex-col items-center justify-center gap-1"
                 >
                     <span>EP ${ep.ep}</span>
@@ -233,9 +265,20 @@
             `).join("");
         }
 
-        // Core Play Episode & Update Bot 3 Download Button
+        // Safe Episode Fetcher
+        function playEpisodeByNum(epNum) {
+            const epList = animeData.seasons[currentSeason] || [];
+            const foundEp = epList.find(e => e.ep == epNum);
+            if(foundEp) {
+                playEpisode(foundEp);
+            }
+        }
+
+        // Core Play Episode & Update Links
         function playEpisode(epObj) {
             currentEpNum = epObj.ep;
+            activeEpisodeObj = epObj;
+            errorOverlay.classList.add("hidden");
 
             // 1. Construct Bot 2 Video Streaming Link
             let streamUrl = epObj.stream_url;
@@ -249,29 +292,64 @@
                 downloadUrl = `${BOT3_DOWNLOAD_BASE}/download/${epObj.chat_id}/${epObj.msg_id}`;
             }
 
-            // Update HTML5 Video Player Source
-            const player = document.getElementById("videoPlayer");
-            const source = document.getElementById("videoSource");
+            // Update Video Source & Play
             source.src = streamUrl;
             player.load();
-            player.play().catch(e => console.log("Autoplay blocked by browser policy"));
+            player.play().catch(e => console.log("Autoplay prevented by browser policy"));
 
-            // UPDATE BOT 3 DOWNLOAD BUTTON LINK
+            // Update Download Button
             const downloadBtn = document.getElementById("bot3DownloadBtn");
             downloadBtn.href = downloadUrl;
 
-            // Update Metadata Text
+            // Update Metadata UI
             document.getElementById("currentEpTitle").innerText = `Season ${currentSeason} - Episode ${epObj.ep}`;
             document.getElementById("seasonBadge").innerText = `Season ${currentSeason}`;
             document.getElementById("dubBadge").innerText = epObj.type === "unofficial" ? "Fan Dub" : "Official Dub";
 
-            // Update Episode Active Button UI
+            // Active Button Style Update
             document.querySelectorAll(".ep-card").forEach(btn => btn.classList.remove("ep-btn-active"));
             const activeBtn = document.getElementById(`ep-btn-${epObj.ep}`);
             if(activeBtn) {
                 activeBtn.classList.add("ep-btn-active");
             }
+
+            updateNavButtons();
         }
+
+        // Previous / Next Episode Navigation
+        function playNextOrPrev(direction) {
+            const epList = animeData.seasons[currentSeason] || [];
+            const currentIndex = epList.findIndex(e => e.ep == currentEpNum);
+            
+            if(currentIndex !== -1) {
+                const newIndex = currentIndex + direction;
+                if(newIndex >= 0 && newIndex < epList.length) {
+                    playEpisode(epList[newIndex]);
+                }
+            }
+        }
+
+        function updateNavButtons() {
+            const epList = animeData.seasons[currentSeason] || [];
+            const currentIndex = epList.findIndex(e => e.ep == currentEpNum);
+
+            document.getElementById("prevEpBtn").disabled = (currentIndex <= 0);
+            document.getElementById("nextEpBtn").disabled = (currentIndex >= epList.length - 1);
+        }
+
+        function retryCurrentEpisode() {
+            if(activeEpisodeObj) playEpisode(activeEpisodeObj);
+        }
+
+        // Auto-Play Next Episode when Video Ends
+        player.addEventListener("ended", () => {
+            playNextOrPrev(1);
+        });
+
+        // Video Error Handler
+        player.addEventListener("error", () => {
+            errorOverlay.classList.remove("hidden");
+        });
 
         // Start execution on DOM Load
         window.addEventListener("DOMContentLoaded", initPlayer);
