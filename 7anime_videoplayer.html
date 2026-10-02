@@ -8,6 +8,10 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- ArtPlayer CDN CSS & JS -->
+    <script src="https://cdn.jsdelivr.net/npm/artplayer/dist/artplayer.js"></script>
+
     <style>
         body {
             background-color: #0b0c10;
@@ -40,19 +44,11 @@
     <!-- ==================== MAIN CONTENT ==================== -->
     <main class="max-w-6xl mx-auto px-4 py-6 flex-1 w-full flex flex-col gap-6">
 
-        <!-- ==================== VIDEO PLAYER CONTAINER ==================== -->
+        <!-- ==================== ARTPLAYER VIDEO CONTAINER ==================== -->
         <div class="bg-black rounded-2xl overflow-hidden shadow-2xl border border-gray-800 aspect-video relative flex items-center justify-center">
-            <video 
-                id="videoPlayer" 
-                controls 
-                autoplay 
-                preload="metadata"
-                poster="https://via.placeholder.com/1280x720/0b0c10/66fcf1?text=7anime+Streaming..." 
-                class="w-full h-full object-contain focus:outline-none"
-            >
-                <source id="videoSource" src="" type="video/mp4">
-                Aapka browser HTML5 video tag support nahi karta.
-            </video>
+            
+            <!-- ArtPlayer Mount Element -->
+            <div id="artplayer" class="w-full h-full"></div>
             
             <!-- Error Banner Overlay -->
             <div id="playerErrorOverlay" class="hidden absolute inset-0 bg-black/90 flex flex-col items-center justify-center p-6 text-center z-10">
@@ -78,7 +74,6 @@
 
             <!-- BOT 3 DOWNLOAD & PREV/NEXT BUTTONS -->
             <div class="flex flex-wrap items-center gap-2.5 w-full md:w-auto">
-                <!-- Navigation Controls -->
                 <button 
                     id="prevEpBtn" 
                     onclick="playNextOrPrev(-1)" 
@@ -94,7 +89,6 @@
                     Next <i class="fa-solid fa-forward-step"></i>
                 </button>
 
-                <!-- Direct Single Episode Download (Connected to Bot 3) -->
                 <a 
                     id="bot3DownloadBtn" 
                     href="#" 
@@ -105,7 +99,6 @@
                     <span>Download</span>
                 </a>
 
-                <!-- Multi-Episode / Full Season Download Page -->
                 <a 
                     id="fullDownloadPageBtn" 
                     href="#" 
@@ -125,15 +118,11 @@
                     <i class="fa-solid fa-film text-[#66fcf1]"></i> Episodes List
                 </h2>
                 
-                <!-- Season Tabs -->
                 <div id="seasonTabsContainer" class="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0">
-                    <!-- Season buttons dynamically loaded -->
                 </div>
             </div>
 
-            <!-- Episode Grid Buttons -->
             <div id="episodesGrid" class="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-8 lg:grid-cols-10 gap-2 md:gap-3 max-h-80 overflow-y-auto p-1">
-                <!-- Episode buttons dynamically loaded -->
             </div>
         </div>
 
@@ -146,7 +135,6 @@
 
     <!-- ==================== JS LOGIC ==================== -->
     <script>
-        // Correct Render Web Services Base Endpoints
         const BOT1_API = "https://sevenanime-bot1-scanner.onrender.com";
         const BOT2_STREAM_BASE = "https://sevenanime-bot2-streamer.onrender.com";
         const BOT3_DOWNLOAD_BASE = "https://7anime-bot3-downloader.onrender.com";
@@ -155,14 +143,47 @@
         let currentSeason = "1";
         let currentEpNum = 1;
         let activeEpisodeObj = null;
+        let art = null; // Global ArtPlayer instance
 
-        // URL query parameter parse karein (e.g. ?anime=solo_leveling)
         const urlParams = new URLSearchParams(window.location.search);
         const animeSlug = urlParams.get('anime') || 'solo_leveling';
-
-        const player = document.getElementById("videoPlayer");
-        const source = document.getElementById("videoSource");
         const errorOverlay = document.getElementById("playerErrorOverlay");
+
+        // Initialize ArtPlayer Engine
+        function setupArtPlayer(videoUrl) {
+            if (art) {
+                art.destroy(false);
+            }
+
+            art = new Artplayer({
+                container: '#artplayer',
+                url: videoUrl,
+                type: 'mp4',
+                autoplay: true,
+                pip: true,
+                setting: true,
+                fullscreen: true,
+                fullscreenWeb: true,
+                autoSize: false,
+                playbackRate: true,
+                aspectRatio: true,
+                theme: '#66fcf1',
+                icons: {
+                    state: '<i class="fa-solid fa-play text-4xl text-[#66fcf1]"></i>',
+                },
+            });
+
+            // Handle Video End -> Play Next Episode
+            art.on('ended', () => {
+                playNextOrPrev(1);
+            });
+
+            // Handle Playback Errors
+            art.on('error', (err) => {
+                console.error("ArtPlayer Error:", err);
+                errorOverlay.classList.remove("hidden");
+            });
+        }
 
         // Initialize Player Page
         async function initPlayer() {
@@ -178,7 +199,6 @@
 
                 renderSeasonTabs();
                 
-                // Select first available season & episode
                 const seasons = Object.keys(animeData.seasons || {});
                 if(seasons.length > 0) {
                     currentSeason = seasons[0];
@@ -296,11 +316,8 @@
                 downloadUrl = `${BOT3_DOWNLOAD_BASE}/download/${epObj.chat_id}/${epObj.msg_id}`;
             }
 
-            // Update Video Source & Play (Supports direct player assignment & source fallback)
-            player.src = streamUrl;
-            source.src = streamUrl;
-            player.load();
-            player.play().catch(e => console.log("Autoplay prevented by browser policy"));
+            // Load Video inside ArtPlayer
+            setupArtPlayer(streamUrl);
 
             // Update Download Button
             const downloadBtn = document.getElementById("bot3DownloadBtn");
@@ -349,16 +366,6 @@
                 initPlayer();
             }
         }
-
-        // Auto-Play Next Episode when Video Ends
-        player.addEventListener("ended", () => {
-            playNextOrPrev(1);
-        });
-
-        // Video Error Handler
-        player.addEventListener("error", () => {
-            errorOverlay.classList.remove("hidden");
-        });
 
         // Start execution on DOM Load
         window.addEventListener("DOMContentLoaded", initPlayer);
