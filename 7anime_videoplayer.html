@@ -48,13 +48,13 @@
         <div class="bg-black rounded-2xl overflow-hidden shadow-2xl border border-gray-800 aspect-video relative flex items-center justify-center">
             
             <!-- ArtPlayer Mount Element -->
-            <div id="artplayer" class="w-full h-full"></div>
+            <div id="artplayer" class="w-full h-full z-0"></div>
             
             <!-- Error Banner Overlay -->
-            <div id="playerErrorOverlay" class="hidden absolute inset-0 bg-black/90 flex flex-col items-center justify-center p-6 text-center z-10">
+            <div id="playerErrorOverlay" class="hidden absolute inset-0 bg-black/95 flex flex-col items-center justify-center p-6 text-center z-30">
                 <i class="fa-solid fa-triangle-exclamation text-amber-400 text-4xl mb-2"></i>
                 <h3 class="text-white font-bold text-lg">Video Playback Error</h3>
-                <p class="text-xs text-gray-400 max-w-md mt-1">Video stream load hone me dikkat ho rahi hai. Kripya dubaara try karein ya server switch karein.</p>
+                <p class="text-xs text-gray-400 max-w-md mt-1">Server wake up hone me thoda time le raha hai ya stream offline hai. Dobara try karein.</p>
                 <button onclick="retryCurrentEpisode()" class="mt-4 bg-[#66fcf1] text-black font-bold text-xs px-4 py-2 rounded-lg hover:bg-[#45a29e] transition">
                     <i class="fa-solid fa-rotate-right mr-1"></i> Retry Stream
                 </button>
@@ -143,14 +143,16 @@
         let currentSeason = "1";
         let currentEpNum = 1;
         let activeEpisodeObj = null;
-        let art = null; // Global ArtPlayer instance
+        let art = null;
 
         const urlParams = new URLSearchParams(window.location.search);
         const animeSlug = urlParams.get('anime') || 'solo_leveling';
         const errorOverlay = document.getElementById("playerErrorOverlay");
 
-        // Initialize ArtPlayer Engine
+        // Universal Custom ArtPlayer Setup
         function setupArtPlayer(videoUrl) {
+            errorOverlay.classList.add("hidden");
+
             if (art) {
                 art.destroy(false);
             }
@@ -158,7 +160,14 @@
             art = new Artplayer({
                 container: '#artplayer',
                 url: videoUrl,
-                type: 'mp4',
+                type: 'custom_mp4',
+                customType: {
+                    custom_mp4: function (video, url) {
+                        video.src = url;
+                        video.crossOrigin = 'anonymous';
+                        video.preload = 'auto';
+                    },
+                },
                 autoplay: true,
                 pip: true,
                 setting: true,
@@ -173,15 +182,28 @@
                 },
             });
 
-            // Handle Video End -> Play Next Episode
+            // Prevent false error overlays while Render server spins up
+            art.on('video:canplay', () => {
+                errorOverlay.classList.add("hidden");
+            });
+
+            art.on('ready', () => {
+                errorOverlay.classList.add("hidden");
+            });
+
             art.on('ended', () => {
                 playNextOrPrev(1);
             });
 
-            // Handle Playback Errors
+            // Handle genuine playback failure
             art.on('error', (err) => {
-                console.error("ArtPlayer Error:", err);
-                errorOverlay.classList.remove("hidden");
+                console.error("Stream Error:", err);
+                // Fail-safe timeout check before displaying banner
+                setTimeout(() => {
+                    if (art && art.video && art.video.readyState === 0) {
+                        errorOverlay.classList.remove("hidden");
+                    }
+                }, 3000);
             });
         }
 
