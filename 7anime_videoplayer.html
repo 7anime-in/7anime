@@ -149,7 +149,16 @@
         const animeSlug = urlParams.get('anime') || 'solo_leveling';
         const errorOverlay = document.getElementById("playerErrorOverlay");
 
-        // Universal Custom ArtPlayer Setup
+        // Background Warm-up Ping for Streaming Server
+        async function wakeUpStreamServer() {
+            try {
+                await fetch(BOT2_STREAM_BASE, { mode: 'no-cors' });
+            } catch (e) {
+                console.log("Waking up stream server...");
+            }
+        }
+
+        // Optimized Mobile-Friendly ArtPlayer Setup
         function setupArtPlayer(videoUrl) {
             errorOverlay.classList.add("hidden");
 
@@ -160,14 +169,6 @@
             art = new Artplayer({
                 container: '#artplayer',
                 url: videoUrl,
-                type: 'custom_mp4',
-                customType: {
-                    custom_mp4: function (video, url) {
-                        video.src = url;
-                        video.crossOrigin = 'anonymous';
-                        video.preload = 'auto';
-                    },
-                },
                 autoplay: true,
                 pip: true,
                 setting: true,
@@ -180,9 +181,14 @@
                 icons: {
                     state: '<i class="fa-solid fa-play text-4xl text-[#66fcf1]"></i>',
                 },
+                moreVideoAttr: {
+                    'playsinline': true,
+                    'webkit-playsinline': true,
+                    'preload': 'metadata'
+                }
             });
 
-            // Prevent false error overlays while Render server spins up
+            // Hide error banner when video buffers properly
             art.on('video:canplay', () => {
                 errorOverlay.classList.add("hidden");
             });
@@ -195,15 +201,16 @@
                 playNextOrPrev(1);
             });
 
-            // Handle genuine playback failure
+            // Graceful Fail-safe check
             art.on('error', (err) => {
                 console.error("Stream Error:", err);
-                // Fail-safe timeout check before displaying banner
+                wakeUpStreamServer();
+
                 setTimeout(() => {
-                    if (art && art.video && art.video.readyState === 0) {
+                    if (art && art.video && (art.video.readyState === 0 || art.video.networkState === 3)) {
                         errorOverlay.classList.remove("hidden");
                     }
-                }, 3000);
+                }, 10000);
             });
         }
 
@@ -211,6 +218,8 @@
         async function initPlayer() {
             try {
                 errorOverlay.classList.add("hidden");
+                wakeUpStreamServer();
+
                 const res = await fetch(`${BOT1_API}/api/episodes/${animeSlug}`);
                 if(!res.ok) throw new Error("Anime API not found");
                 
@@ -382,6 +391,7 @@
         }
 
         function retryCurrentEpisode() {
+            wakeUpStreamServer();
             if(activeEpisodeObj) {
                 playEpisode(activeEpisodeObj);
             } else {
