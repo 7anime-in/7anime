@@ -16,11 +16,6 @@ API_ID = int(os.getenv("API_ID", "31169133"))
 API_HASH = os.getenv("API_HASH", "b836f4b836df4cf83c2d475a5ad3b285")
 BOT_TOKEN = os.getenv("BOT2_TOKEN") or os.getenv("BOT_TOKEN", "8946650986:AAGy6rYE-C42f7jcgeyS8Xl4-j9UAyIEwEk")
 
-# ==================== CHUNK CONFIGURATION ====================
-MIN_STREAM_CHUNK_SIZE = 1 * 1024          # 1 KB Minimum (Instant Playback/Seeking Start)
-MAX_STREAM_CHUNK_SIZE = 10 * 1024 * 1024  # 10 MB Maximum Chunk Size
-DEFAULT_CHUNK_SIZE = 2 * 1024 * 1024      # 2 MB Standard Chunk Size
-
 pyro_client: Optional[Client] = None
 
 def is_video_message(message) -> bool:
@@ -87,11 +82,18 @@ async def get_stream_response(
         return Response(content=b"Streamer Engine Initializing...", media_type="text/plain", status_code=503)
 
     try:
-        target_id = int(chat_id) if (chat_id.startswith("-") or chat_id.isdigit()) else (chat_id if chat_id.startswith("@") else f"@{chat_id}")
+        # Proper Channel ID Formatting Fix
+        cid_str = str(chat_id).strip()
+        if cid_str.lstrip('-').isdigit():
+            target_id = int(cid_str)
+        else:
+            target_id = cid_str if cid_str.startswith("@") else f"@{cid_str}"
+
         msg = await pyro_client.get_messages(target_id, msg_id_clean)
     except FloodWait as e:
         return Response(content=b"Rate limited by Telegram", status_code=429, headers={"Retry-After": str(e.value)})
-    except Exception:
+    except Exception as e:
+        print(f"Error fetching message: {e}")
         return Response(content=b"Video Message Not Found", media_type="text/plain", status_code=404)
 
     if not is_video_message(msg):
@@ -105,7 +107,7 @@ async def get_stream_response(
     from_bytes = 0
     until_bytes = file_size - 1
 
-    # HTTP Range Header Parsing (Seeking / Partial Content)
+    # Fix: Correct Range Header Handling for Smooth HTML5 Video Playback
     if range_header:
         range_match = re.search(r"bytes=(\d+)-(\d*)", range_header)
         if range_match:
@@ -114,24 +116,13 @@ async def get_stream_response(
             from_bytes = int(start) if start else 0
             if end:
                 until_bytes = int(end)
-            else:
-                until_bytes = from_bytes + DEFAULT_CHUNK_SIZE - 1
-    else:
-        until_bytes = from_bytes + DEFAULT_CHUNK_SIZE - 1
-
-    requested_length = until_bytes - from_bytes + 1
-
-    if requested_length > MAX_STREAM_CHUNK_SIZE:
-        until_bytes = from_bytes + MAX_STREAM_CHUNK_SIZE - 1
-    elif requested_length < MIN_STREAM_CHUNK_SIZE and (file_size - from_bytes) >= MIN_STREAM_CHUNK_SIZE:
-        until_bytes = from_bytes + MIN_STREAM_CHUNK_SIZE - 1
 
     until_bytes = min(until_bytes, file_size - 1)
     chunk_length = (until_bytes - from_bytes) + 1
 
     headers = {
         "Content-Type": mime_type,
-        "Content-Disposition": f"inline; filename=\"{file_name}\"",
+        "Content-Disposition": f'inline; filename="{file_name}"',
         "Accept-Ranges": "bytes",
         "Content-Range": f"bytes {from_bytes}-{until_bytes}/{file_size}",
         "Content-Length": str(chunk_length),
@@ -144,7 +135,7 @@ async def get_stream_response(
     if request.method == "HEAD":
         return Response(status_code=206 if range_header else 200, headers=headers)
 
-    # Pyrogram Block Calculation (1 MB Internal Telegram Blocks)
+    # Pyrogram 1 MB Block Calculation
     PYRO_BLOCK_SIZE = 1024 * 1024
     start_chunk = from_bytes // PYRO_BLOCK_SIZE
     end_chunk = until_bytes // PYRO_BLOCK_SIZE
@@ -183,7 +174,11 @@ async def get_stream_response(
         except (asyncio.CancelledError, Exception):
             pass
 
-    return StreamingResponse(media_streamer(), status_code=206, headers=headers)
+    return StreamingResponse(
+        media_streamer(), 
+        status_code=206 if range_header else 200, 
+        headers=headers
+    )
 
 # ==================== ENDPOINTS ====================
 @app.api_route("/", methods=["GET", "HEAD"])
