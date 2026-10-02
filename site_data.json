@@ -13,6 +13,14 @@
             "rating": "9.2",
             "type": "series",
             "slug": "solo_leveling"
+        },
+        "the_exiled_heavy_knight_knows_how_to_game_the_system": {
+            "title": "The Exiled Heavy Knight Knows How To Game The System",
+            "image": "https://drive.google.com/file/d/1aicVAvinPNaNzfkDfry8NXIs0dxKXzRe/view?usp=drivesdk",
+            "genres": "action, adventure, and fantasy",
+            "rating": "9.3",
+            "type": "series",
+            "slug": "the_exiled_heavy_knight_knows_how_to_game_the_system"
         }
     }
 }
