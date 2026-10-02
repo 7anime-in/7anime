@@ -54,7 +54,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="Bot 2 - Streamer Engine", lifespan=lifespan)
 
-# Enable Full CORS for Web Player Compatibility
+# Enable Full CORS for Web Player & P2P WebRTC Compatibility
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -69,8 +69,13 @@ async def get_stream_response(
     chat_id: str,
     message_id: str,
     request: Request,
-    range_header: str
+    range_header: Optional[str] = None
 ):
+    # Fallback to fetch Range header directly from request headers
+    if not range_header:
+        range_header = request.headers.get("range") or request.headers.get("Range")
+
+    # Fast Return for Pre-flight OPTIONS Request (P2P Handshake)
     if request.method == "OPTIONS":
         return Response(
             status_code=200, 
@@ -78,6 +83,7 @@ async def get_stream_response(
                 "Access-Control-Allow-Origin": "*",
                 "Access-Control-Allow-Methods": "GET, HEAD, OPTIONS",
                 "Access-Control-Allow-Headers": "*",
+                "Access-Control-Expose-Headers": "Content-Range, Content-Length, Accept-Ranges, Content-Type",
             }
         )
 
@@ -121,7 +127,7 @@ async def get_stream_response(
     from_bytes = 0
     until_bytes = file_size - 1
 
-    # Exact Range Header Handling for Smooth HTML5 / Mobile Playback
+    # Exact Range Header Handling for SwarmCloud P2P Chunking
     if range_header:
         range_match = re.search(r"bytes=(\d+)-(\d*)", range_header)
         if range_match:
@@ -146,6 +152,7 @@ async def get_stream_response(
         "Cache-Control": "public, max-age=3600",
     }
 
+    # HEAD Request (SwarmCloud P2P Chunk Probing)
     if request.method == "HEAD":
         return Response(status_code=206 if range_header else 200, headers=headers)
 
