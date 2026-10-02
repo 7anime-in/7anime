@@ -4,8 +4,8 @@ import asyncio
 from typing import Optional
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, Request, HTTPException, Header
-from fastapi.responses import StreamingResponse, Response, HTMLResponse
+from fastapi import FastAPI, Request, Header
+from fastapi.responses import StreamingResponse, Response
 from fastapi.middleware.cors import CORSMiddleware
 
 from pyrogram import Client
@@ -14,16 +14,14 @@ from pyrogram.errors import FloodWait, RPCError
 # ==================== ENVIRONMENT VARIABLES ====================
 API_ID = int(os.getenv("API_ID", "31169133"))
 API_HASH = os.getenv("API_HASH", "b836f4b836df4cf83c2d475a5ad3b285")
-# Supports BOT2_TOKEN with fallback to BOT_TOKEN
 BOT_TOKEN = os.getenv("BOT2_TOKEN") or os.getenv("BOT_TOKEN", "8946650986:AAGy6rYE-C42f7jcgeyS8Xl4-j9UAyIEwEk")
 
 # ==================== CHUNK CONFIGURATION ====================
-# Minimum Chunk Size set to 1 KB for instant playback start
-MIN_STREAM_CHUNK_SIZE = 1 * 1024          # 1 KB Minimum
-MAX_STREAM_CHUNK_SIZE = 10 * 1024 * 1024  # 10 MB Maximum
-DEFAULT_CHUNK_SIZE = 2 * 1024 * 1024      # 2 MB Standard Chunk
+MIN_STREAM_CHUNK_SIZE = 1 * 1024          # 1 KB Minimum (Instant Playback/Seeking Start)
+MAX_STREAM_CHUNK_SIZE = 10 * 1024 * 1024  # 10 MB Maximum Chunk Size
+DEFAULT_CHUNK_SIZE = 2 * 1024 * 1024      # 2 MB Standard Chunk Size
 
-pyro_client = None
+pyro_client: Optional[Client] = None
 
 def is_video_message(message) -> bool:
     if not message or message.empty:
@@ -48,11 +46,11 @@ async def lifespan(app: FastAPI):
         api_id=API_ID,
         api_hash=API_HASH,
         bot_token=BOT_TOKEN,
+        in_memory=True  # Prevents SQLite DB locks on cloud hosts
     )
 
-    # Background task for instant Render Port binding (prevents Port Scan Timeout)
-    asyncio.create_task(pyro_client.start())
-    print("✅ Bot 2 Pyrogram Engine Initiated!")
+    await pyro_client.start()
+    print("✅ Bot 2 Pyrogram Engine Active & Ready!")
     yield
     if pyro_client and pyro_client.is_connected:
         await pyro_client.stop()
@@ -78,27 +76,36 @@ async def get_stream_response(
     if request.method == "OPTIONS":
         return Response(status_code=200, headers={"Access-Control-Allow-Origin": "*"})
 
-    msg_id_clean = int(str(message_id).replace(".mp4", "").replace(".mkv", ""))
+    # Clean extension if passed in URL (.mp4, .mkv, .webm, etc.)
+    clean_msg_str = re.sub(r"\.\w+$", "", str(message_id))
+    try:
+        msg_id_clean = int(clean_msg_str)
+    except ValueError:
+        return Response(content=b"Invalid Message ID", media_type="text/plain", status_code=400)
 
-    if not pyro_client:
-        return Response(content=b"", media_type="video/mp4", status_code=503)
+    if not pyro_client or not pyro_client.is_connected:
+        return Response(content=b"Streamer Engine Initializing...", media_type="text/plain", status_code=503)
 
     try:
         target_id = int(chat_id) if (chat_id.startswith("-") or chat_id.isdigit()) else (chat_id if chat_id.startswith("@") else f"@{chat_id}")
         msg = await pyro_client.get_messages(target_id, msg_id_clean)
-    except Exception as e:
-        return Response(content=b"", media_type="video/mp4", status_code=404)
+    except FloodWait as e:
+        return Response(content=b"Rate limited by Telegram", status_code=429, headers={"Retry-After": str(e.value)})
+    except Exception:
+        return Response(content=b"Video Message Not Found", media_type="text/plain", status_code=404)
 
     if not is_video_message(msg):
-        return Response(content=b"", media_type="video/mp4", status_code=400)
+        return Response(content=b"Target message is not a valid video file", media_type="text/plain", status_code=400)
 
     media = msg.video or msg.document
     file_size = media.file_size
+    file_name = getattr(media, "file_name", f"{msg_id_clean}.mp4") or f"{msg_id_clean}.mp4"
+    mime_type = getattr(media, "mime_type", "video/mp4") or "video/mp4"
 
     from_bytes = 0
     until_bytes = file_size - 1
 
-    # Range Header Parsing
+    # HTTP Range Header Parsing (Seeking / Partial Content)
     if range_header:
         range_match = re.search(r"bytes=(\d+)-(\d*)", range_header)
         if range_match:
@@ -112,7 +119,6 @@ async def get_stream_response(
     else:
         until_bytes = from_bytes + DEFAULT_CHUNK_SIZE - 1
 
-    # Enforce Minimum 1 KB and Maximum 10 MB per chunk response
     requested_length = until_bytes - from_bytes + 1
 
     if requested_length > MAX_STREAM_CHUNK_SIZE:
@@ -124,8 +130,8 @@ async def get_stream_response(
     chunk_length = (until_bytes - from_bytes) + 1
 
     headers = {
-        "Content-Type": "video/mp4",
-        "Content-Disposition": f"inline; filename=\"{msg_id_clean}.mp4\"",
+        "Content-Type": mime_type,
+        "Content-Disposition": f"inline; filename=\"{file_name}\"",
         "Accept-Ranges": "bytes",
         "Content-Range": f"bytes {from_bytes}-{until_bytes}/{file_size}",
         "Content-Length": str(chunk_length),
@@ -138,7 +144,7 @@ async def get_stream_response(
     if request.method == "HEAD":
         return Response(status_code=206 if range_header else 200, headers=headers)
 
-    # Pyrogram Stream Offset Logic (Pyrogram works in 1MB internal chunks)
+    # Pyrogram Block Calculation (1 MB Internal Telegram Blocks)
     PYRO_BLOCK_SIZE = 1024 * 1024
     start_chunk = from_bytes // PYRO_BLOCK_SIZE
     end_chunk = until_bytes // PYRO_BLOCK_SIZE
