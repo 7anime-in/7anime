@@ -2,7 +2,7 @@ import os
 import re
 import json
 import asyncio
-from typing import Dict, Any
+from typing import Dict, Any, Tuple, Set
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -25,6 +25,9 @@ CHANNEL_IDS = [ch.strip() for ch in CHANNEL_INPUT.split(",") if ch.strip()]
 # FILE NAME FOR JSON STORAGE
 DATA_FILE = "sitevideo_data.json"
 anime_database: Dict[str, Any] = {}
+# Fast O(1) Duplicate Lookup Index: set of tuples (chat_id, msg_id)
+msg_index: Set[Tuple[str, int]] = set()
+
 pyro_client: Client = None
 scanner_task: asyncio.Task = None
 
@@ -37,6 +40,21 @@ active_context: Dict[str, Any] = {
 }
 
 # ==================== PERSISTENT JSON STORAGE ====================
+def rebuild_msg_index():
+    """Builds O(1) lookup index in memory for fast duplicate checks."""
+    global msg_index
+    msg_index.clear()
+    for slug, anime_data in anime_database.items():
+        for season, ep_list in anime_data.get("seasons", {}).items():
+            for ep_item in ep_list:
+                chat = ep_item.get("chat_id")
+                msg = ep_item.get("msg_id")
+                if chat and msg is not None:
+                    try:
+                        msg_index.add((str(chat), int(msg)))
+                    except ValueError:
+                        continue
+
 def load_database_from_file():
     """Bot restart hone par local sitevideo_data.json load karta hai."""
     global anime_database
@@ -44,15 +62,18 @@ def load_database_from_file():
         try:
             with open(DATA_FILE, "r", encoding="utf-8") as f:
                 anime_database = json.load(f)
+            rebuild_msg_index()
             print(f"✅ Loaded existing data from {DATA_FILE}! Total Anime: {len(anime_database)}")
         except Exception as e:
             print(f"⚠️ Error reading {DATA_FILE}: {e}")
             anime_database = {}
+            rebuild_msg_index()
     else:
         anime_database = {}
+        rebuild_msg_index()
 
 def save_database_to_file():
-    """JSON file me current DB append/update karta hai."""
+    """JSON file me current DB update karta hai."""
     try:
         with open(DATA_FILE, "w", encoding="utf-8") as f:
             json.dump(anime_database, f, indent=2, ensure_ascii=False)
@@ -73,16 +94,15 @@ def is_video_message(message: Message) -> bool:
     return False
 
 # ENHANCED CAPTION & CONTEXT PARSER
-def parse_anime_info(caption: str, forward_title: str = "", use_context: bool = True):
+def parse_anime_info(caption: str, forward_title: str = "", use_context: bool = True) -> Tuple[str, str, int, str]:
     global active_context
 
-    # 1. BULK CONTEXT MODE (Sirf live forward me chalega, auto-scan me nahi)
+    # 1. BULK CONTEXT MODE
     if use_context and active_context.get("anime"):
         anime_name = active_context["anime"]
         season = str(active_context["season"])
         dub_type = active_context["type"]
 
-        # Caption/Filename se Episode scan karo
         ep_match = re.search(r"(?:Episode|Ep|E)[\s\-\_]*0*(\d+)", caption or "", re.IGNORECASE)
         if not ep_match:
             clean_text = re.sub(r"\b(1080p|720p|480p|360p|2160p|x264|x265|hevc)\b", "", caption or "", flags=re.IGNORECASE)
@@ -90,7 +110,7 @@ def parse_anime_info(caption: str, forward_title: str = "", use_context: bool = 
 
         if ep_match:
             episode = int(ep_match.group(1))
-            active_context["auto_ep"] = episode + 1  # Sync auto_ep counter
+            active_context["auto_ep"] = episode + 1
         else:
             episode = active_context["auto_ep"]
             active_context["auto_ep"] += 1
@@ -100,18 +120,15 @@ def parse_anime_info(caption: str, forward_title: str = "", use_context: bool = 
     # 2. STANDARD CAPTION PARSING
     text = caption or ""
 
-    # Dub Type
     dub_type = "official"
     if re.search(r"\b(unofficial|fandub|fan_dub|fan-dub|fan dub)\b", text, re.IGNORECASE) or "#unofficial" in text.lower() or "#fandub" in text.lower():
         dub_type = "unofficial"
     elif re.search(r"\b(official|officialdub|official_dub)\b", text, re.IGNORECASE) or "#official" in text.lower():
         dub_type = "official"
 
-    # Season Number
     season_match = re.search(r"\b(?:Season|S)[\s\-\_]*0*(\d+)\b", text, re.IGNORECASE)
     season = season_match.group(1) if season_match else "1"
 
-    # Episode Number
     ep_match = re.search(r"\b(?:Episode|Ep|E)[\s\-\_]*0*(\d+)\b", text, re.IGNORECASE)
     if not ep_match:
         clean_text = re.sub(r"\b(1080p|720p|480p|360p|2160p|x264|x265|hevc|2023|2024|2025|2026)\b", "", text, flags=re.IGNORECASE)
@@ -119,7 +136,6 @@ def parse_anime_info(caption: str, forward_title: str = "", use_context: bool = 
 
     episode = int(ep_match.group(1)) if ep_match else 1
 
-    # Anime Name
     explicit_name = re.search(r"(?:Anime|Title|Name)\s*:\s*([^\n\r\t|]+)", text, re.IGNORECASE)
 
     if explicit_name:
@@ -143,25 +159,26 @@ def parse_anime_info(caption: str, forward_title: str = "", use_context: bool = 
 
     return clean_title, str(int(season)), episode, dub_type
 
-# PRESERVE & MERGE DB ENTRIES IN sitevideo_data.json
-def add_to_database(chat_id: str, msg_id: int, caption: str, forward_title: str, use_context: bool = True):
+# OPTIMIZED ADD TO DATABASE WITH O(1) LOOKUP & TYPE SAFETY
+def add_to_database(chat_id: str, msg_id: int, caption: str, forward_title: str, use_context: bool = True, auto_save: bool = True) -> Tuple[str, str, int, str]:
     formatted_chat = str(chat_id).replace("@", "")
 
-    # Check duplicate
-    for slug, anime_data in anime_database.items():
-        for season, ep_list in anime_data.get("seasons", {}).items():
-            for ep_item in ep_list:
-                if ep_item.get("chat_id") == formatted_chat and ep_item.get("msg_id") == msg_id:
-                    ep_item["stream_url"] = f"{BOT2_STREAM_BASE.rstrip('/')}/stream/{formatted_chat}/{msg_id}.mp4"
-                    ep_item["download_url"] = f"{BOT3_DOWNLOAD_BASE.rstrip('/')}/download/{formatted_chat}/{msg_id}"
-                    ep_item["embed_url"] = f"https://t.me/{formatted_chat}/{msg_id}?embed=1"
-                    ep_item["tg_url"] = f"https://t.me/{formatted_chat}/{msg_id}"
-                    save_database_to_file()
-                    return
-
-    # Parse and add
     anime_name, season_num, ep_num, dub_type = parse_anime_info(caption, forward_title, use_context=use_context)
-    slug_key = re.sub(r'[^a-zA-Z0-9]', '_', anime_name.lower()).strip('_')
+    slug_key = re.sub(r'[^a-zA-Z0-9]+', '_', anime_name.lower()).strip('_')
+
+    # Fast O(1) Duplicate Check
+    if (formatted_chat, int(msg_id)) in msg_index:
+        for slug, anime_data in anime_database.items():
+            for season, ep_list in anime_data.get("seasons", {}).items():
+                for ep_item in ep_list:
+                    if str(ep_item.get("chat_id")) == formatted_chat and int(ep_item.get("msg_id", 0)) == int(msg_id):
+                        ep_item["stream_url"] = f"{BOT2_STREAM_BASE.rstrip('/')}/stream/{formatted_chat}/{msg_id}.mp4"
+                        ep_item["download_url"] = f"{BOT3_DOWNLOAD_BASE.rstrip('/')}/download/{formatted_chat}/{msg_id}"
+                        ep_item["embed_url"] = f"https://t.me/{formatted_chat}/{msg_id}?embed=1"
+                        ep_item["tg_url"] = f"https://t.me/{formatted_chat}/{msg_id}"
+                        if auto_save:
+                            save_database_to_file()
+                        return anime_name, season_num, ep_num, dub_type
 
     if slug_key not in anime_database:
         anime_database[slug_key] = {"title": anime_name, "seasons": {}}
@@ -181,7 +198,7 @@ def add_to_database(chat_id: str, msg_id: int, caption: str, forward_title: str,
     ep_entry = {
         "ep": ep_num,
         "chat_id": formatted_chat,
-        "msg_id": msg_id,
+        "msg_id": int(msg_id),
         "type": dub_type,
         "stream_url": stream_url,
         "download_url": download_url,
@@ -197,7 +214,12 @@ def add_to_database(chat_id: str, msg_id: int, caption: str, forward_title: str,
         ep_list.append(ep_entry)
         ep_list.sort(key=lambda x: x["ep"])
 
-    save_database_to_file()
+    msg_index.add((formatted_chat, int(msg_id)))
+
+    if auto_save:
+        save_database_to_file()
+
+    return anime_name, season_num, ep_num, dub_type
 
 # ==================== CHANNEL AUTO SCANNER ====================
 async def auto_scan_channels():
@@ -238,8 +260,7 @@ async def auto_scan_channels():
                                     if message.forward_from_chat
                                     else (message.forward_sender_name or "")
                                 )
-                                # Context ignore enabled for auto scan
-                                add_to_database(str(target_chat), message.id, caption, forward_title, use_context=False)
+                                add_to_database(str(target_chat), message.id, caption, forward_title, use_context=False, auto_save=False)
 
                     if not has_media:
                         empty_count += 1
@@ -253,6 +274,7 @@ async def auto_scan_channels():
                     current_id += chunk_size
                     await asyncio.sleep(1)
 
+            save_database_to_file()
             print(f"✅ Channel '{target_chat}' scan sync completed!")
         except Exception as e:
             print(f"⚠️ Error scanning channel {ch_id}: {e}")
@@ -361,6 +383,7 @@ async def lifespan(app: FastAPI):
     @pyro_client.on_message(filters.command("rescan"))
     async def rescan_cmd(client: Client, message: Message):
         anime_database.clear()
+        msg_index.clear()
         save_database_to_file()
         await message.reply_text("🔄 **Database Reset! Rescanning channels...**", quote=True)
         asyncio.create_task(auto_scan_channels())
@@ -423,6 +446,7 @@ async def lifespan(app: FastAPI):
             ep_list.append(ep_entry)
             ep_list.sort(key=lambda x: x["ep"])
 
+        msg_index.add((chat_id, msg_id))
         save_database_to_file()
         await message.reply_text(f"✅ Episode added manually to `{slug_key}` (S{season_num}E{ep_num})!", quote=True)
 
@@ -437,6 +461,7 @@ async def lifespan(app: FastAPI):
         if slug_key in anime_database and season_num in anime_database[slug_key]["seasons"]:
             ep_list = anime_database[slug_key]["seasons"][season_num]
             anime_database[slug_key]["seasons"][season_num] = [i for i in ep_list if i["ep"] != ep_num]
+            rebuild_msg_index()
             save_database_to_file()
             return await message.reply_text(f"🗑️ Deleted S{season_num}E{ep_num} from `{slug_key}`.", quote=True)
 
@@ -456,7 +481,7 @@ async def lifespan(app: FastAPI):
 
         await message.reply_text("❌ Anime slug not found.", quote=True)
 
-    # # AUTO LIVE FORWARD & UPLOAD HANDLER
+    # AUTO LIVE FORWARD & UPLOAD HANDLER
     @pyro_client.on_message((filters.video | filters.document) & ~filters.command(["start", "stats", "rescan", "ping", "add", "delete", "rename", "addchannel", "listchannels", "setcontext", "clearcontext"]))
     async def auto_index_media(client: Client, message: Message):
         if not is_video_message(message):
@@ -473,9 +498,16 @@ async def lifespan(app: FastAPI):
             else (message.forward_sender_name or "")
         )
 
-        # Context enabled for live forwards
-        add_to_database(chat_identifier, msg_id, caption, forward_title, use_context=True)
-        await message.reply_text("✅ **Video Indexed Automatically!** Saved to `sitevideo_data.json`.", quote=True)
+        anime_name, season_num, ep_num, dub_type = add_to_database(chat_identifier, msg_id, caption, forward_title, use_context=True, auto_save=True)
+        
+        reply_text = (
+            f"✅ **Video Indexed Automatically!**\n\n"
+            f"🎬 **Anime:** `{anime_name}`\n"
+            f"🍂 **Season:** `{season_num}` | 📺 **Episode:** `{ep_num}`\n"
+            f"🎙️ **Audio:** `{dub_type.upper()}`\n\n"
+            f"📁 Saved to `sitevideo_data.json`"
+        )
+        await message.reply_text(reply_text, quote=True)
 
     asyncio.create_task(pyro_client.start())
     print("✅ Bot 1 Active & Ready!")
@@ -529,6 +561,7 @@ def get_anime_episodes(anime_slug: str):
 @app.get("/api/rescan")
 async def rescan_api():
     anime_database.clear()
+    msg_index.clear()
     save_database_to_file()
     asyncio.create_task(auto_scan_channels())
     return {"status": "Rescan initiated"}
