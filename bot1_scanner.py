@@ -93,7 +93,7 @@ def is_video_message(message: Message) -> bool:
             return True
     return False
 
-# ENHANCED CAPTION & CONTEXT PARSER
+# ENHANCED CAPTION & CONTEXT PARSER (FIXED FOR S02E04 FORMAT)
 def parse_anime_info(caption: str, forward_title: str = "", use_context: bool = True) -> Tuple[str, str, int, str]:
     global active_context
 
@@ -102,6 +102,12 @@ def parse_anime_info(caption: str, forward_title: str = "", use_context: bool = 
         anime_name = active_context["anime"]
         season = str(active_context["season"])
         dub_type = active_context["type"]
+
+        se_match = re.search(r"\bS(\d{1,2})[\s\.\-_]*E(\d{1,3})\b", caption or "", re.IGNORECASE)
+        if se_match:
+            episode = int(se_match.group(2))
+            active_context["auto_ep"] = episode + 1
+            return anime_name, season, episode, dub_type
 
         ep_match = re.search(r"(?:Episode|Ep|E)[\s\-\_]*0*(\d+)", caption or "", re.IGNORECASE)
         if not ep_match:
@@ -126,15 +132,21 @@ def parse_anime_info(caption: str, forward_title: str = "", use_context: bool = 
     elif re.search(r"\b(official|officialdub|official_dub)\b", text, re.IGNORECASE) or "#official" in text.lower():
         dub_type = "official"
 
-    season_match = re.search(r"\b(?:Season|S)[\s\-\_]*0*(\d+)\b", text, re.IGNORECASE)
-    season = season_match.group(1) if season_match else "1"
+    # Check combined S01E01 / S02E04 pattern first
+    se_match = re.search(r"\bS(\d{1,2})[\s\.\-_]*E(\d{1,3})\b", text, re.IGNORECASE)
+    if se_match:
+        season = str(int(se_match.group(1)))
+        episode = int(se_match.group(2))
+    else:
+        season_match = re.search(r"\b(?:Season|S)[\s\-\_]*0*(\d+)\b", text, re.IGNORECASE)
+        season = str(int(season_match.group(1))) if season_match else "1"
 
-    ep_match = re.search(r"\b(?:Episode|Ep|E)[\s\-\_]*0*(\d+)\b", text, re.IGNORECASE)
-    if not ep_match:
-        clean_text = re.sub(r"\b(1080p|720p|480p|360p|2160p|x264|x265|hevc|2023|2024|2025|2026)\b", "", text, flags=re.IGNORECASE)
-        ep_match = re.search(r"(?:[\s\-\_\[\vert{}^])0*(\d{1,3})(?:[\s\-\_\]]|$|\.mp4|\.mkv)", clean_text)
+        ep_match = re.search(r"\b(?:Episode|Ep|E)[\s\-\_]*0*(\d+)\b", text, re.IGNORECASE)
+        if not ep_match:
+            clean_text = re.sub(r"\b(1080p|720p|480p|360p|2160p|x264|x265|hevc|2023|2024|2025|2026)\b", "", text, flags=re.IGNORECASE)
+            ep_match = re.search(r"(?:[\s\-\_\[\vert{}^])0*(\d{1,3})(?:[\s\-\_\]]|$|\.mp4|\.mkv)", clean_text)
 
-    episode = int(ep_match.group(1)) if ep_match else 1
+        episode = int(ep_match.group(1)) if ep_match else 1
 
     explicit_name = re.search(r"(?:Anime|Title|Name)\s*:\s*([^\n\r\t|]+)", text, re.IGNORECASE)
 
@@ -146,10 +158,11 @@ def parse_anime_info(caption: str, forward_title: str = "", use_context: bool = 
         lines = [l.strip() for l in text.split("\n") if l.strip()]
         raw_title = lines[0] if lines else "Unknown Anime"
 
+    clean_title = re.sub(r"(?i)\bS\d{1,2}[\s\.\-_]*E\d{1,3}\b", "", raw_title)
     clean_title = re.sub(
         r"(?i)\b(in|hindi|dubbed|dub|sub|official|unofficial|fandub|1080p|720p|480p|fhd|hd|hevc|x264|x265|episode|season|language|quality|main channel)\b",
         "",
-        raw_title,
+        clean_title,
     )
     clean_title = re.sub(r"[^\w\s]", " ", clean_title)
     clean_title = re.sub(r"\s+", " ", clean_title).strip().title()
@@ -157,7 +170,7 @@ def parse_anime_info(caption: str, forward_title: str = "", use_context: bool = 
     if not clean_title or len(clean_title) < 2:
         clean_title = "Unknown Anime"
 
-    return clean_title, str(int(season)), episode, dub_type
+    return clean_title, season, episode, dub_type
 
 # OPTIMIZED ADD TO DATABASE WITH O(1) LOOKUP & TYPE SAFETY
 def add_to_database(chat_id: str, msg_id: int, caption: str, forward_title: str, use_context: bool = True, auto_save: bool = True) -> Tuple[str, str, int, str]:
@@ -305,22 +318,26 @@ async def lifespan(app: FastAPI):
     async def start_cmd(client: Client, message: Message):
         start_text = (
             "🤖 **7anime Bot 1: Master Scanner & Indexer Bot**\n\n"
-            "Main Telegram channel me video/anime upload ya forward karo, ye auto-index karke `sitevideo_data.json` me save kar dega.\n\n"
-            "📌 **Available Admin Commands:**\n\n"
-            "• `/start` or `/ping` - Show this complete info menu\n"
+            "📌 **Commands & Usage Guide:**\n\n"
+            "🎯 **Bulk Forwarding:**\n"
+            "• `/setcontext <Anime> | <Season> | <Audio>`\n"
+            "  _Example:_ `/setcontext Solo Leveling | 2 | official`\n"
+            "• `/clearcontext` - Clear active bulk context\n\n"
+            "📺 **Channel Management:**\n"
+            "• `/listchannels` - View all monitored channels\n"
+            "• `/addchannel <@username>` - Add new channel\n"
+            "  _Example:_ `/addchannel @sevenanime_ch2`\n"
+            "• `/rescan` - Reset DB & fresh scan channels\n\n"
+            "🛠️ **Manual Database Edits:**\n"
+            "• `/add <channel> <msg_id> <slug> <season> <ep> [official/unofficial]`\n"
+            "  _Example:_ `/add sevenanime_ch1 248 solo_leveling 2 1 official`\n"
+            "• `/delete <slug> <season> <ep>`\n"
+            "  _Example:_ `/delete solo_leveling 2 1`\n"
+            "• `/rename <slug> <New Title>`\n"
+            "  _Example:_ `/rename solo_leveling Solo Leveling: Arise`\n\n"
+            "📊 **System:**\n"
             "• `/stats` - View total indexed anime & episode count\n"
-            "• `/setcontext <Anime Name> | <Season> | <Audio>` - Set bulk forwarding details\n"
-            "• `/clearcontext` - Clear active bulk forwarding context\n"
-            "• `/listchannels` - View all currently monitored channels\n"
-            "• `/addchannel <@username>` - Add new Telegram channel dynamically\n"
-            "• `/rescan` - Reset JSON DB and force fresh rescan of all channels\n"
-            "• `/add <channel> <msg_id> <slug> <season> <ep> [official/unofficial]` - Manual Episode Add\n"
-            "• `/delete <slug> <season> <ep>` - Delete specific episode from DB\n"
-            "• `/rename <slug> <new_title>` - Rename anime title in DB\n\n"
-            "💡 **Caption Format Tip (Auto-Parsing):**\n"
-            "`Anime: Solo Leveling`\n"
-            "`Season: 1` | `Episode: 12`\n"
-            "`Audio: official` (or `#unofficial` / `#fandub`)"
+            "• `/start` or `/ping` - Show this full help menu"
         )
         await message.reply_text(start_text, quote=True)
 
