@@ -170,6 +170,50 @@
           "download_url": "https://sevenanime-bot3-downloader.onrender.com/download/sevenanime_ch1/527",
           "embed_url": "https://t.me/sevenanime_ch1/527?embed=1",
           "tg_url": "https://t.me/sevenanime_ch1/527"
+        },
+        {
+          "ep": 3,
+          "chat_id": "sevenanime_ch1",
+          "msg_id": 529,
+          "type": "official",
+          "format": "H.264 / AVC (AAC)",
+          "stream_url": "https://sevenanime-bot2-streamer.onrender.com/stream/sevenanime_ch1/529.mp4",
+          "download_url": "https://sevenanime-bot3-downloader.onrender.com/download/sevenanime_ch1/529",
+          "embed_url": "https://t.me/sevenanime_ch1/529?embed=1",
+          "tg_url": "https://t.me/sevenanime_ch1/529"
+        },
+        {
+          "ep": 4,
+          "chat_id": "sevenanime_ch1",
+          "msg_id": 530,
+          "type": "official",
+          "format": "H.264 / AVC (AAC)",
+          "stream_url": "https://sevenanime-bot2-streamer.onrender.com/stream/sevenanime_ch1/530.mp4",
+          "download_url": "https://sevenanime-bot3-downloader.onrender.com/download/sevenanime_ch1/530",
+          "embed_url": "https://t.me/sevenanime_ch1/530?embed=1",
+          "tg_url": "https://t.me/sevenanime_ch1/530"
+        },
+        {
+          "ep": 5,
+          "chat_id": "sevenanime_ch1",
+          "msg_id": 531,
+          "type": "official",
+          "format": "H.264 / AVC (AAC)",
+          "stream_url": "https://sevenanime-bot2-streamer.onrender.com/stream/sevenanime_ch1/531.mp4",
+          "download_url": "https://sevenanime-bot3-downloader.onrender.com/download/sevenanime_ch1/531",
+          "embed_url": "https://t.me/sevenanime_ch1/531?embed=1",
+          "tg_url": "https://t.me/sevenanime_ch1/531"
+        },
+        {
+          "ep": 6,
+          "chat_id": "sevenanime_ch1",
+          "msg_id": 532,
+          "type": "official",
+          "format": "H.264 / AVC (AAC)",
+          "stream_url": "https://sevenanime-bot2-streamer.onrender.com/stream/sevenanime_ch1/532.mp4",
+          "download_url": "https://sevenanime-bot3-downloader.onrender.com/download/sevenanime_ch1/532",
+          "embed_url": "https://t.me/sevenanime_ch1/532?embed=1",
+          "tg_url": "https://t.me/sevenanime_ch1/532"
         }
       ]
     }
