@@ -1,2 +1,12 @@
+[project]
+name = "7anime-scanner"
+version = "0.1.0"
+dependencies = [
+    "fastapi",
+    "pyrogram",
+    "tgcrypto",
+    "uvicorn"
+]
+
 [tool.vercel]
-entrypoint = "bot1_scanner:app"
+entrypoint = "bot1_scanner.py"
