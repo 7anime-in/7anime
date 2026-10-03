@@ -57,7 +57,7 @@
             <div id="playerErrorOverlay" class="hidden absolute inset-0 bg-black/95 flex flex-col items-center justify-center p-6 text-center z-30">
                 <i class="fa-solid fa-triangle-exclamation text-amber-400 text-4xl mb-2"></i>
                 <h3 class="text-white font-bold text-lg">Video Playback Error</h3>
-                <p class="text-xs text-gray-400 max-w-md mt-1">Server wake up hone me thoda time le raha hai ya stream offline hai. Dobara try karein.</p>
+                <p class="text-xs text-gray-400 max-w-md mt-1">Server wake up hone me thoda time le raha hai ya H.265/AAC video browser me unsupported hai. Dobara try karein.</p>
                 <button onclick="retryCurrentEpisode()" class="mt-4 bg-[#66fcf1] text-black font-bold text-xs px-4 py-2 rounded-lg hover:bg-[#45a29e] transition">
                     <i class="fa-solid fa-rotate-right mr-1"></i> Retry Stream
                 </button>
@@ -142,7 +142,8 @@
 
     <!-- ==================== JS LOGIC ==================== -->
     <script>
-        const BOT1_API = "https://7anime-mu.vercel.app";
+        // UPDATED VERCEL API LINK
+        const BOT1_API = "https://sevenanime-bot1-scanner.onrender.com";
         const BOT2_STREAM_BASE = "https://sevenanime-bot2-streamer.onrender.com";
         const BOT3_DOWNLOAD_BASE = "https://sevenanime-bot3-downloader.onrender.com";
 
@@ -151,7 +152,7 @@
         let currentEpNum = 1;
         let activeEpisodeObj = null;
         let art = null;
-        let p2pEngine = null; // P2P Instance Holder
+        let p2pEngine = null;
 
         const urlParams = new URLSearchParams(window.location.search);
         const animeSlug = urlParams.get('anime') || 'solo_leveling';
@@ -166,7 +167,7 @@
             }
         }
 
-        // Optimized ArtPlayer Setup with WebRTC P2P
+        // Optimized ArtPlayer Setup with H.264/H.265 AAC + WebRTC P2P Support
         function setupArtPlayer(videoUrl) {
             errorOverlay.classList.add("hidden");
 
@@ -184,6 +185,7 @@
             art = new Artplayer({
                 container: '#artplayer',
                 url: videoUrl,
+                type: 'mp4',
                 autoplay: true,
                 pip: true,
                 setting: true,
@@ -199,7 +201,8 @@
                 moreVideoAttr: {
                     'playsinline': true,
                     'webkit-playsinline': true,
-                    'preload': 'metadata'
+                    'preload': 'auto',
+                    'crossOrigin': 'anonymous'
                 }
             });
 
@@ -210,7 +213,7 @@
                 if (window.P2pEngineMp4 && P2pEngineMp4.isSupported()) {
                     p2pEngine = new P2pEngineMp4({
                         video: art.video,
-                        segmentId: videoUrl, // Unique Identifier for peers watching same stream
+                        segmentId: videoUrl,
                         trackerZone: 'global',
                     });
 
@@ -239,7 +242,7 @@
                 playNextOrPrev(1);
             });
 
-            // Graceful Fail-safe check
+            // Graceful Fail-safe check for H.264 / H.265 AAC errors
             art.on('error', (err) => {
                 console.error("Stream Error:", err);
                 wakeUpStreamServer();
@@ -248,7 +251,7 @@
                     if (art && art.video && (art.video.readyState === 0 || art.video.networkState === 3)) {
                         errorOverlay.classList.remove("hidden");
                     }
-                }, 10000);
+                }, 8000);
             });
         }
 
