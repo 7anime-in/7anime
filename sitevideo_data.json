@@ -159,6 +159,17 @@
           "download_url": "https://sevenanime-bot3-downloader.onrender.com/download/sevenanime_ch1/475",
           "embed_url": "https://t.me/sevenanime_ch1/475?embed=1",
           "tg_url": "https://t.me/sevenanime_ch1/475"
+        },
+        {
+          "ep": 2,
+          "chat_id": "sevenanime_ch1",
+          "msg_id": 527,
+          "type": "official",
+          "format": "H.264 / AVC (AAC)",
+          "stream_url": "https://sevenanime-bot2-streamer.onrender.com/stream/sevenanime_ch1/527.mp4",
+          "download_url": "https://sevenanime-bot3-downloader.onrender.com/download/sevenanime_ch1/527",
+          "embed_url": "https://t.me/sevenanime_ch1/527?embed=1",
+          "tg_url": "https://t.me/sevenanime_ch1/527"
         }
       ]
     }
