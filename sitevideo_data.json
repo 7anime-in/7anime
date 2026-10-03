@@ -162,5 +162,23 @@
         }
       ]
     }
+  },
+  "chained_soldier": {
+    "title": "Chained Soldier",
+    "seasons": {
+      "1": [
+        {
+          "ep": 1,
+          "chat_id": "sevenanime_ch1",
+          "msg_id": 473,
+          "type": "official",
+          "format": "H.264 / AVC (AAC)",
+          "stream_url": "https://sevenanime-bot2-streamer.onrender.com/stream/sevenanime_ch1/473.mp4",
+          "download_url": "https://sevenanime-bot3-downloader.onrender.com/download/sevenanime_ch1/473",
+          "embed_url": "https://t.me/sevenanime_ch1/473?embed=1",
+          "tg_url": "https://t.me/sevenanime_ch1/473"
+        }
+      ]
+    }
   }
 }
