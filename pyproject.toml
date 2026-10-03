@@ -9,4 +9,4 @@ dependencies = [
 ]
 
 [tool.vercel]
-entrypoint = "bot1_scanner.py"
+entrypoint = "bot1_scanner:app"
