@@ -1,0 +1,2 @@
+[tool.vercel]
+entrypoint = "bot1_scanner:app"
