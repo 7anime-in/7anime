@@ -63,7 +63,7 @@
                         <i class="fa-solid fa-play"></i> Switch To Player
                     </a>
                     <!-- 1-CLICK SEASON PACK DOWNLOAD BUTTON -->
-                    <button onclick="downloadCurrentSeasonPack()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold px-5 py-2.5 rounded-lg flex items-center gap-2 transition text-sm shadow-lg border border-emerald-500/40">
+                    <button id="downloadPackBtn" onclick="downloadCurrentSeasonPack()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold px-5 py-2.5 rounded-lg flex items-center gap-2 transition text-sm shadow-lg border border-emerald-500/40">
                         <i class="fa-solid fa-box-archive text-[#66fcf1]"></i> <span id="downloadPackBtnText">Download Full Season Pack</span>
                     </button>
                 </div>
@@ -282,25 +282,46 @@
             }).join("");
         }
 
-        // 1-Click Season Pack Downloader Logic
-        function downloadCurrentSeasonPack() {
+        // Updated In-Website Direct Auto-Downloader
+        async function downloadCurrentSeasonPack() {
             const episodes = animeData?.seasons?.[currentSeason] || [];
-            if(!episodes || episodes.length === 0) {
+            if (!episodes || episodes.length === 0) {
                 alert("Is season ke koi episodes nahi mile!");
                 return;
             }
 
-            const confirmDownload = confirm(`Season ${currentSeason} ke Total ${episodes.length} Episodes ka download start karein?\n\n(Dhyaan de: Browser popups block na kare)`);
-            if(confirmDownload) {
-                episodes.forEach((ep, index) => {
-                    let downloadUrl = ep.download_url || `${BOT3_DOWNLOAD_BASE}/download/${ep.chat_id}/${ep.msg_id}`;
-                    
-                    // Delay 1 second per episode to bypass browser popup block
-                    setTimeout(() => {
-                        window.open(downloadUrl, '_blank');
-                    }, index * 1000);
-                });
+            const confirmDownload = confirm(`Season ${currentSeason} ke Total ${episodes.length} Episodes ka download aapki screen par hi start ho raha hai.\n\nStart karein?`);
+            if (!confirmDownload) return;
+
+            const packBtn = document.getElementById("downloadPackBtn");
+            const packBtnText = document.getElementById("downloadPackBtnText");
+            
+            if (packBtn) packBtn.disabled = true;
+
+            for (let i = 0; i < episodes.length; i++) {
+                const ep = episodes[i];
+                let downloadUrl = ep.download_url || `${BOT3_DOWNLOAD_BASE}/download/${ep.chat_id}/${ep.msg_id}`;
+
+                if (packBtnText) {
+                    packBtnText.innerText = `Downloading Ep ${ep.ep} (${i + 1}/${episodes.length})...`;
+                }
+
+                const a = document.createElement("a");
+                a.href = downloadUrl;
+                a.setAttribute("download", "");
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+
+                await new Promise(resolve => setTimeout(resolve, 2000));
             }
+
+            if (packBtnText) {
+                packBtnText.innerText = `Download Season ${currentSeason} Pack`;
+            }
+            if (packBtn) packBtn.disabled = false;
+
+            alert(`Season ${currentSeason} ke saare episodes ka download trigger ho gaya hai!`);
         }
 
         // Start Execution
