@@ -28,7 +28,7 @@ def is_video_message(message) -> bool:
     if message.document:
         mime = (message.document.mime_type or "").lower()
         fname = (message.document.file_name or "").lower()
-        if mime.startswith("video/") or fname.endswith((".mp4", ".mkv", ".webm", ".avi", ".mov")):
+        if mime.startswith("video/") or fname.endswith((".mp4", ".mkv", ".webm", ".avi", ".mov", ".m4v")):
             return True
     return False
 
@@ -79,7 +79,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="Bot 3 - Downloader Engine", lifespan=lifespan)
 
-# Enable Full CORS for Web Downloads
+# Enable Full CORS for Web Downloads & Multi-threaded Managers
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -108,8 +108,11 @@ async def handle_download_request(
             }
         )
 
-    # Clean extension if passed in URL (.mp4, .mkv, etc.)
-    clean_msg_str = re.sub(r"\.\w+$", "", str(message_id))
+    # Clean URL parameters and extensions
+    chat_id_clean = urllib.parse.unquote(str(chat_id)).strip()
+    msg_str_clean = urllib.parse.unquote(str(message_id)).strip()
+    clean_msg_str = re.sub(r"\.\w+$", "", msg_str_clean)
+
     try:
         msg_id_clean = int(clean_msg_str)
     except ValueError:
@@ -119,7 +122,7 @@ async def handle_download_request(
         raise HTTPException(status_code=503, detail="Downloader client engine initializing...")
 
     try:
-        cid_str = str(chat_id).strip()
+        cid_str = chat_id_clean
         if cid_str.lstrip('-').isdigit():
             target_id = int(cid_str)
         else:
@@ -141,6 +144,10 @@ async def handle_download_request(
     media = msg.video or msg.document
     file_size = media.file_size
     file_name = extract_filename(msg, msg_id_clean, filename_override)
+
+    # Safe Header Encoding (Fixes Latin-1 Uvicorn header crashes)
+    ascii_filename = file_name.encode('ascii', 'ignore').decode('ascii').strip() or f"7anime_Episode_{msg_id_clean}.mp4"
+    ascii_filename = re.sub(r'[\r\n"]', '', ascii_filename)
     encoded_filename = urllib.parse.quote(file_name)
 
     # Range Header Handling for Resumable Downloads (1DM / ADM / Chrome)
@@ -159,12 +166,22 @@ async def handle_download_request(
             if end:
                 until_bytes = int(end)
 
+    # 416 Range Not Satisfiable check
+    if from_bytes >= file_size:
+        return Response(
+            status_code=416,
+            headers={
+                "Content-Range": f"bytes */{file_size}",
+                "Access-Control-Allow-Origin": "*",
+            }
+        )
+
     until_bytes = min(until_bytes, file_size - 1)
     chunk_length = (until_bytes - from_bytes) + 1
 
     headers = {
         "Content-Type": getattr(media, "mime_type", "video/mp4") or "video/mp4",
-        "Content-Disposition": f"attachment; filename=\"{file_name}\"; filename*=UTF-8''{encoded_filename}",
+        "Content-Disposition": f'attachment; filename="{ascii_filename}"; filename*=UTF-8\'\'{encoded_filename}',
         "Accept-Ranges": "bytes",
         "Content-Range": f"bytes {from_bytes}-{until_bytes}/{file_size}",
         "Content-Length": str(chunk_length),
@@ -176,7 +193,7 @@ async def handle_download_request(
     if request.method == "HEAD":
         return Response(status_code=206 if range_header else 200, headers=headers)
 
-    # Pyrogram 1 MB Block Calculation
+    # Pyrogram Block Calculation (1MB Chunking)
     PYRO_BLOCK_SIZE = 1024 * 1024
     start_chunk = from_bytes // PYRO_BLOCK_SIZE
     end_chunk = until_bytes // PYRO_BLOCK_SIZE
@@ -231,7 +248,7 @@ def home():
 def health_check():
     return {"status": "ok", "connected": pyro_client.is_connected if pyro_client else False}
 
-# Standard Download Endpoint
+# Standard Download Endpoints
 @app.api_route("/download/{chat_id}/{message_id}", methods=["GET", "HEAD", "OPTIONS"])
 @app.api_route("/download/{chat_id}/{message_id}.mp4", methods=["GET", "HEAD", "OPTIONS"])
 @app.api_route("/download/{chat_id}/{message_id}.mkv", methods=["GET", "HEAD", "OPTIONS"])
@@ -247,5 +264,5 @@ async def download_file(
 if __name__ == "__main__":
     import uvicorn
     port = int(os.getenv("PORT", 8000))
-    uvicorn.run("bot3_downloader:app", host="0.0.0.0", port=port, reload=False)
+    uvicorn.run(app, host="0.0.0.0", port=port, reload=False)
     
