@@ -72,7 +72,7 @@ def detect_video_format(caption: str = "", filename: str = "") -> str:
 def sync_to_github_sync(json_str: str) -> bool:
     """GitHub REST API via sitevideo_data.json update/commit karta hai."""
     if not GITHUB_TOKEN:
-        print("⚠️️ GITHUB_TOKEN missing! Skipping GitHub commit.")
+        print("⚠ GITHUB_TOKEN missing! Skipping GitHub commit.")
         return False
 
     url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{GITHUB_FILE_PATH}"
@@ -175,37 +175,20 @@ def is_video_message(message: Message) -> bool:
 def parse_anime_info(caption: str, forward_title: str = "", use_context: bool = True) -> Tuple[str, str, int, str]:
     global active_context
 
-    if use_context and active_context.get("anime"):
-        anime_name = active_context["anime"]
-        season = str(active_context["season"])
-        dub_type = active_context["type"]
-
-        se_match = re.search(r"\bS(\d{1,2})[\s\.\-_]*E(\d{1,3})\b", caption or "", re.IGNORECASE)
-        if se_match:
-            episode = int(se_match.group(2))
-            active_context["auto_ep"] = episode + 1
-            return anime_name, season, episode, dub_type
-
-        ep_match = re.search(r"(?:Episode|Ep|E)[\s\-\_]*0*(\d+)", caption or "", re.IGNORECASE)
-        if not ep_match:
-            clean_text = re.sub(r"\b(1080p|720p|480p|360p|2160p|x264|x265|hevc)\b", "", caption or "", flags=re.IGNORECASE)
-            ep_match = re.search(r"(?:[\s\-\_\[\vert{}^])0*(\d{1,3})(?:[\s\-\_\]]|$|\.mp4|\.mkv)", clean_text)
-
-        if ep_match:
-            episode = int(ep_match.group(1))
-            active_context["auto_ep"] = episode + 1
-        else:
-            episode = active_context["auto_ep"]
-            active_context["auto_ep"] += 1
-
-        return anime_name, season, episode, dub_type
-
     text = caption or ""
+
+    # 1. AUDIO / DUB TYPE EXTRACTION (PRIORITY 1: Caption Text)
     dub_type = "official"
     if re.search(r"\b(unofficial|fandub|fan_dub|fan-dub|fan dub)\b", text, re.IGNORECASE) or "#unofficial" in text.lower() or "#fandub" in text.lower():
         dub_type = "unofficial"
     elif re.search(r"\b(official|officialdub|official_dub)\b", text, re.IGNORECASE) or "#official" in text.lower():
         dub_type = "official"
+    elif use_context and active_context.get("type"):
+        dub_type = active_context["type"]
+
+    # 2. SEASON & EPISODE EXTRACTION (PRIORITY 1: Caption Text like S01E01 / S1E1 / Season 1)
+    season = None
+    episode = None
 
     se_match = re.search(r"\bS(\d{1,2})[\s\.\-_]*E(\d{1,3})\b", text, re.IGNORECASE)
     if se_match:
@@ -213,19 +196,43 @@ def parse_anime_info(caption: str, forward_title: str = "", use_context: bool = 
         episode = int(se_match.group(2))
     else:
         season_match = re.search(r"\b(?:Season|S)[\s\-\_]*0*(\d+)\b", text, re.IGNORECASE)
-        season = str(int(season_match.group(1))) if season_match else "1"
+        if season_match:
+            season = str(int(season_match.group(1)))
 
         ep_match = re.search(r"\b(?:Episode|Ep|E)[\s\-\_]*0*(\d+)\b", text, re.IGNORECASE)
         if not ep_match:
             clean_text = re.sub(r"\b(1080p|720p|480p|360p|2160p|x264|x265|hevc|2023|2024|2025|2026)\b", "", text, flags=re.IGNORECASE)
             ep_match = re.search(r"(?:[\s\-\_\[\vert{}^])0*(\d{1,3})(?:[\s\-\_\]]|$|\.mp4|\.mkv)", clean_text)
 
-        episode = int(ep_match.group(1)) if ep_match else 1
+        if ep_match:
+            episode = int(ep_match.group(1))
 
-    explicit_name = re.search(r"(?:Anime|Title|Name)\s*:\s*([^\n\r\t|]+)", text, re.IGNORECASE)
+    # Context Fallbacks for Season & Episode if missing in caption
+    if season is None:
+        if use_context and active_context.get("season"):
+            season = str(active_context["season"])
+        else:
+            season = "1"
 
+    if episode is None:
+        if use_context and active_context.get("auto_ep"):
+            episode = active_context["auto_ep"]
+            active_context["auto_ep"] += 1
+        else:
+            episode = 1
+    else:
+        if use_context and active_context.get("anime"):
+            active_context["auto_ep"] = episode + 1
+
+    # 3. ANIME NAME EXTRACTION (PRIORITY 1: Explicit Caption Tags)
+    # Support examples: "(Anime name: Solo leveling)", "Anime name: Solo leveling", "Anime: Solo Leveling", "Title: ...", "Name: ..."
+    explicit_name = re.search(r"(?:\(?\s*(?:Anime\s*Name\vert{}Anime\vert{}Title\vert{}Name)\s*:\s*([^\n\r\t\vert{}\)\(]+)\)?)", text, re.IGNORECASE)
+
+    raw_title = None
     if explicit_name:
         raw_title = explicit_name.group(1).strip()
+    elif use_context and active_context.get("anime"):
+        raw_title = active_context["anime"]
     elif forward_title:
         raw_title = forward_title
     else:
