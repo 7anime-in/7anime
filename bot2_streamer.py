@@ -3,13 +3,18 @@ import re
 import asyncio
 from typing import Optional
 from contextlib import asynccontextmanager
+import subprocess
 
 from fastapi import FastAPI, Request, Header
 from fastapi.responses import StreamingResponse, Response
 from fastapi.middleware.cors import CORSMiddleware
 
 from pyrogram import Client
-from pyrogram.errors import FloodWait, RPCError
+from pyrogram.errors import FloodWait
+
+# Import imageio-ffmpeg to get bundled FFmpeg binary on Render automatically
+import imageio_ffmpeg
+FFMPEG_BINARY = imageio_ffmpeg.get_ffmpeg_exe()
 
 # ==================== ENVIRONMENT VARIABLES ====================
 API_ID = int(os.getenv("API_ID", "31169133"))
@@ -34,7 +39,8 @@ def is_video_message(message) -> bool:
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     global pyro_client
-    print("🚀 Starting Bot 2 High-Speed Video Streaming Engine...")
+    print("🚀 Starting Bot 2 High-Speed Video Streaming Engine with FFmpeg Support...")
+    print(f"📦 FFmpeg Path detected: {FFMPEG_BINARY}")
 
     pyro_client = Client(
         "bot2_streamer_session",
@@ -42,7 +48,7 @@ async def lifespan(app: FastAPI):
         api_hash=API_HASH,
         bot_token=BOT_TOKEN,
         in_memory=True,  # Prevents SQLite DB locks on cloud hosts like Render
-        max_concurrent_transmissions=10  # Telegram Speed Boost for concurrent chunking
+        max_concurrent_transmissions=10
     )
 
     await pyro_client.start()
@@ -64,6 +70,27 @@ app.add_middleware(
     expose_headers=["Content-Range", "Content-Length", "Accept-Ranges", "Content-Type", "Content-Disposition"],
 )
 
+# ==================== OPTIONAL TRANSCODING HELPER ====================
+def transcode_media_to_h264(input_path: str, output_path: str) -> bool:
+    """Uses bundled imageio-ffmpeg binary to transcode H.265/MKV to H.264 + AAC"""
+    command = [
+        FFMPEG_BINARY,
+        "-i", input_path,
+        "-c:v", "libx264",
+        "-preset", "fast",
+        "-crf", "23",
+        "-c:a", "aac",
+        "-b:a", "128k",
+        output_path,
+        "-y"
+    ]
+    try:
+        subprocess.run(command, check=True)
+        return True
+    except subprocess.CalledProcessError as e:
+        print(f"Transcoding error: {e}")
+        return False
+
 # ==================== STREAMING CORE ENGINE ====================
 async def get_stream_response(
     chat_id: str,
@@ -71,11 +98,9 @@ async def get_stream_response(
     request: Request,
     range_header: Optional[str] = None
 ):
-    # Fallback to fetch Range header directly from request headers
     if not range_header:
         range_header = request.headers.get("range") or request.headers.get("Range")
 
-    # Fast Return for Pre-flight OPTIONS Request (P2P Handshake)
     if request.method == "OPTIONS":
         return Response(
             status_code=200, 
@@ -87,7 +112,6 @@ async def get_stream_response(
             }
         )
 
-    # Clean extension if passed in URL (.mp4, .mkv, .webm, etc.)
     clean_msg_str = re.sub(r"\.\w+$", "", str(message_id))
     try:
         msg_id_clean = int(clean_msg_str)
@@ -98,7 +122,6 @@ async def get_stream_response(
         return Response(content=b"Streamer Engine Initializing...", media_type="text/plain", status_code=503)
 
     try:
-        # Channel ID Formatting Fix (-100... or @channel)
         cid_str = str(chat_id).strip()
         if cid_str.lstrip('-').isdigit():
             target_id = int(cid_str)
@@ -127,7 +150,6 @@ async def get_stream_response(
     from_bytes = 0
     until_bytes = file_size - 1
 
-    # Exact Range Header Handling for SwarmCloud P2P Chunking
     if range_header:
         range_match = re.search(r"bytes=(\d+)-(\d*)", range_header)
         if range_match:
@@ -152,11 +174,9 @@ async def get_stream_response(
         "Cache-Control": "public, max-age=3600",
     }
 
-    # HEAD Request (SwarmCloud P2P Chunk Probing)
     if request.method == "HEAD":
         return Response(status_code=206 if range_header else 200, headers=headers)
 
-    # Pyrogram 1 MB Block Calculation
     PYRO_BLOCK_SIZE = 1024 * 1024
     start_chunk = from_bytes // PYRO_BLOCK_SIZE
     end_chunk = until_bytes // PYRO_BLOCK_SIZE
@@ -194,7 +214,6 @@ async def get_stream_response(
                 bytes_sent += len(chunk)
 
         except (asyncio.CancelledError, Exception):
-            # Gracefully handle player seek or tab closed events
             pass
 
     return StreamingResponse(
@@ -206,11 +225,11 @@ async def get_stream_response(
 # ==================== ENDPOINTS ====================
 @app.api_route("/", methods=["GET", "HEAD"])
 def home():
-    return {"status": "Bot 2 Video Streamer Engine Active 🚀", "service": "7anime Engine"}
+    return {"status": "Bot 2 Video Streamer Engine Active 🚀 with FFmpeg", "service": "7anime Engine"}
 
 @app.get("/health")
 def health_check():
-    return {"status": "ok", "connected": pyro_client.is_connected if pyro_client else False}
+    return {"status": "ok", "connected": pyro_client.is_connected if pyro_client else False, "ffmpeg": FFMPEG_BINARY}
 
 @app.api_route("/stream/{chat_id}/{message_id}", methods=["GET", "HEAD", "OPTIONS"])
 @app.api_route("/stream/{chat_id}/{message_id}.mp4", methods=["GET", "HEAD", "OPTIONS"])
