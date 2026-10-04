@@ -63,7 +63,7 @@
                         <i class="fa-solid fa-play"></i> Switch To Player
                     </a>
                     <!-- 1-CLICK SEASON PACK DOWNLOAD BUTTON -->
-                    <button id="downloadPackBtn" onclick="downloadCurrentSeasonPack()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold px-5 py-2.5 rounded-lg flex items-center gap-2 transition text-sm shadow-lg border border-emerald-500/40">
+                    <button id="downloadPackBtn" onclick="downloadCurrentSeasonPack()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold px-5 py-2.5 rounded-lg flex items-center gap-2 transition text-sm shadow-lg border border-emerald-500/40 cursor-pointer">
                         <i class="fa-solid fa-box-archive text-[#66fcf1]"></i> <span id="downloadPackBtnText">Download Full Season Pack</span>
                     </button>
                 </div>
@@ -100,6 +100,9 @@
     <footer class="bg-[#1f2833] border-t border-gray-800 text-center py-6 text-sm text-gray-400 mt-auto">
         <p>© 2026 7anime Engine. Powered by Bot 3 Direct Downloader Engine.</p>
     </footer>
+
+    <!-- Container for invisible background frames -->
+    <div id="iframeContainer" style="display:none;"></div>
 
     <!-- ==================== JS LOGIC ==================== -->
     <script>
@@ -155,7 +158,6 @@
                 if(siteDataRes.ok) {
                     const siteData = await siteDataRes.json();
                     
-                    // Match slug in array or object format
                     let foundItem = null;
                     if(Array.isArray(siteData)) {
                         foundItem = siteData.find(item => item.slug === animeSlug || item.id === animeSlug);
@@ -221,7 +223,6 @@
                 }
             });
 
-            // Update button label
             document.getElementById("downloadPackBtnText").innerText = `Download Season ${currentSeason} Pack`;
         }
 
@@ -282,7 +283,7 @@
             }).join("");
         }
 
-        // Updated In-Website Direct Auto-Downloader
+        // Multi-file Background IFrame Engine (Server ko load hone ka 4 sec gap milta hai)
         async function downloadCurrentSeasonPack() {
             const episodes = animeData?.seasons?.[currentSeason] || [];
             if (!episodes || episodes.length === 0) {
@@ -290,12 +291,13 @@
                 return;
             }
 
-            const confirmDownload = confirm(`Season ${currentSeason} ke Total ${episodes.length} Episodes ka download aapki screen par hi start ho raha hai.\n\nStart karein?`);
+            const confirmDownload = confirm(`Season ${currentSeason} ke Total ${episodes.length} Episodes ka download start karein?\n\n(Har episode 4 second ke gap me load ho kar download hoga)`);
             if (!confirmDownload) return;
 
             const packBtn = document.getElementById("downloadPackBtn");
             const packBtnText = document.getElementById("downloadPackBtnText");
-            
+            const iframeContainer = document.getElementById("iframeContainer");
+
             if (packBtn) packBtn.disabled = true;
 
             for (let i = 0; i < episodes.length; i++) {
@@ -303,17 +305,16 @@
                 let downloadUrl = ep.download_url || `${BOT3_DOWNLOAD_BASE}/download/${ep.chat_id}/${ep.msg_id}`;
 
                 if (packBtnText) {
-                    packBtnText.innerText = `Downloading Ep ${ep.ep} (${i + 1}/${episodes.length})...`;
+                    packBtnText.innerText = `Loading Ep ${ep.ep} (${i + 1}/${episodes.length})...`;
                 }
 
-                const a = document.createElement("a");
-                a.href = downloadUrl;
-                a.setAttribute("download", "");
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
+                // Create isolated hidden iframe so browser doesn't cancel previous stream
+                const iframe = document.createElement("iframe");
+                iframe.src = downloadUrl;
+                iframeContainer.appendChild(iframe);
 
-                await new Promise(resolve => setTimeout(resolve, 2000));
+                // Server link load hone ka 4 second time
+                await new Promise(resolve => setTimeout(resolve, 4000));
             }
 
             if (packBtnText) {
@@ -321,7 +322,7 @@
             }
             if (packBtn) packBtn.disabled = false;
 
-            alert(`Season ${currentSeason} ke saare episodes ka download trigger ho gaya hai!`);
+            alert(`Season ${currentSeason} ke sabhi (${episodes.length}) episodes ka download queue poora ho gaya hai!`);
         }
 
         // Start Execution
