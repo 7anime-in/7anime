@@ -3,3 +3,4 @@ uvicorn[standard]
 pyrogram
 tgcrypto
 aiohttp
+imageio-ffmpeg
