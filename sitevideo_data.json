@@ -265,5 +265,56 @@
         }
       ]
     }
+  },
+  "ranma": {
+    "title": "RANMA½",
+    "seasons": {
+      "1": [
+        {
+          "ep": 1,
+          "chat_id": "sevenanime_ch1",
+          "msg_id": 599,
+          "type": "official",
+          "format": "H.264 / AVC (AAC)",
+          "stream_url": "https://sevenanime-bot2-streamer.onrender.com/stream/sevenanime_ch1/599.mp4",
+          "download_url": "https://sevenanime-bot3-downloader.onrender.com/download/sevenanime_ch1/599",
+          "embed_url": "https://t.me/sevenanime_ch1/599?embed=1",
+          "tg_url": "https://t.me/sevenanime_ch1/599"
+        },
+        {
+          "ep": 2,
+          "chat_id": "sevenanime_ch1",
+          "msg_id": 600,
+          "type": "official",
+          "format": "H.264 / AVC (AAC)",
+          "stream_url": "https://sevenanime-bot2-streamer.onrender.com/stream/sevenanime_ch1/600.mp4",
+          "download_url": "https://sevenanime-bot3-downloader.onrender.com/download/sevenanime_ch1/600",
+          "embed_url": "https://t.me/sevenanime_ch1/600?embed=1",
+          "tg_url": "https://t.me/sevenanime_ch1/600"
+        },
+        {
+          "ep": 3,
+          "chat_id": "sevenanime_ch1",
+          "msg_id": 601,
+          "type": "official",
+          "format": "H.264 / AVC (AAC)",
+          "stream_url": "https://sevenanime-bot2-streamer.onrender.com/stream/sevenanime_ch1/601.mp4",
+          "download_url": "https://sevenanime-bot3-downloader.onrender.com/download/sevenanime_ch1/601",
+          "embed_url": "https://t.me/sevenanime_ch1/601?embed=1",
+          "tg_url": "https://t.me/sevenanime_ch1/601"
+        },
+        {
+          "ep": 4,
+          "chat_id": "sevenanime_ch1",
+          "msg_id": 602,
+          "type": "official",
+          "format": "H.265 / HEVC (AAC)",
+          "stream_url": "https://sevenanime-bot2-streamer.onrender.com/stream/sevenanime_ch1/602.mp4",
+          "download_url": "https://sevenanime-bot3-downloader.onrender.com/download/sevenanime_ch1/602",
+          "embed_url": "https://t.me/sevenanime_ch1/602?embed=1",
+          "tg_url": "https://t.me/sevenanime_ch1/602"
+        }
+      ]
+    }
   }
 }
