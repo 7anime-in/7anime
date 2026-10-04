@@ -565,6 +565,17 @@
           "download_url": "https://sevenanime-bot3-downloader.onrender.com/download/sevenanime_ch1/644",
           "embed_url": "https://t.me/sevenanime_ch1/644?embed=1",
           "tg_url": "https://t.me/sevenanime_ch1/644"
+        },
+        {
+          "ep": 12,
+          "chat_id": "sevenanime_ch1",
+          "msg_id": 645,
+          "type": "official",
+          "format": "H.264 / AVC (AAC)",
+          "stream_url": "https://sevenanime-bot2-streamer.onrender.com/stream/sevenanime_ch1/645.mp4",
+          "download_url": "https://sevenanime-bot3-downloader.onrender.com/download/sevenanime_ch1/645",
+          "embed_url": "https://t.me/sevenanime_ch1/645?embed=1",
+          "tg_url": "https://t.me/sevenanime_ch1/645"
         }
       ]
     }
