@@ -41,11 +41,12 @@
 
         <!-- ==================== ANIME BANNER & HEADER INFO ==================== -->
         <div class="bg-[#1f2833] p-5 md:p-8 rounded-2xl border border-gray-800 flex flex-col md:flex-row items-center md:items-start gap-6 shadow-xl">
+            <!-- ANIME POSTER IMAGE -->
             <img 
                 id="animePoster" 
-                src="https://via.placeholder.com/300x420/0b0c10/66fcf1?text=7anime" 
+                src="https://via.placeholder.com/300x420/0b0c10/66fcf1?text=Loading..." 
                 alt="Anime Poster" 
-                class="w-36 md:w-48 aspect-[3/4] object-cover rounded-xl border border-gray-700 shadow-md"
+                class="w-36 md:w-48 aspect-[3/4] object-cover rounded-xl border border-gray-700 shadow-md bg-gray-900"
             >
             <div class="flex-1 text-center md:text-left flex flex-col justify-between h-full py-1">
                 <div>
@@ -58,11 +59,12 @@
                 </div>
 
                 <div class="flex flex-wrap items-center justify-center md:justify-start gap-3 mt-6">
-                    <a id="watchNowBtn" href="#" class="bg-[#66fcf1] hover:bg-[#45a29e] text-black font-extrabold px-6 py-2.5 rounded-lg flex items-center gap-2 transition text-sm">
+                    <a id="watchNowBtn" href="#" class="bg-[#66fcf1] hover:bg-[#45a29e] text-black font-extrabold px-6 py-2.5 rounded-lg flex items-center gap-2 transition text-sm shadow-md">
                         <i class="fa-solid fa-play"></i> Switch To Player
                     </a>
-                    <button onclick="downloadCurrentSeasonPack()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-5 py-2.5 rounded-lg flex items-center gap-2 transition text-sm shadow-lg">
-                        <i class="fa-solid fa-[#66fcf1] fa-box-archive"></i> Download Full Season Pack
+                    <!-- 1-CLICK SEASON PACK DOWNLOAD BUTTON -->
+                    <button onclick="downloadCurrentSeasonPack()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold px-5 py-2.5 rounded-lg flex items-center gap-2 transition text-sm shadow-lg border border-emerald-500/40">
+                        <i class="fa-solid fa-box-archive text-[#66fcf1]"></i> <span id="downloadPackBtnText">Download Full Season Pack</span>
                     </button>
                 </div>
             </div>
@@ -71,20 +73,20 @@
         <!-- ==================== SEASON & EPISODE DOWNLOAD LIST ==================== -->
         <div class="bg-[#1f2833] p-4 md:p-6 rounded-2xl border border-gray-800 flex flex-col gap-5">
             
-            <!-- Season Selector Tabs -->
+            <!-- Season Selector Buttons -->
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-700/60 pb-4">
                 <h2 class="text-xl font-bold text-white flex items-center gap-2">
                     <i class="fa-solid fa-cloud-arrow-down text-[#66fcf1]"></i> Available Downloads
                 </h2>
                 
+                <!-- Season Buttons (Season 1, Season 2...) -->
                 <div id="seasonTabsContainer" class="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0">
-                    <!-- Season tabs render dynamically -->
+                    <!-- Dynamic Season Buttons -->
                 </div>
             </div>
 
             <!-- Download List Container -->
             <div id="episodesDownloadList" class="flex flex-col gap-2 max-h-[600px] overflow-y-auto pr-1">
-                <!-- Episode Rows render dynamically -->
                 <div class="animate-pulse bg-gray-800 h-14 rounded-lg"></div>
                 <div class="animate-pulse bg-gray-800 h-14 rounded-lg"></div>
                 <div class="animate-pulse bg-gray-800 h-14 rounded-lg"></div>
@@ -106,6 +108,7 @@
         const BOT3_DOWNLOAD_BASE = "https://sevenanime-bot3-downloader.onrender.com";
 
         let animeData = null;
+        let siteDataMap = {};
         let currentSeason = "1";
 
         // URL Query Parameter Parse (`?anime=solo_leveling`)
@@ -115,17 +118,20 @@
         // Initialize Downloader Page
         async function initDownloader() {
             try {
+                // 1. Fetch anime episode data from Render Bot 1
                 const res = await fetch(`${BOT1_API}/api/episodes/${animeSlug}`);
                 if(!res.ok) throw new Error("Anime API not found");
-
                 animeData = await res.json();
 
-                // UI Metadata Update
+                // 2. Fetch poster image from site_data.json
+                await loadAnimePosterImage();
+
+                // 3. UI Metadata Update
                 document.getElementById("animeTitle").innerText = animeData.title || "Anime Title";
-                document.getElementById("animePoster").src = `https://via.placeholder.com/300x420/1f2833/66fcf1?text=${encodeURIComponent(animeData.title || '7anime')}`;
                 document.getElementById("watchNowBtn").href = `7anime_videoplayer.html?anime=${animeSlug}`;
                 document.getElementById("navWatchLink").href = `7anime_videoplayer.html?anime=${animeSlug}`;
 
+                // 4. Render Season Buttons
                 renderSeasonTabs();
 
                 const seasons = Object.keys(animeData.seasons || {});
@@ -140,12 +146,44 @@
             }
         }
 
-        // Render Season Switcher Tabs
+        // Fetch Image from site_data.json or API
+        async function loadAnimePosterImage() {
+            let posterUrl = animeData?.poster || animeData?.image || animeData?.poster_url;
+
+            try {
+                const siteDataRes = await fetch('site_data.json');
+                if(siteDataRes.ok) {
+                    const siteData = await siteDataRes.json();
+                    
+                    // Match slug in array or object format
+                    let foundItem = null;
+                    if(Array.isArray(siteData)) {
+                        foundItem = siteData.find(item => item.slug === animeSlug || item.id === animeSlug);
+                    } else if(siteData[animeSlug]) {
+                        foundItem = siteData[animeSlug];
+                    }
+
+                    if(foundItem) {
+                        posterUrl = foundItem.poster || foundItem.image || foundItem.img || foundItem.banner || posterUrl;
+                    }
+                }
+            } catch(e) {
+                console.log("site_data.json not found or error loading, using fallback poster.");
+            }
+
+            if(posterUrl) {
+                document.getElementById("animePoster").src = posterUrl;
+            } else {
+                document.getElementById("animePoster").src = `https://via.placeholder.com/300x420/1f2833/66fcf1?text=${encodeURIComponent(animeData.title || '7anime')}`;
+            }
+        }
+
+        // Render Season Buttons (Season 1, Season 2, Season 3...)
         function renderSeasonTabs() {
             const tabsContainer = document.getElementById("seasonTabsContainer");
-            const seasons = Object.keys(animeData.seasons || {});
+            const seasons = Object.keys(animeData?.seasons || {});
 
-            if(seasons.length <= 1) {
+            if(seasons.length === 0) {
                 tabsContainer.innerHTML = `<span class="text-xs text-gray-400 font-semibold">Season 1</span>`;
                 return;
             }
@@ -154,9 +192,9 @@
                 <button 
                     onclick="switchSeason('${s}')" 
                     id="tab-s-${s}"
-                    class="px-4 py-1.5 text-xs font-bold rounded-lg bg-gray-800 text-gray-300 hover:bg-gray-700 border border-gray-700 transition whitespace-nowrap"
+                    class="px-4 py-1.5 text-xs font-black rounded-lg transition-all duration-200 cursor-pointer flex items-center gap-1.5"
                 >
-                    Season ${s}
+                    <i class="fa-solid fa-layer-group text-[10px]"></i> Season ${s}
                 </button>
             `).join("");
 
@@ -171,23 +209,26 @@
         }
 
         function updateTabStyles() {
-            const seasons = Object.keys(animeData.seasons || {});
+            const seasons = Object.keys(animeData?.seasons || {});
             seasons.forEach(s => {
                 const tab = document.getElementById(`tab-s-${s}`);
                 if(tab) {
                     if(s === currentSeason) {
-                        tab.className = "px-4 py-1.5 text-xs font-bold rounded-lg bg-[#66fcf1] text-black border border-[#66fcf1] transition whitespace-nowrap";
+                        tab.className = "px-4 py-1.5 text-xs font-black rounded-lg bg-[#66fcf1] text-black border border-[#66fcf1] shadow-lg shadow-[#66fcf1]/20 scale-105 transition-all duration-200 cursor-pointer flex items-center gap-1.5";
                     } else {
-                        tab.className = "px-4 py-1.5 text-xs font-bold rounded-lg bg-gray-800 text-gray-300 hover:bg-gray-700 border border-gray-700 transition whitespace-nowrap";
+                        tab.className = "px-4 py-1.5 text-xs font-bold rounded-lg bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-white border border-gray-700 transition-all duration-200 cursor-pointer flex items-center gap-1.5";
                     }
                 }
             });
+
+            // Update button label
+            document.getElementById("downloadPackBtnText").innerText = `Download Season ${currentSeason} Pack`;
         }
 
         // Render Episodes Download List
         function renderEpisodeDownloadList(seasonNum) {
             const listContainer = document.getElementById("episodesDownloadList");
-            const episodes = animeData.seasons[seasonNum] || [];
+            const episodes = animeData?.seasons?.[seasonNum] || [];
 
             document.getElementById("totalEpBadge").innerText = `${episodes.length} Episodes Total`;
 
@@ -241,23 +282,23 @@
             }).join("");
         }
 
-        // 1-Click Multi-Episode Season Pack Downloader Logic
+        // 1-Click Season Pack Downloader Logic
         function downloadCurrentSeasonPack() {
-            const episodes = animeData.seasons[currentSeason] || [];
-            if(episodes.length === 0) {
-                alert("No episodes found to download!");
+            const episodes = animeData?.seasons?.[currentSeason] || [];
+            if(!episodes || episodes.length === 0) {
+                alert("Is season ke koi episodes nahi mile!");
                 return;
             }
 
-            const confirmDownload = confirm(`Season ${currentSeason} ke Total ${episodes.length} episodes ka download start karein?\n\n(Note: Browser popups allow rakhein)`);
+            const confirmDownload = confirm(`Season ${currentSeason} ke Total ${episodes.length} Episodes ka download start karein?\n\n(Dhyaan de: Browser popups block na kare)`);
             if(confirmDownload) {
                 episodes.forEach((ep, index) => {
                     let downloadUrl = ep.download_url || `${BOT3_DOWNLOAD_BASE}/download/${ep.chat_id}/${ep.msg_id}`;
                     
-                    // Delay 1.2 second per file to bypass browser popup block
+                    // Delay 1 second per episode to bypass browser popup block
                     setTimeout(() => {
                         window.open(downloadUrl, '_blank');
-                    }, index * 1200);
+                    }, index * 1000);
                 });
             }
         }
