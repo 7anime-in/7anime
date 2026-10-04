@@ -338,6 +338,105 @@
           "download_url": "https://sevenanime-bot3-downloader.onrender.com/download/sevenanime_ch1/667",
           "embed_url": "https://t.me/sevenanime_ch1/667?embed=1",
           "tg_url": "https://t.me/sevenanime_ch1/667"
+        },
+        {
+          "ep": 4,
+          "chat_id": "sevenanime_ch1",
+          "msg_id": 668,
+          "type": "official",
+          "format": "H.264 / AVC (AAC)",
+          "stream_url": "https://sevenanime-bot2-streamer.onrender.com/stream/sevenanime_ch1/668.mp4",
+          "download_url": "https://sevenanime-bot3-downloader.onrender.com/download/sevenanime_ch1/668",
+          "embed_url": "https://t.me/sevenanime_ch1/668?embed=1",
+          "tg_url": "https://t.me/sevenanime_ch1/668"
+        },
+        {
+          "ep": 5,
+          "chat_id": "sevenanime_ch1",
+          "msg_id": 669,
+          "type": "official",
+          "format": "H.264 / AVC (AAC)",
+          "stream_url": "https://sevenanime-bot2-streamer.onrender.com/stream/sevenanime_ch1/669.mp4",
+          "download_url": "https://sevenanime-bot3-downloader.onrender.com/download/sevenanime_ch1/669",
+          "embed_url": "https://t.me/sevenanime_ch1/669?embed=1",
+          "tg_url": "https://t.me/sevenanime_ch1/669"
+        },
+        {
+          "ep": 6,
+          "chat_id": "sevenanime_ch1",
+          "msg_id": 670,
+          "type": "official",
+          "format": "H.264 / AVC (AAC)",
+          "stream_url": "https://sevenanime-bot2-streamer.onrender.com/stream/sevenanime_ch1/670.mp4",
+          "download_url": "https://sevenanime-bot3-downloader.onrender.com/download/sevenanime_ch1/670",
+          "embed_url": "https://t.me/sevenanime_ch1/670?embed=1",
+          "tg_url": "https://t.me/sevenanime_ch1/670"
+        },
+        {
+          "ep": 7,
+          "chat_id": "sevenanime_ch1",
+          "msg_id": 671,
+          "type": "official",
+          "format": "H.264 / AVC (AAC)",
+          "stream_url": "https://sevenanime-bot2-streamer.onrender.com/stream/sevenanime_ch1/671.mp4",
+          "download_url": "https://sevenanime-bot3-downloader.onrender.com/download/sevenanime_ch1/671",
+          "embed_url": "https://t.me/sevenanime_ch1/671?embed=1",
+          "tg_url": "https://t.me/sevenanime_ch1/671"
+        },
+        {
+          "ep": 8,
+          "chat_id": "sevenanime_ch1",
+          "msg_id": 672,
+          "type": "official",
+          "format": "H.264 / AVC (AAC)",
+          "stream_url": "https://sevenanime-bot2-streamer.onrender.com/stream/sevenanime_ch1/672.mp4",
+          "download_url": "https://sevenanime-bot3-downloader.onrender.com/download/sevenanime_ch1/672",
+          "embed_url": "https://t.me/sevenanime_ch1/672?embed=1",
+          "tg_url": "https://t.me/sevenanime_ch1/672"
+        },
+        {
+          "ep": 9,
+          "chat_id": "sevenanime_ch1",
+          "msg_id": 673,
+          "type": "official",
+          "format": "H.264 / AVC (AAC)",
+          "stream_url": "https://sevenanime-bot2-streamer.onrender.com/stream/sevenanime_ch1/673.mp4",
+          "download_url": "https://sevenanime-bot3-downloader.onrender.com/download/sevenanime_ch1/673",
+          "embed_url": "https://t.me/sevenanime_ch1/673?embed=1",
+          "tg_url": "https://t.me/sevenanime_ch1/673"
+        },
+        {
+          "ep": 10,
+          "chat_id": "sevenanime_ch1",
+          "msg_id": 674,
+          "type": "official",
+          "format": "H.264 / AVC (AAC)",
+          "stream_url": "https://sevenanime-bot2-streamer.onrender.com/stream/sevenanime_ch1/674.mp4",
+          "download_url": "https://sevenanime-bot3-downloader.onrender.com/download/sevenanime_ch1/674",
+          "embed_url": "https://t.me/sevenanime_ch1/674?embed=1",
+          "tg_url": "https://t.me/sevenanime_ch1/674"
+        },
+        {
+          "ep": 11,
+          "chat_id": "sevenanime_ch1",
+          "msg_id": 675,
+          "type": "official",
+          "format": "H.264 / AVC (AAC)",
+          "stream_url": "https://sevenanime-bot2-streamer.onrender.com/stream/sevenanime_ch1/675.mp4",
+          "download_url": "https://sevenanime-bot3-downloader.onrender.com/download/sevenanime_ch1/675",
+          "embed_url": "https://t.me/sevenanime_ch1/675?embed=1",
+          "tg_url": "https://t.me/sevenanime_ch1/675"
+        },
+        {
+          "ep": 12,
+          "chat_id": "sevenanime_ch1",
+          "msg_id": 676,
+          "type": "official",
+          "format": "H.264 / AVC (AAC)",
+          "stream_url": "https://sevenanime-bot2-streamer.onrender.com/stream/sevenanime_ch1/676.mp4",
+          "download_url": "https://sevenanime-bot3-downloader.onrender.com/download/sevenanime_ch1/676",
+          "embed_url": "https://t.me/sevenanime_ch1/676?embed=1",
+          "tg_url": "https://t.me/sevenanime_ch1/676"
         }
       ]
     }
