@@ -33,10 +33,7 @@ GITHUB_FILE_PATH = os.getenv("GITHUB_FILE_PATH", "sitevideo_data.json")
 
 DATA_FILE = "sitevideo_data.json"
 anime_database: Dict[str, Any] = {}
-
-# Fast Lookups
 msg_index: Set[Tuple[str, int]] = set()
-msg_lookup: Dict[Tuple[str, int], Tuple[str, str, int]] = {}
 
 pyro_client: Client = None
 scanner_task: asyncio.Task = None
@@ -48,48 +45,32 @@ active_context: Dict[str, Any] = {
     "auto_ep": 1
 }
 
-# ==================== PRE-COMPILED REGEX PATTERNS ====================
-RE_UNOFFICIAL_DUB = re.compile(r"\b(unofficial|fandub|fan_dub|fan-dub|fan dub)\b", re.IGNORECASE)
-RE_OFFICIAL_DUB = re.compile(r"\b(official|offical|officialdub|official_dub)\b", re.IGNORECASE)
-
-RE_SE_COMBINED = re.compile(r"\bS(\d{1,2})[\s\.\-_]*E(\d{1,3})\b", re.IGNORECASE)
-RE_SEASON_ONLY = re.compile(r"\b(?:Season|S)[\s\-\_]*0*(\d+)\b", re.IGNORECASE)
-RE_EPISODE_ONLY = re.compile(r"\b(?:Episode|Ep|E)[\s\-\_]*0*(\d+)\b", re.IGNORECASE)
-RE_CLEAN_NOISE_EP = re.compile(r"\b(1080p|720p|480p|360p|2160p|x264|x265|hevc|2023|2024|2025|2026)\b", re.IGNORECASE)
-RE_EP_FALLBACK = re.compile(r"(?:[\s\-\_\[\vert{}^])0*(\d{1,3})(?:[\s\-\_\]]|$|\.mp4|\.mkv)")
-
-RE_FN_SE = re.compile(r"(?:[_\s\.\-]|\b)[sS](\d{1,2})[_\s\.\-]*[eE](\d{1,3})\b")
-RE_FN_S = re.compile(r"(?:[_\s\.\-]|\b)[sS]0*(\d{1,2})\b")
-RE_FN_E = re.compile(r"(?:[_\s\.\-]|\b)[eE]0*(\d{1,3})\b")
-
-RE_EXPLICIT_TAG = re.compile(r"(?:Anime\s*Name|Anime|Title|Name)\s*[:\-]\s*([^\n\r]+)", re.IGNORECASE)
-RE_NON_GENERIC_LINE = re.compile(r"^(Episode|Season|Language|Quality|Main Channel|Powered By|http|https|@)", re.IGNORECASE)
-RE_GENERIC_FORWARD = re.compile(r"(official|community|animez|channel|network|main)", re.IGNORECASE)
-
-RE_CLEAN_TITLE_TAGS = re.compile(
-    r"(?i)\b(in|hindi|dubbed|dub|sub|official|offical|unofficial|fandub|1080p|720p|480p|fhd|hd|hevc|x264|x265|language|quality|main channel|community|animez)\b"
-)
-RE_CODEC_HEVC = re.compile(r"\b(x265|hevc|h265|h\.265|265)\b", re.IGNORECASE)
-RE_CODEC_AAC = re.compile(r"\b(aac|aac2\.0)\b", re.IGNORECASE)
-RE_CODEC_OPUS = re.compile(r"\b(opus|ac3|eac3|dts)\b", re.IGNORECASE)
-
 # ==================== FORMAT & CODEC DETECTOR ====================
 def detect_video_format(caption: str = "", filename: str = "") -> str:
+    """Detects H.264 / AAC or H.265 / AAC from caption/filename."""
     combined = f"{caption} {filename}".lower()
     
-    v_codec = "H.265 / HEVC" if RE_CODEC_HEVC.search(combined) else "H.264 / AVC"
-    
-    if RE_CODEC_AAC.search(combined):
+    # Check Video Codec
+    if re.search(r"\b(x265|hevc|h265|h\.265|265)\b", combined):
+        v_codec = "H.265 / HEVC"
+    elif re.search(r"\b(x264|avc|h264|h\.264|264)\b", combined):
+        v_codec = "H.264 / AVC"
+    else:
+        v_codec = "H.264 / AVC"  # Standard Default
+
+    # Check Audio Codec
+    if re.search(r"\b(aac|aac2\.0)\b", combined):
         a_codec = "AAC"
-    elif RE_CODEC_OPUS.search(combined):
+    elif re.search(r"\b(opus|ac3|eac3|dts)\b", combined):
         a_codec = "Opus/AC3"
     else:
-        a_codec = "AAC"
+        a_codec = "AAC"  # Standard Default
 
     return f"{v_codec} ({a_codec})"
 
 # ==================== GITHUB API SYNC & LOCAL PERSISTENCE ====================
 def sync_to_github_sync(json_str: str) -> bool:
+    """GitHub REST API via sitevideo_data.json update/commit karta hai."""
     if not GITHUB_TOKEN:
         print("⚠ GITHUB_TOKEN missing! Skipping GitHub commit.")
         return False
@@ -135,34 +116,28 @@ def sync_to_github_sync(json_str: str) -> bool:
 
     return False
 
-def _write_file_sync(data_str: str):
-    with open(DATA_FILE, "w", encoding="utf-8") as f:
-        f.write(data_str)
-
 async def save_database_to_file():
-    json_str = json.dumps(anime_database, indent=2, ensure_ascii=False)
+    """Local JSON write ke sath-sath GitHub par auto commit karta hai."""
     try:
-        await asyncio.to_thread(_write_file_sync, json_str)
+        with open(DATA_FILE, "w", encoding="utf-8") as f:
+            json.dump(anime_database, f, indent=2, ensure_ascii=False)
     except Exception as e:
         print(f"⚠️ Error saving locally: {e}")
 
+    json_str = json.dumps(anime_database, indent=2, ensure_ascii=False)
     await asyncio.to_thread(sync_to_github_sync, json_str)
 
 def rebuild_msg_index():
-    global msg_index, msg_lookup
+    global msg_index
     msg_index.clear()
-    msg_lookup.clear()
-    
     for slug, anime_data in anime_database.items():
         for season, ep_list in anime_data.get("seasons", {}).items():
-            for idx, ep_item in enumerate(ep_list):
+            for ep_item in ep_list:
                 chat = ep_item.get("chat_id")
                 msg = ep_item.get("msg_id")
                 if chat and msg is not None:
                     try:
-                        key = (str(chat), int(msg))
-                        msg_index.add(key)
-                        msg_lookup[key] = (slug, str(season), idx)
+                        msg_index.add((str(chat), int(msg)))
                     except ValueError:
                         continue
 
@@ -195,127 +170,78 @@ def is_video_message(message: Message) -> bool:
             return True
     return False
 
-def parse_anime_info(caption: str, forward_title: str = "", filename: str = "", use_context: bool = True) -> Tuple[str, str, int, str]:
+def parse_anime_info(caption: str, forward_title: str = "", use_context: bool = True) -> Tuple[str, str, int, str]:
     global active_context
 
-    caption_text = caption or ""
-    file_text = filename or ""
+    if use_context and active_context.get("anime"):
+        anime_name = active_context["anime"]
+        season = str(active_context["season"])
+        dub_type = active_context["type"]
 
-    # 1. AUDIO / DUB TYPE EXTRACTION
-    dub_type = None
+        se_match = re.search(r"\bS(\d{1,2})[\s\.\-_]*E(\d{1,3})\b", caption or "", re.IGNORECASE)
+        if se_match:
+            episode = int(se_match.group(2))
+            active_context["auto_ep"] = episode + 1
+            return anime_name, season, episode, dub_type
 
-    if RE_UNOFFICIAL_DUB.search(caption_text) or "#unofficial" in caption_text.lower() or "#fandub" in caption_text.lower():
+        ep_match = re.search(r"(?:Episode|Ep|E)[\s\-\_]*0*(\d+)", caption or "", re.IGNORECASE)
+        if not ep_match:
+            clean_text = re.sub(r"\b(1080p|720p|480p|360p|2160p|x264|x265|hevc)\b", "", caption or "", flags=re.IGNORECASE)
+            ep_match = re.search(r"(?:[\s\-\_\[\vert{}^])0*(\d{1,3})(?:[\s\-\_\]]|$|\.mp4|\.mkv)", clean_text)
+
+        if ep_match:
+            episode = int(ep_match.group(1))
+            active_context["auto_ep"] = episode + 1
+        else:
+            episode = active_context["auto_ep"]
+            active_context["auto_ep"] += 1
+
+        return anime_name, season, episode, dub_type
+
+    text = caption or ""
+    dub_type = "official"
+    if re.search(r"\b(unofficial|fandub|fan_dub|fan-dub|fan dub)\b", text, re.IGNORECASE) or "#unofficial" in text.lower() or "#fandub" in text.lower():
         dub_type = "unofficial"
-    elif RE_OFFICIAL_DUB.search(caption_text) or "#official" in caption_text.lower():
+    elif re.search(r"\b(official|officialdub|official_dub)\b", text, re.IGNORECASE) or "#official" in text.lower():
         dub_type = "official"
 
-    if not dub_type and file_text:
-        if RE_UNOFFICIAL_DUB.search(file_text):
-            dub_type = "unofficial"
-        elif RE_OFFICIAL_DUB.search(file_text):
-            dub_type = "official"
-
-    if not dub_type:
-        dub_type = active_context.get("type") if (use_context and active_context.get("type")) else "official"
-
-    # 2. SEASON & EPISODE EXTRACTION
-    season = None
-    episode = None
-
-    # Priority 1: Caption Text
-    se_match = RE_SE_COMBINED.search(caption_text)
+    se_match = re.search(r"\bS(\d{1,2})[\s\.\-_]*E(\d{1,3})\b", text, re.IGNORECASE)
     if se_match:
         season = str(int(se_match.group(1)))
         episode = int(se_match.group(2))
     else:
-        season_match = RE_SEASON_ONLY.search(caption_text)
-        if season_match:
-            season = str(int(season_match.group(1)))
+        season_match = re.search(r"\b(?:Season|S)[\s\-\_]*0*(\d+)\b", text, re.IGNORECASE)
+        season = str(int(season_match.group(1))) if season_match else "1"
 
-        ep_match = RE_EPISODE_ONLY.search(caption_text)
+        ep_match = re.search(r"\b(?:Episode|Ep|E)[\s\-\_]*0*(\d+)\b", text, re.IGNORECASE)
         if not ep_match:
-            clean_text = RE_CLEAN_NOISE_EP.sub("", caption_text)
-            ep_match = RE_EP_FALLBACK.search(clean_text)
+            clean_text = re.sub(r"\b(1080p|720p|480p|360p|2160p|x264|x265|hevc|2023|2024|2025|2026)\b", "", text, flags=re.IGNORECASE)
+            ep_match = re.search(r"(?:[\s\-\_\[\vert{}^])0*(\d{1,3})(?:[\s\-\_\]]|$|\.mp4|\.mkv)", clean_text)
 
-        if ep_match:
-            episode = int(ep_match.group(1))
+        episode = int(ep_match.group(1)) if ep_match else 1
 
-    # Priority 2: Video File Name
-    if (season is None or episode is None) and file_text:
-        fn_se_match = RE_FN_SE.search(file_text)
-        if fn_se_match:
-            if season is None:
-                season = str(int(fn_se_match.group(1)))
-            if episode is None:
-                episode = int(fn_se_match.group(2))
-        else:
-            if season is None:
-                fn_s = RE_FN_S.search(file_text)
-                if fn_s:
-                    season = str(int(fn_s.group(1)))
-            if episode is None:
-                fn_e = RE_FN_E.search(file_text)
-                if fn_e:
-                    episode = int(fn_e.group(1))
+    # 1. Explicit search like "Anime : Ranma 1/2" or "Title ranma1/2"
+    explicit_name = re.search(r"(?:Anime|Title|Name)\s*[:\s\-]\s*([^\n\r\t|]+)", text, re.IGNORECASE)
 
-    # Context Fallbacks for Season & Episode
-    if season is None:
-        season = str(active_context["season"]) if (use_context and active_context.get("season")) else "1"
-
-    if episode is None:
-        if use_context and active_context.get("auto_ep"):
-            episode = active_context["auto_ep"]
-            active_context["auto_ep"] += 1
-        else:
-            episode = 1
+    if explicit_name:
+        raw_title = explicit_name.group(1).strip()
     else:
-        if use_context and active_context.get("anime"):
-            active_context["auto_ep"] = episode + 1
-
-    # 3. ANIME NAME EXTRACTION
-    raw_title = None
-
-    # Priority A: Caption Tag "Anime name: XYZ", "Anime: XYZ", "Title: XYZ"
-    explicit_match = RE_EXPLICIT_TAG.search(caption_text)
-    if explicit_match:
-        raw_title = explicit_match.group(1).strip()
-        raw_title = re.sub(r"[\)\}\]]+$", "", raw_title).strip()
-
-    # Priority B: Video File Name Extraction
-    elif file_text and not re.search(r"^(video|file|doc|\d+$)", file_text, re.IGNORECASE):
-        fn_clean = re.sub(r"\.(mp4|mkv|webm|avi|mov)$", "", file_text, flags=re.IGNORECASE)
-        fn_clean = re.sub(r"(?i)[_\s\.\-]*[sS]\d{1,2}[_\s\.\-]*[eE]\d{1,3}\b", "", fn_clean)
-        fn_clean = re.sub(r"(?i)[_\s\.\-]*[sS]\d{1,2}\b", "", fn_clean)
-        fn_clean = re.sub(r"(?i)[_\s\.\-]*[eE]\d{1,3}\b", "", fn_clean)
-        fn_clean = RE_CLEAN_TITLE_TAGS.sub("", fn_clean)
-        fn_clean = re.sub(r"[_\.\-]", " ", fn_clean).strip()
-        if len(fn_clean) > 2:
-            raw_title = fn_clean
-
-    # Priority C: Active Context
-    elif use_context and active_context.get("anime"):
-        raw_title = active_context["anime"]
-
-    # Priority D: First Non-Generic Line in Caption
-    else:
-        lines = [l.strip() for l in caption_text.split("\n") if l.strip()]
+        # IGNORE forward_title completely so channel names are NEVER used during rescan
+        lines = [l.strip() for l in text.split("\n") if l.strip()]
+        # Skip lines that look like headers or episode info
+        candidate_lines = []
         for line in lines:
-            if not RE_NON_GENERIC_LINE.search(line):
-                raw_title = line
-                break
+            if not re.search(r"(?i)\b(episode|season|language|quality|main channel|powered by)\b", line):
+                candidate_lines.append(line)
+        raw_title = candidate_lines[0] if candidate_lines else (lines[0] if lines else "Unknown Anime")
 
-    # Priority E: Forward Title Fallback
-    if not raw_title and forward_title:
-        if not RE_GENERIC_FORWARD.search(forward_title):
-            raw_title = forward_title
-
-    if not raw_title:
-        raw_title = "Unknown Anime"
-
-    # Final Cleaning of Title
+    # Clean special noise from title
     clean_title = re.sub(r"(?i)\bS\d{1,2}[\s\.\-_]*E\d{1,3}\b", "", raw_title)
-    clean_title = re.sub(r"(?i)\b(Episode|Season)\s*\d+", "", clean_title)
-    clean_title = RE_CLEAN_TITLE_TAGS.sub("", clean_title)
+    clean_title = re.sub(
+        r"(?i)\b(in|hindi|dubbed|dub|sub|official|unofficial|fandub|1080p|720p|480p|fhd|hd|hevc|x264|x265|episode|season|language|quality|main channel|powered by)\b",
+        "",
+        clean_title,
+    )
     clean_title = re.sub(r"[^\w\s]", " ", clean_title)
     clean_title = re.sub(r"\s+", " ", clean_title).strip().title()
 
@@ -326,27 +252,24 @@ def parse_anime_info(caption: str, forward_title: str = "", filename: str = "", 
 
 async def add_to_database(chat_id: str, msg_id: int, caption: str, forward_title: str, filename: str = "", use_context: bool = True, auto_save: bool = True) -> Tuple[str, str, int, str, str]:
     formatted_chat = str(chat_id).replace("@", "")
-    key = (formatted_chat, int(msg_id))
 
-    anime_name, season_num, ep_num, dub_type = parse_anime_info(caption, forward_title, filename, use_context=use_context)
+    anime_name, season_num, ep_num, dub_type = parse_anime_info(caption, forward_title, use_context=use_context)
     slug_key = re.sub(r'[^a-zA-Z0-9]+', '_', anime_name.lower()).strip('_')
     video_format = detect_video_format(caption, filename)
 
-    # Fast O(1) Update if message already indexed
-    if key in msg_index and key in msg_lookup:
-        slug, season, idx = msg_lookup[key]
-        try:
-            ep_item = anime_database[slug]["seasons"][season][idx]
-            ep_item["stream_url"] = f"{BOT2_STREAM_BASE.rstrip('/')}/stream/{formatted_chat}/{msg_id}.mp4"
-            ep_item["download_url"] = f"{BOT3_DOWNLOAD_BASE.rstrip('/')}/download/{formatted_chat}/{msg_id}"
-            ep_item["embed_url"] = f"https://t.me/{formatted_chat}/{msg_id}?embed=1"
-            ep_item["tg_url"] = f"https://t.me/{formatted_chat}/{msg_id}"
-            ep_item["format"] = video_format
-            if auto_save:
-                await save_database_to_file()
-            return anime_database[slug]["title"], season, ep_item["ep"], ep_item.get("type", dub_type), video_format
-        except (KeyError, IndexError):
-            pass
+    if (formatted_chat, int(msg_id)) in msg_index:
+        for slug, anime_data in anime_database.items():
+            for season, ep_list in anime_data.get("seasons", {}).items():
+                for ep_item in ep_list:
+                    if str(ep_item.get("chat_id")) == formatted_chat and int(ep_item.get("msg_id", 0)) == int(msg_id):
+                        ep_item["stream_url"] = f"{BOT2_STREAM_BASE.rstrip('/')}/stream/{formatted_chat}/{msg_id}.mp4"
+                        ep_item["download_url"] = f"{BOT3_DOWNLOAD_BASE.rstrip('/')}/download/{formatted_chat}/{msg_id}"
+                        ep_item["embed_url"] = f"https://t.me/{formatted_chat}/{msg_id}?embed=1"
+                        ep_item["tg_url"] = f"https://t.me/{formatted_chat}/{msg_id}"
+                        ep_item["format"] = video_format
+                        if auto_save:
+                            await save_database_to_file()
+                        return anime_name, season_num, ep_num, dub_type, video_format
 
     if slug_key not in anime_database:
         anime_database[slug_key] = {"title": anime_name, "seasons": {}}
@@ -358,16 +281,21 @@ async def add_to_database(chat_id: str, msg_id: int, caption: str, forward_title
 
     ep_list = anime_database[slug_key]["seasons"][season_num]
 
+    stream_url = f"{BOT2_STREAM_BASE.rstrip('/')}/stream/{formatted_chat}/{msg_id}.mp4"
+    download_url = f"{BOT3_DOWNLOAD_BASE.rstrip('/')}/download/{formatted_chat}/{msg_id}"
+    embed_url = f"https://t.me/{formatted_chat}/{msg_id}?embed=1"
+    tg_url = f"https://t.me/{formatted_chat}/{msg_id}"
+
     ep_entry = {
         "ep": ep_num,
         "chat_id": formatted_chat,
         "msg_id": int(msg_id),
         "type": dub_type,
         "format": video_format,
-        "stream_url": f"{BOT2_STREAM_BASE.rstrip('/')}/stream/{formatted_chat}/{msg_id}.mp4",
-        "download_url": f"{BOT3_DOWNLOAD_BASE.rstrip('/')}/download/{formatted_chat}/{msg_id}",
-        "embed_url": f"https://t.me/{formatted_chat}/{msg_id}?embed=1",
-        "tg_url": f"https://t.me/{formatted_chat}/{msg_id}"
+        "stream_url": stream_url,
+        "download_url": download_url,
+        "embed_url": embed_url,
+        "tg_url": tg_url
     }
 
     existing_ep = next((item for item in ep_list if item["ep"] == ep_num and item.get("type", "official") == dub_type), None)
@@ -378,8 +306,7 @@ async def add_to_database(chat_id: str, msg_id: int, caption: str, forward_title
         ep_list.append(ep_entry)
         ep_list.sort(key=lambda x: x["ep"])
 
-    msg_index.add(key)
-    msg_lookup[key] = (slug_key, season_num, len(ep_list) - 1)
+    msg_index.add((formatted_chat, int(msg_id)))
 
     if auto_save:
         await save_database_to_file()
@@ -479,9 +406,15 @@ async def lifespan(app: FastAPI):
             "📺 **Channel Management:**\n"
             "• `/listchannels` - View all monitored channels\n"
             "• `/addchannel <@username>` - Add new channel\n"
+            "  _Example:_ `/addchannel @sevenanime_ch2`\n"
             "• `/rescan` - Reset DB & fresh scan channels\n\n"
+            "🛠️ **Manual Database Edits:**\n"
+            "• `/add <channel> <msg_id> <slug> <season> <ep> [official/unofficial]`\n"
+            "• `/delete <slug> <season> <ep>`\n"
+            "• `/rename <slug> <New Title>`\n\n"
             "📊 **System:**\n"
-            "• `/stats` - View total indexed anime & episode count"
+            "• `/stats` - View total indexed anime & episode count\n"
+            "• `/start` or `/ping` - Show this full help menu"
         )
         await message.reply_text(start_text, quote=True)
 
@@ -517,7 +450,6 @@ async def lifespan(app: FastAPI):
     async def rescan_cmd(client: Client, message: Message):
         anime_database.clear()
         msg_index.clear()
-        msg_lookup.clear()
         await save_database_to_file()
         await message.reply_text("🔄 **Database Reset! Rescanning channels...**", quote=True)
         asyncio.create_task(auto_scan_channels())
@@ -532,17 +464,11 @@ async def lifespan(app: FastAPI):
         chat_identifier = f"@{chat.username}" if chat.username else str(chat.id)
         msg_id = message.id
 
-        combined_text = ""
-        if message.reply_to_message:
-            combined_text += (message.reply_to_message.text or message.reply_to_message.caption or "") + "\n"
-
         caption = message.caption or getattr(message.video or message.document, "file_name", "") or ""
-        combined_text += caption
-
         fname = getattr(message.video or message.document, "file_name", "") or ""
         forward_title = message.forward_from_chat.title if message.forward_from_chat else (message.forward_sender_name or "")
 
-        anime_name, season_num, ep_num, dub_type, video_format = await add_to_database(chat_identifier, msg_id, combined_text, forward_title, filename=fname, use_context=True, auto_save=True)
+        anime_name, season_num, ep_num, dub_type, video_format = await add_to_database(chat_identifier, msg_id, caption, forward_title, filename=fname, use_context=True, auto_save=True)
         
         reply_text = (
             f"✅ **Video Indexed Automatically!**\n\n"
@@ -607,7 +533,6 @@ def get_anime_episodes(anime_slug: str):
 async def rescan_api():
     anime_database.clear()
     msg_index.clear()
-    msg_lookup.clear()
     await save_database_to_file()
     asyncio.create_task(auto_scan_channels())
     return {"status": "Rescan initiated"}
