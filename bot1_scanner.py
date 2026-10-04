@@ -45,28 +45,47 @@ active_context: Dict[str, Any] = {
     "auto_ep": 1
 }
 
-# ==================== FORMAT & CODEC DETECTOR ====================
+# ==================== ADVANCED FORMAT & CODEC DETECTOR ====================
 def detect_video_format(caption: str = "", filename: str = "") -> str:
-    """Detects H.264 / AAC or H.265 / AAC from caption/filename."""
+    """Advanced detector for Video & Audio codecs, supporting H.265, H.264, AV1, VP9, FLAC, Opus, etc."""
     combined = f"{caption} {filename}".lower()
     
     # Check Video Codec
-    if re.search(r"\b(x265|hevc|h265|h\.265|265)\b", combined):
+    if any(k in combined for k in ["x265", "hevc", "h.265", "h265", "265"]):
         v_codec = "H.265 / HEVC"
-    elif re.search(r"\b(x264|avc|h264|h\.264|264)\b", combined):
+    elif any(k in combined for k in ["av1"]):
+        v_codec = "AV1"
+    elif any(k in combined for k in ["vp9"]):
+        v_codec = "VP9"
+    elif any(k in combined for k in ["x264", "avc", "avc1", "h.264", "h264", "264"]):
         v_codec = "H.264 / AVC"
     else:
-        v_codec = "H.264 / AVC"  # Standard Default
+        v_codec = "H.264 / AVC"  # Default Fallback
 
     # Check Audio Codec
-    if re.search(r"\b(aac|aac2\.0)\b", combined):
+    if any(k in combined for k in ["flac"]):
+        a_codec = "FLAC"
+    elif any(k in combined for k in ["opus"]):
+        a_codec = "Opus"
+    elif any(k in combined for k in ["eac3", "dd+", "atmos"]):
+        a_codec = "E-AC-3 / Atmos"
+    elif any(k in combined for k in ["ac3", "dolby"]):
+        a_codec = "AC3"
+    elif any(k in combined for k in ["dts"]):
+        a_codec = "DTS"
+    elif any(k in combined for k in ["truehd"]):
+        a_codec = "TrueHD"
+    elif any(k in combined for k in ["mp3"]):
+        a_codec = "MP3"
+    elif any(k in combined for k in ["aac", "aac2.0"]):
         a_codec = "AAC"
-    elif re.search(r"\b(opus|ac3|eac3|dts)\b", combined):
-        a_codec = "Opus/AC3"
     else:
-        a_codec = "AAC"  # Standard Default
+        a_codec = "AAC"  # Default Fallback
 
-    return f"{v_codec} ({a_codec})"
+    # Check Bit Depth (10-bit support)
+    bit_depth = " (10-bit)" if "10bit" in combined or "10-bit" in combined else ""
+
+    return f"{v_codec}{bit_depth} ({a_codec})"
 
 # ==================== GITHUB API SYNC & LOCAL PERSISTENCE ====================
 def sync_to_github_sync(json_str: str) -> bool:
@@ -220,22 +239,19 @@ def parse_anime_info(caption: str, forward_title: str = "", use_context: bool = 
 
         episode = int(ep_match.group(1)) if ep_match else 1
 
-    # 1. Explicit search like "Anime : Ranma 1/2" or "Title ranma1/2"
+    # Explicit search like "Anime : Ranma 1/2" or "Title ranma1/2"
     explicit_name = re.search(r"(?:Anime|Title|Name)\s*[:\s\-]\s*([^\n\r\t|]+)", text, re.IGNORECASE)
 
     if explicit_name:
         raw_title = explicit_name.group(1).strip()
     else:
-        # IGNORE forward_title completely so channel names are NEVER used during rescan
         lines = [l.strip() for l in text.split("\n") if l.strip()]
-        # Skip lines that look like headers or episode info
         candidate_lines = []
         for line in lines:
             if not re.search(r"(?i)\b(episode|season|language|quality|main channel|powered by)\b", line):
                 candidate_lines.append(line)
         raw_title = candidate_lines[0] if candidate_lines else (lines[0] if lines else "Unknown Anime")
 
-    # Clean special noise from title
     clean_title = re.sub(r"(?i)\bS\d{1,2}[\s\.\-_]*E\d{1,3}\b", "", raw_title)
     clean_title = re.sub(
         r"(?i)\b(in|hindi|dubbed|dub|sub|official|unofficial|fandub|1080p|720p|480p|fhd|hd|hevc|x264|x265|episode|season|language|quality|main channel|powered by)\b",
@@ -407,7 +423,7 @@ async def lifespan(app: FastAPI):
             "• `/listchannels` - View all monitored channels\n"
             "• `/addchannel <@username>` - Add new channel\n"
             "  _Example:_ `/addchannel @sevenanime_ch2`\n"
-            "• `/rescan` - Reset DB & fresh scan channels\n\n"
+            "• `/rescan` - Rescan channels safely without wiping DB\n\n"
             "🛠️ **Manual Database Edits:**\n"
             "• `/add <channel> <msg_id> <slug> <season> <ep> [official/unofficial]`\n"
             "• `/delete <slug> <season> <ep>`\n"
@@ -448,10 +464,8 @@ async def lifespan(app: FastAPI):
 
     @pyro_client.on_message(filters.command("rescan"))
     async def rescan_cmd(client: Client, message: Message):
-        anime_database.clear()
         msg_index.clear()
-        await save_database_to_file()
-        await message.reply_text("🔄 **Database Reset! Rescanning channels...**", quote=True)
+        await message.reply_text("🔄 **Rescanning channels without clearing existing database...**", quote=True)
         asyncio.create_task(auto_scan_channels())
 
     # AUTO LIVE FORWARD & UPLOAD HANDLER
@@ -531,8 +545,6 @@ def get_anime_episodes(anime_slug: str):
 
 @app.get("/api/rescan")
 async def rescan_api():
-    anime_database.clear()
     msg_index.clear()
-    await save_database_to_file()
     asyncio.create_task(auto_scan_channels())
-    return {"status": "Rescan initiated"}
+    return {"status": "Rescan initiated without clearing database"}
