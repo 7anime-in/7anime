@@ -283,5 +283,23 @@
         }
       ]
     }
+  },
+  "01_01": {
+    "title": "01 01",
+    "seasons": {
+      "1": [
+        {
+          "ep": 1,
+          "chat_id": "ranma12sevenanime",
+          "msg_id": 4,
+          "type": "official",
+          "format": "H.264 / AVC (AAC)",
+          "stream_url": "https://sevenanime-bot2-streamer.onrender.com/stream/ranma12sevenanime/4.mp4",
+          "download_url": "https://sevenanime-bot3-downloader.onrender.com/download/ranma12sevenanime/4",
+          "embed_url": "https://t.me/ranma12sevenanime/4?embed=1",
+          "tg_url": "https://t.me/ranma12sevenanime/4"
+        }
+      ]
+    }
   }
 }
