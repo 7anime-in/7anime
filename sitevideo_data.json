@@ -299,6 +299,19 @@
           "embed_url": "https://t.me/ranma12sevenanime/7?embed=1",
           "tg_url": "https://t.me/ranma12sevenanime/7"
         }
+      ],
+      "ranma1/2": [
+        {
+          "ep": 1,
+          "chat_id": "ranma12sevenanime",
+          "msg_id": 11,
+          "type": "official",
+          "format": "H.264 / AVC (AAC)",
+          "stream_url": "https://sevenanime-bot2-streamer.onrender.com/stream/ranma12sevenanime/11.mp4",
+          "download_url": "https://sevenanime-bot3-downloader.onrender.com/download/ranma12sevenanime/11",
+          "embed_url": "https://t.me/ranma12sevenanime/11?embed=1",
+          "tg_url": "https://t.me/ranma12sevenanime/11"
+        }
       ]
     }
   }
