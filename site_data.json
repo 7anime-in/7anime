@@ -30,5 +30,13 @@
             "type": "series",
             "slug": "ranma1_2"
         }
-    }
+    },
+    "banners": [
+        {
+            "title": "The Exiled Heavy Knight",
+            "image": "https://drive.google.com/file/d/1Cty8C2HIMjqP5B1W_s221mRGPDvK8Ezq/view?usp=drivesdk",
+            "description": "follows Elymas Edvaughn...",
+            "play_slug": "the_exiled_heavy_knight_knows_how_to_game_the_system"
+        }
+    ]
 }
