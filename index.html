@@ -4,10 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>7anime - Watch & Download Anime Free</title>
+
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- ==================== POPUNDER AD ==================== -->
+    <script src="https://seenimplieddump.com/ea/4f/e6/ea4fe66a53acc6c4fc7b48bc03a4acf5.js"></script>
+
+    <!-- ==================== SOCIAL BAR AD ==================== -->
+    <script src="https://seenimplieddump.com/77/c2/24/77c224c37e85a092112b37e82c893705.js"></script>
+
     <style>
         body {
             background-color: #0b0c10;
@@ -105,15 +113,52 @@
                 <a id="bannerPlayBtn" href="#" class="bg-[#66fcf1] hover:bg-[#45a29e] text-black font-bold px-4 py-1.5 rounded-lg text-xs flex items-center gap-1.5 transition">
                     <i class="fa-solid fa-play"></i> Watch Now
                 </a>
-                <a id="bannerDownloadBtn" href="#" class="bg-gray-800/90 hover:bg-gray-700 text-white font-medium px-3.5 py-1.5 rounded-lg text-xs flex items-center gap-1.5 border border-gray-700 transition">
+                <a id="bannerDownloadBtn" href="#" onclick="triggerSmartLink()" class="bg-gray-800/90 hover:bg-gray-700 text-white font-medium px-3.5 py-1.5 rounded-lg text-xs flex items-center gap-1.5 border border-gray-700 transition">
                     <i class="fa-solid fa-download"></i> Download
                 </a>
             </div>
         </div>
     </section>
 
-    <!-- ==================== ANIME CARDS GRID ==================== -->
-    <main class="max-w-7xl mx-auto px-3 sm:px-4 py-5 flex-1 w-full">
+    <!-- ==================== TOP BANNER AD SLOT (728x90 Desktop / 320x50 Mobile) ==================== -->
+    <div class="max-w-7xl mx-auto px-3 my-4 flex justify-center items-center overflow-hidden">
+        <!-- Desktop 728x90 Banner -->
+        <div class="hidden md:block">
+            <script>
+              atOptions = {
+                'key' : '266405efe3dce7546f9cf7fc8942276f',
+                'format' : 'iframe',
+                'height' : 90,
+                'width' : 728,
+                'params' : {}
+              };
+            </script>
+            <script src="https://seenimplieddump.com/266405efe3dce7546f9cf7fc8942276f/invoke.js"></script>
+        </div>
+        <!-- Mobile 320x50 Banner -->
+        <div class="block md:hidden">
+            <script>
+              atOptions = {
+                'key' : 'cc4edbceab156b82e59dfda602d17208',
+                'format' : 'iframe',
+                'height' : 50,
+                'width' : 320,
+                'params' : {}
+              };
+            </script>
+            <script src="https://seenimplieddump.com/cc4edbceab156b82e59dfda602d17208/invoke.js"></script>
+        </div>
+    </div>
+
+    <!-- ==================== ANIME CARDS GRID SECTION ==================== -->
+    <main class="max-w-7xl mx-auto px-3 sm:px-4 py-3 flex-1 w-full">
+        
+        <!-- NATIVE BANNER AD -->
+        <div class="mb-5 flex justify-center items-center overflow-hidden bg-[#1f2833]/40 rounded-xl p-2 border border-gray-800">
+            <script async="async" data-cfasync="false" src="https://seenimplieddump.com/1d9a698023dcebe6538e97b52efe6c85/invoke.js"></script>
+            <div id="container-1d9a698023dcebe6538e97b52efe6c85"></div>
+        </div>
+
         <div class="flex items-center justify-between mb-4">
             <h2 id="gridTitle" class="text-base sm:text-xl font-bold text-white border-l-4 border-[#66fcf1] pl-2.5">Explore Anime</h2>
             <span id="totalCardsCount" class="text-[11px] text-gray-400">Loading...</span>
@@ -125,7 +170,43 @@
             <div class="animate-pulse bg-[#1f2833] aspect-[2/3] rounded-xl"></div>
             <div class="animate-pulse bg-[#1f2833] aspect-[2/3] rounded-xl"></div>
         </div>
+
+        <!-- ==================== BOTTOM BANNER AD (300x250) ==================== -->
+        <div class="my-6 flex justify-center items-center overflow-hidden">
+            <script>
+              atOptions = {
+                'key' : '26d9fe493cd81a084fd8969e8ef1e358',
+                'format' : 'iframe',
+                'height' : 250,
+                'width' : 300,
+                'params' : {}
+              };
+            </script>
+            <script src="https://seenimplieddump.com/26d9fe493cd81a084fd8969e8ef1e358/invoke.js"></script>
+        </div>
+
     </main>
+
+    <!-- ==================== 18+ AGE RESTRICTION MODAL ==================== -->
+    <div id="ageModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-[100] hidden flex items-center justify-center p-4">
+        <div class="bg-[#1f2833] border border-red-800/80 rounded-2xl p-6 max-w-sm w-full text-center shadow-2xl">
+            <div class="w-12 h-12 bg-red-950/60 border border-red-800 text-red-500 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <h3 class="text-xl font-black text-white mb-1.5">18+ Age Restriction</h3>
+            <p class="text-xs text-gray-300 leading-relaxed mb-6">
+                This section contains adult explicit content (18+). You must be at least 18 years old to proceed.
+            </p>
+            <div class="flex items-center gap-2.5">
+                <button onclick="declineAge()" class="flex-1 bg-gray-800 hover:bg-gray-700 text-gray-300 font-semibold py-2 px-3 text-xs rounded-xl transition border border-gray-700">
+                    Exit
+                </button>
+                <button onclick="confirmAge()" class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-3 text-xs rounded-xl transition shadow-lg shadow-red-600/30">
+                    I am 18 or Older
+                </button>
+            </div>
+        </div>
+    </div>
 
     <!-- ==================== FOOTER ==================== -->
     <footer class="bg-[#1f2833] border-t border-gray-800 text-center py-4 text-xs text-gray-400 mt-auto">
@@ -135,6 +216,7 @@
     <!-- ==================== JS LOGIC ==================== -->
     <script>
         const BOT1_API = "https://7anime-bot1-scanner.onrender.com";
+        const SMART_LINK_URL = "https://seenimplieddump.com/r4encwrvs?key=991b24b9ac839ae4944305239012fd68";
 
         let allAnimeCards = [];
         let activeCategory = 'all';
@@ -145,6 +227,19 @@
             description: "In a world where hunters battle monsters, Sung Jinwoo is known as the weakest hunter of all mankind.",
             play_slug: "solo_leveling"
         };
+
+        function triggerSmartLink() {
+            window.open(SMART_LINK_URL, '_blank');
+        }
+
+        // Utility to shuffle array randomly
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
 
         function formatImageUrl(url) {
             if (!url) return "https://via.placeholder.com/300x420/1f2833/ffffff?text=7anime";
@@ -221,10 +316,17 @@
                     allAnimeCards.push(card);
                 }
             });
+
+            shuffleArray(allAnimeCards);
             filterCategory(activeCategory);
         }
 
         function filterCategory(cat) {
+            if (cat === 'hentai' && !sessionStorage.getItem('isAdultVerified')) {
+                document.getElementById('ageModal').classList.remove('hidden');
+                return;
+            }
+
             activeCategory = cat;
 
             document.querySelectorAll('.cat-btn').forEach(btn => {
@@ -253,7 +355,19 @@
                 filtered = allAnimeCards.filter(c => (c.type || 'series').toLowerCase() === cat);
             }
 
+            filtered = shuffleArray([...filtered]);
             renderCardsGrid(filtered);
+        }
+
+        function confirmAge() {
+            sessionStorage.setItem('isAdultVerified', 'true');
+            document.getElementById('ageModal').classList.add('hidden');
+            filterCategory('hentai');
+        }
+
+        function declineAge() {
+            document.getElementById('ageModal').classList.add('hidden');
+            filterCategory('all');
         }
 
         function handleSearch() {
@@ -342,7 +456,7 @@
                             <a href="7anime_videoplayer.html?anime=${card.slug}" class="flex-1 bg-[#66fcf1] hover:bg-[#45a29e] text-black text-[11px] font-bold py-1 rounded text-center transition">
                                 Watch
                             </a>
-                            <a href="download.html?anime=${card.slug}" class="bg-gray-800 hover:bg-gray-700 text-white text-[11px] p-1 rounded transition border border-gray-700" title="Download">
+                            <a href="download.html?anime=${card.slug}" onclick="triggerSmartLink()" class="bg-gray-800 hover:bg-gray-700 text-white text-[11px] p-1 rounded transition border border-gray-700" title="Download">
                                 <i class="fa-solid fa-download"></i>
                             </a>
                         </div>
