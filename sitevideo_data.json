@@ -320,13 +320,13 @@
         {
           "ep": 2,
           "chat_id": "sevenanime_ch1",
-          "msg_id": 659,
+          "msg_id": 690,
           "type": "official",
           "format": "H.264 / AVC (AAC)",
-          "stream_url": "https://sevenanime-bot2-streamer.onrender.com/stream/sevenanime_ch1/659.mp4",
-          "download_url": "https://sevenanime-bot3-downloader.onrender.com/download/sevenanime_ch1/659",
-          "embed_url": "https://t.me/sevenanime_ch1/659?embed=1",
-          "tg_url": "https://t.me/sevenanime_ch1/659"
+          "stream_url": "https://sevenanime-bot2-streamer.onrender.com/stream/sevenanime_ch1/690.mp4",
+          "download_url": "https://sevenanime-bot3-downloader.onrender.com/download/sevenanime_ch1/690",
+          "embed_url": "https://t.me/sevenanime_ch1/690?embed=1",
+          "tg_url": "https://t.me/sevenanime_ch1/690"
         },
         {
           "ep": 3,
