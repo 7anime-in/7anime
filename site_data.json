@@ -21,6 +21,14 @@
             "rating": "9.3",
             "type": "series",
             "slug": "the_exiled_heavy_knight_knows_how_to_game_the_system"
+        },
+        "ranma1_2": {
+            "title": "Ranma1 2",
+            "image": "https://drive.google.com/file/d/1icTU_5KjyYyIeXWM1EPeDmf1AWNWeg_G/view?usp=drivesdk",
+            "genres": "Ranma \u00bd belongs to the genres of martial arts, romantic comedy, and adventure, serialized primarily as a shonen",
+            "rating": "7.9",
+            "type": "series",
+            "slug": "ranma1_2"
         }
     }
 }
