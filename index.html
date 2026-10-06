@@ -23,13 +23,12 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
         .hero-gradient {
-            background: linear-gradient(180deg, rgba(11,12,16,0.2) 0%, rgba(11,12,16,0.8) 70%, #0b0c10 100%);
+            background: linear-gradient(180deg, rgba(11,12,16,0.1) 0%, rgba(11,12,16,0.85) 75%, #0b0c10 100%);
         }
         .card-hover:active, .card-hover:hover {
             transform: scale(0.98);
             transition: all 0.2s ease;
         }
-        /* Hide scrollbar for category tabs on mobile */
         .no-scrollbar::-webkit-scrollbar {
             display: none;
         }
@@ -37,22 +36,29 @@
             -ms-overflow-style: none;
             scrollbar-width: none;
         }
-        #searchDropdown::-webkit-scrollbar {
+        .search-dropdown::-webkit-scrollbar {
             width: 4px;
         }
-        #searchDropdown::-webkit-scrollbar-thumb {
+        .search-dropdown::-webkit-scrollbar-thumb {
             background: #45a29e;
             border-radius: 4px;
+        }
+        /* Smooth Fade Transition for Hero Slider */
+        #heroSection {
+            transition: background-image 0.6s ease-in-out;
+        }
+        iframe {
+            max-width: 100% !important;
         }
     </style>
 </head>
 <body class="min-h-screen flex flex-col selection:bg-[#66fcf1] selection:text-black">
 
     <!-- ==================== NAVBAR ==================== -->
-    <nav class="sticky top-0 z-50 bg-[#1f2833]/95 backdrop-blur-md border-b border-gray-800 px-3 py-2">
+    <nav class="sticky top-0 z-[60] bg-[#1f2833]/95 backdrop-blur-md border-b border-gray-800 px-3 py-2">
         <div class="max-w-7xl mx-auto flex flex-col gap-2">
             
-            <!-- Top Row: Logo + Search -->
+            <!-- Top Row: Logo + Compact Search -->
             <div class="flex items-center justify-between gap-2">
                 <!-- Logo -->
                 <a href="index.html" class="flex items-center gap-1.5 text-xl font-extrabold text-[#66fcf1] shrink-0">
@@ -60,27 +66,25 @@
                     <span>7<span class="text-white">anime</span></span>
                 </a>
 
-                <!-- Compact Search Input -->
+                <!-- Compact Search Input in Navbar -->
                 <div class="relative flex-1 max-w-md">
                     <input 
                         type="text" 
-                        id="searchInput" 
-                        oninput="handleSearch()"
-                        onfocus="handleSearch()"
+                        id="searchInputNav" 
+                        oninput="handleSearch('nav')"
+                        onfocus="handleSearch('nav')"
                         placeholder="Search anime, movie..." 
                         class="w-full bg-[#0b0c10] border border-gray-700/80 rounded-full py-1.5 px-3 pl-8 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-[#66fcf1]"
                         autocomplete="off"
                     >
                     <i class="fa-solid fa-magnifying-glass absolute left-2.5 top-2 text-gray-400 text-xs"></i>
 
-                    <!-- LIVE SEARCH DROPDOWN BOX -->
-                    <div id="searchDropdown" class="hidden absolute left-0 right-0 top-full mt-2 bg-[#1f2833] border border-gray-700 rounded-xl shadow-2xl z-50 max-h-72 overflow-y-auto">
-                        <!-- Search items rendered dynamically -->
-                    </div>
+                    <!-- LIVE SEARCH DROPDOWN BOX (NAVBAR) -->
+                    <div id="searchDropdownNav" class="search-dropdown hidden absolute left-0 right-0 top-full mt-2 bg-[#1f2833] border border-gray-700 rounded-xl shadow-2xl z-50 max-h-72 overflow-y-auto"></div>
                 </div>
             </div>
 
-            <!-- Horizontal Scrollable Category Tabs -->
+            <!-- Horizontal Category Tabs -->
             <div class="flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
                 <button onclick="filterCategory('all')" id="btn-all" class="cat-btn bg-[#66fcf1] text-black font-bold text-[11px] px-3 py-1 rounded-full transition shrink-0 flex items-center gap-1">
                     <i class="fa-solid fa-house text-[10px]"></i> Home
@@ -99,29 +103,55 @@
         </div>
     </nav>
 
-    <!-- ==================== HERO BANNER ==================== -->
-    <section id="heroSection" class="relative w-full h-[250px] sm:h-[340px] md:h-[420px] bg-cover bg-center flex items-end">
+    <!-- ==================== HERO SLIDING BANNER ==================== -->
+    <section id="heroSection" class="relative w-full h-[260px] sm:h-[360px] md:h-[430px] bg-cover bg-center flex items-end">
         <div class="absolute inset-0 hero-gradient"></div>
         
-        <div class="relative max-w-7xl mx-auto px-4 pb-4 sm:pb-6 w-full z-10 flex flex-col gap-1.5">
-            <span class="bg-[#66fcf1] text-black font-extrabold text-[10px] uppercase px-2 py-0.5 rounded w-fit tracking-wider">FEATURED</span>
+        <div class="relative max-w-7xl mx-auto px-4 pb-5 w-full z-10 flex flex-col gap-1.5">
+            <div class="flex items-center gap-2">
+                <span class="bg-[#66fcf1] text-black font-extrabold text-[10px] uppercase px-2 py-0.5 rounded w-fit tracking-wider">FEATURED</span>
+                <span id="bannerBadge" class="bg-black/60 backdrop-blur-md text-[#66fcf1] text-[10px] font-bold px-2 py-0.5 rounded border border-[#66fcf1]/30">Auto Slide</span>
+            </div>
             
             <h1 id="bannerTitle" class="text-2xl sm:text-4xl font-black text-white leading-tight drop-shadow-md">Loading...</h1>
             <p id="bannerDesc" class="text-xs sm:text-sm text-gray-300 max-w-xl line-clamp-2 text-ellipsis">Loading banner description...</p>
             
-            <div class="flex items-center gap-2.5 mt-1">
-                <a id="bannerPlayBtn" href="#" class="bg-[#66fcf1] hover:bg-[#45a29e] text-black font-bold px-4 py-1.5 rounded-lg text-xs flex items-center gap-1.5 transition">
+            <div class="flex items-center gap-2.5 mt-2">
+                <a id="bannerPlayBtn" href="#" class="bg-[#66fcf1] hover:bg-[#45a29e] text-black font-bold px-4 py-2 rounded-lg text-xs flex items-center gap-1.5 transition shadow-lg shadow-[#66fcf1]/20">
                     <i class="fa-solid fa-play"></i> Watch Now
                 </a>
-                <a id="bannerDownloadBtn" href="#" onclick="triggerSmartLink()" class="bg-gray-800/90 hover:bg-gray-700 text-white font-medium px-3.5 py-1.5 rounded-lg text-xs flex items-center gap-1.5 border border-gray-700 transition">
+                <a id="bannerDownloadBtn" href="#" onclick="triggerSmartLink()" class="bg-gray-800/90 hover:bg-gray-700 text-white font-medium px-3.5 py-2 rounded-lg text-xs flex items-center gap-1.5 border border-gray-700 transition">
                     <i class="fa-solid fa-download"></i> Download
                 </a>
             </div>
+
+            <!-- Carousel Slide Dots Indicator -->
+            <div id="bannerDots" class="flex items-center gap-1.5 mt-3"></div>
+        </div>
+    </section>
+
+    <!-- ==================== DEDICATED MAIN SEARCH BAR (BELOW BANNER) ==================== -->
+    <section class="max-w-7xl mx-auto px-3 my-4 w-full">
+        <div class="relative w-full bg-[#1f2833] p-2 sm:p-3 rounded-2xl border border-gray-800 shadow-xl">
+            <div class="relative flex items-center">
+                <i class="fa-solid fa-magnifying-glass absolute left-3.5 text-[#66fcf1] text-base"></i>
+                <input 
+                    type="text" 
+                    id="searchInputMain" 
+                    oninput="handleSearch('main')"
+                    onfocus="handleSearch('main')"
+                    placeholder="Search your favorite anime, movie, or series..." 
+                    class="w-full bg-[#0b0c10] border border-gray-700/80 rounded-xl py-2.5 px-4 pl-10 text-xs sm:text-sm text-white placeholder-gray-400 focus:outline-none focus:border-[#66fcf1] transition"
+                    autocomplete="off"
+                >
+            </div>
+            <!-- LIVE SEARCH DROPDOWN BOX (MAIN) -->
+            <div id="searchDropdownMain" class="search-dropdown hidden absolute left-2 right-2 top-full mt-2 bg-[#1f2833] border border-gray-700 rounded-xl shadow-2xl z-50 max-h-80 overflow-y-auto"></div>
         </div>
     </section>
 
     <!-- ==================== TOP BANNER AD SLOT (728x90 Desktop / 320x50 Mobile) ==================== -->
-    <div class="max-w-7xl mx-auto px-3 my-4 flex justify-center items-center overflow-hidden">
+    <div class="max-w-7xl mx-auto px-3 my-2 flex justify-center items-center overflow-hidden min-h-[50px]">
         <!-- Desktop 728x90 Banner -->
         <div class="hidden md:block">
             <script>
@@ -154,7 +184,7 @@
     <main class="max-w-7xl mx-auto px-3 sm:px-4 py-3 flex-1 w-full">
         
         <!-- NATIVE BANNER AD -->
-        <div class="mb-5 flex justify-center items-center overflow-hidden bg-[#1f2833]/40 rounded-xl p-2 border border-gray-800">
+        <div class="mb-5 flex justify-center items-center overflow-hidden bg-[#1f2833]/40 rounded-xl p-2 border border-gray-800 min-h-[90px]">
             <script async="async" data-cfasync="false" src="https://seenimplieddump.com/1d9a698023dcebe6538e97b52efe6c85/invoke.js"></script>
             <div id="container-1d9a698023dcebe6538e97b52efe6c85"></div>
         </div>
@@ -172,7 +202,7 @@
         </div>
 
         <!-- ==================== BOTTOM BANNER AD (300x250) ==================== -->
-        <div class="my-6 flex justify-center items-center overflow-hidden">
+        <div class="my-6 flex justify-center items-center overflow-hidden min-h-[250px]">
             <script>
               atOptions = {
                 'key' : '26d9fe493cd81a084fd8969e8ef1e358',
@@ -221,18 +251,35 @@
         let allAnimeCards = [];
         let activeCategory = 'all';
 
-        const defaultBanner = {
-            title: "Solo Leveling",
-            image: "https://m.media-amazon.com/images/M/MV5BODlhM2RmM2ItM2FkYi00ZGY2LTg2NzAtNjg4NTgwOGVhMDFkXkEyXkFqcGdeQXVyMTI1NDEyNTM5._V1_.jpg",
-            description: "In a world where hunters battle monsters, Sung Jinwoo is known as the weakest hunter of all mankind.",
-            play_slug: "solo_leveling"
-        };
+        // Default Fallback Banners for Automatic 4s Slider
+        let bannerList = [
+            {
+                title: "Solo Leveling",
+                image: "https://m.media-amazon.com/images/M/MV5BODlhM2RmM2ItM2FkYi00ZGY2LTg2NzAtNjg4NTgwOGVhMDFkXkEyXkFqcGdeQXVyMTI1NDEyNTM5._V1_.jpg",
+                description: "In a world where hunters battle monsters, Sung Jinwoo awakens as the strongest shadow monarch.",
+                play_slug: "solo_leveling"
+            },
+            {
+                title: "The Exiled Heavy Knight Knows How To Game The System",
+                image: "https://lh3.googleusercontent.com/d/1_9I9ZqXk8m9o3V7kE3J1X3I4b5c6d7e",
+                description: "Follows Elma, a young noble born into a prestigious family who uses game knowledge to dominate.",
+                play_slug: "the_exiled_heavy_knight"
+            },
+            {
+                title: "Classroom of the Elite",
+                image: "https://m.media-amazon.com/images/M/MV5BYzA2Nzk5M2EtNWY4Yi00ZDY4LThjMGItNmU3MjlmYzE4NWFlXkEyXkFqcGdeQXVyNjAwNDUxODI@._V1_.jpg",
+                description: "Ayanokoji Kiyotaka navigates the cutthroat environment of Tokyo Metropolitan Advanced Nurturing High School.",
+                play_slug: "classroom_of_the_elite"
+            }
+        ];
+
+        let currentBannerIndex = 0;
+        let sliderTimer = null;
 
         function triggerSmartLink() {
             window.open(SMART_LINK_URL, '_blank');
         }
 
-        // Utility to shuffle array randomly
         function shuffleArray(array) {
             for (let i = array.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
@@ -262,6 +309,7 @@
 
         async function initPage() {
             await Promise.all([loadBannerAndAdminCards(), loadScannedAnime()]);
+            startBannerAutoSlide();
         }
 
         async function loadBannerAndAdminCards() {
@@ -272,14 +320,68 @@
                 const rawJson = await res.json();
                 const cardsList = rawJson.cards ? Object.values(rawJson.cards) : [];
 
-                renderHeroBanner(rawJson.banner || defaultBanner);
+                if (rawJson.banners && Array.isArray(rawJson.banners) && rawJson.banners.length > 0) {
+                    bannerList = rawJson.banners;
+                } else if (rawJson.banner) {
+                    bannerList[0] = rawJson.banner;
+                }
+
+                renderHeroBanner(bannerList[0]);
                 if (cardsList.length > 0) {
                     mergeCards(cardsList);
                 }
             } catch (err) {
-                console.warn("Fallback banner loaded:", err);
-                renderHeroBanner(defaultBanner);
+                console.warn("Using fallback banners:", err);
+                renderHeroBanner(bannerList[0]);
             }
+        }
+
+        // Automatic Sliding Banner (Every 4 Seconds)
+        function startBannerAutoSlide() {
+            renderBannerDots();
+            if (sliderTimer) clearInterval(sliderTimer);
+            
+            sliderTimer = setInterval(() => {
+                if (bannerList.length <= 1) return;
+                currentBannerIndex = (currentBannerIndex + 1) % bannerList.length;
+                renderHeroBanner(bannerList[currentBannerIndex]);
+            }, 4000);
+        }
+
+        function renderHeroBanner(banner) {
+            const bgImg = formatImageUrl(banner.image);
+            const heroElem = document.getElementById("heroSection");
+            heroElem.style.backgroundImage = `url('${bgImg}')`;
+            document.getElementById("bannerTitle").innerText = banner.title || "Solo Leveling";
+            document.getElementById("bannerDesc").innerText = banner.description || "";
+            document.getElementById("bannerPlayBtn").href = `7anime_videoplayer.html?anime=${banner.play_slug || 'solo_leveling'}`;
+            document.getElementById("bannerDownloadBtn").href = `download.html?anime=${banner.play_slug || 'solo_leveling'}`;
+            updateBannerDots();
+        }
+
+        function renderBannerDots() {
+            const dotsBox = document.getElementById("bannerDots");
+            if (!dotsBox) return;
+            dotsBox.innerHTML = bannerList.map((_, idx) => `
+                <button onclick="setBannerSlide(${idx})" class="w-2.5 h-2.5 rounded-full transition-all duration-300 ${idx === currentBannerIndex ? 'bg-[#66fcf1] w-6' : 'bg-gray-600'}" aria-label="Slide ${idx+1}"></button>
+            `).join("");
+        }
+
+        function updateBannerDots() {
+            const dots = document.querySelectorAll("#bannerDots button");
+            dots.forEach((dot, idx) => {
+                if (idx === currentBannerIndex) {
+                    dot.className = "w-6 h-2.5 rounded-full bg-[#66fcf1] transition-all duration-300";
+                } else {
+                    dot.className = "w-2.5 h-2.5 rounded-full bg-gray-600 transition-all duration-300";
+                }
+            });
+        }
+
+        function setBannerSlide(index) {
+            currentBannerIndex = index;
+            renderHeroBanner(bannerList[currentBannerIndex]);
+            startBannerAutoSlide(); // Reset 4s timer on click
         }
 
         async function loadScannedAnime() {
@@ -370,9 +472,11 @@
             filterCategory('all');
         }
 
-        function handleSearch() {
-            const query = document.getElementById("searchInput").value.toLowerCase().trim();
-            const dropdown = document.getElementById("searchDropdown");
+        // Unified Live Search Handler for Both Search Inputs
+        function handleSearch(source) {
+            const inputElem = source === 'main' ? document.getElementById("searchInputMain") : document.getElementById("searchInputNav");
+            const dropdown = source === 'main' ? document.getElementById("searchDropdownMain") : document.getElementById("searchDropdownNav");
+            const query = inputElem.value.toLowerCase().trim();
 
             if (!query) {
                 dropdown.classList.add("hidden");
@@ -389,8 +493,8 @@
                 dropdown.innerHTML = `<div class="p-3 text-center text-xs text-gray-400">No matching anime found</div>`;
             } else {
                 dropdown.innerHTML = matches.map(card => `
-                    <a href="7anime_videoplayer.html?anime=${card.slug}" class="flex items-center gap-2.5 p-2 hover:bg-[#0b0c10] border-b border-gray-800/60 transition group">
-                        <img src="${formatImageUrl(card.image)}" class="w-8 h-11 object-cover rounded shadow" onerror="this.src='https://via.placeholder.com/100x120/1f2833/ffffff?text=7A'">
+                    <a href="7anime_videoplayer.html?anime=${card.slug}" class="flex items-center gap-2.5 p-2.5 hover:bg-[#0b0c10] border-b border-gray-800/60 transition group">
+                        <img src="${formatImageUrl(card.image)}" class="w-9 h-12 object-cover rounded shadow" onerror="this.src='https://via.placeholder.com/100x120/1f2833/ffffff?text=7A'">
                         <div class="flex flex-col flex-1 min-w-0">
                             <div class="flex items-center gap-1.5 mb-0.5">
                                 ${getTypeBadge(card.type)}
@@ -405,22 +509,20 @@
             dropdown.classList.remove("hidden");
         }
 
+        // Close dropdowns on outside click
         document.addEventListener("click", (e) => {
-            const searchInput = document.getElementById("searchInput");
-            const dropdown = document.getElementById("searchDropdown");
-            if (!searchInput.contains(e.target) && !dropdown.contains(e.target)) {
-                dropdown.classList.add("hidden");
+            const navInput = document.getElementById("searchInputNav");
+            const navDropdown = document.getElementById("searchDropdownNav");
+            const mainInput = document.getElementById("searchInputMain");
+            const mainDropdown = document.getElementById("searchDropdownMain");
+
+            if (navInput && navDropdown && !navInput.contains(e.target) && !navDropdown.contains(e.target)) {
+                navDropdown.classList.add("hidden");
+            }
+            if (mainInput && mainDropdown && !mainInput.contains(e.target) && !mainDropdown.contains(e.target)) {
+                mainDropdown.classList.add("hidden");
             }
         });
-
-        function renderHeroBanner(banner) {
-            const bgImg = formatImageUrl(banner.image);
-            document.getElementById("heroSection").style.backgroundImage = `url('${bgImg}')`;
-            document.getElementById("bannerTitle").innerText = banner.title || "Solo Leveling";
-            document.getElementById("bannerDesc").innerText = banner.description || "";
-            document.getElementById("bannerPlayBtn").href = `7anime_videoplayer.html?anime=${banner.play_slug || 'solo_leveling'}`;
-            document.getElementById("bannerDownloadBtn").href = `download.html?anime=${banner.play_slug || 'solo_leveling'}`;
-        }
 
         function renderCardsGrid(cards) {
             const grid = document.getElementById("animeGrid");
