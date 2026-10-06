@@ -440,5 +440,23 @@
         }
       ]
     }
+  },
+  "anime_name_that_time_i_got_reincarnated_as_a_slime": {
+    "title": "Anime Name That Time I Got Reincarnated As A Slime",
+    "seasons": {
+      "1": [
+        {
+          "ep": 14,
+          "chat_id": "sevenanime_ch1",
+          "msg_id": 688,
+          "type": "official",
+          "format": "H.264 / AVC (AAC)",
+          "stream_url": "https://sevenanime-bot2-streamer.onrender.com/stream/sevenanime_ch1/688.mp4",
+          "download_url": "https://sevenanime-bot3-downloader.onrender.com/download/sevenanime_ch1/688",
+          "embed_url": "https://t.me/sevenanime_ch1/688?embed=1",
+          "tg_url": "https://t.me/sevenanime_ch1/688"
+        }
+      ]
+    }
   }
 }
