@@ -72,7 +72,7 @@ def detect_video_format(caption: str = "", filename: str = "") -> str:
 def sync_to_github_sync(json_str: str) -> bool:
     """GitHub REST API via sitevideo_data.json update/commit karta hai."""
     if not GITHUB_TOKEN:
-        print("⚠️️ GITHUB_TOKEN missing! Skipping GitHub commit.")
+        print("⚠ GITHUB_TOKEN missing! Skipping GitHub commit.")
         return False
 
     url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{GITHUB_FILE_PATH}"
@@ -186,7 +186,7 @@ def parse_anime_info(caption: str, forward_title: str = "", use_context: bool = 
             active_context["auto_ep"] = episode + 1
             return anime_name, season, episode, dub_type
 
-        ep_match = re.search(r"(?:Episode|Ep|E)[\s\-\_]*0*(\d+)", caption or "", re.IGNORECASE)
+        ep_match = re.search(r"(?:Episode|Ep|E)[\s\-\_\:]*0*(\d+)", caption or "", re.IGNORECASE)
         if not ep_match:
             clean_text = re.sub(r"\b(1080p|720p|480p|360p|2160p|x264|x265|hevc)\b", "", caption or "", flags=re.IGNORECASE)
             ep_match = re.search(r"(?:[\s\-\_\[\vert{}^])0*(\d{1,3})(?:[\s\-\_\]]|$|\.mp4|\.mkv)", clean_text)
@@ -212,17 +212,17 @@ def parse_anime_info(caption: str, forward_title: str = "", use_context: bool = 
         season = str(int(se_match.group(1)))
         episode = int(se_match.group(2))
     else:
-        season_match = re.search(r"\b(?:Season|S)[\s\-\_]*0*(\d+)\b", text, re.IGNORECASE)
+        season_match = re.search(r"\b(?:Season|S)[\s\-\_\:]*0*(\d+)\b", text, re.IGNORECASE)
         season = str(int(season_match.group(1))) if season_match else "1"
 
-        ep_match = re.search(r"\b(?:Episode|Ep|E)[\s\-\_]*0*(\d+)\b", text, re.IGNORECASE)
+        ep_match = re.search(r"\b(?:Episode|Ep|E)[\s\-\_\:]*0*(\d+)\b", text, re.IGNORECASE)
         if not ep_match:
             clean_text = re.sub(r"\b(1080p|720p|480p|360p|2160p|x264|x265|hevc|2023|2024|2025|2026)\b", "", text, flags=re.IGNORECASE)
             ep_match = re.search(r"(?:[\s\-\_\[\vert{}^])0*(\d{1,3})(?:[\s\-\_\]]|$|\.mp4|\.mkv)", clean_text)
 
         episode = int(ep_match.group(1)) if ep_match else 1
 
-    explicit_name = re.search(r"(?:Anime|Title|Name)\s*:\s*([^\n\r\t|]+)", text, re.IGNORECASE)
+    explicit_name = re.search(r"(?:Anime\s*Name|Anime\s*Title|Anime|Title|Name)\s*:\s*([^\n\r\t|]+)", text, re.IGNORECASE)
 
     if explicit_name:
         raw_title = explicit_name.group(1).strip()
@@ -238,7 +238,7 @@ def parse_anime_info(caption: str, forward_title: str = "", use_context: bool = 
         "",
         clean_title,
     )
-    clean_title = re.sub(r"[^\w\s]", " ", clean_title)
+    clean_title = re.sub(r"[^\w\s/]", " ", clean_title)
     clean_title = re.sub(r"\s+", " ", clean_title).strip().title()
 
     if not clean_title or len(clean_title) < 2:
