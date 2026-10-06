@@ -3,7 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>7anime - Streaming Player</title>
+    <title>7anime - Fast Streaming Player</title>
+
+    <!-- Network Pre-connect for Faster Stream & Asset Loading -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    <link rel="preconnect" href="https://sevenanime-bot1-scanner.onrender.com" crossorigin>
+    <link rel="preconnect" href="https://sevenanime-bot2-streamer.onrender.com" crossorigin>
+
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
@@ -20,12 +27,18 @@
             background-color: #0b0c10;
             color: #c5c6c7;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            will-change: scroll-position;
         }
         .ep-btn-active {
             background-color: #66fcf1 !important;
             color: #000000 !important;
             font-weight: bold;
             border-color: #66fcf1 !important;
+        }
+        .type-btn-active {
+            background-color: #66fcf1 !important;
+            color: #000000 !important;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -57,65 +70,95 @@
             <div id="playerErrorOverlay" class="hidden absolute inset-0 bg-black/95 flex flex-col items-center justify-center p-6 text-center z-30">
                 <i class="fa-solid fa-triangle-exclamation text-amber-400 text-4xl mb-2"></i>
                 <h3 class="text-white font-bold text-lg">Video Playback Error</h3>
-                <p class="text-xs text-gray-400 max-w-md mt-1">Server wake up hone me thoda time le raha hai ya H.265/AAC video browser me unsupported hai. Dobara try karein.</p>
+                <p class="text-xs text-gray-400 max-w-md mt-1">Server wake up hone me thoda time le raha hai ya video unsupported hai. Dobara try karein.</p>
                 <button onclick="retryCurrentEpisode()" class="mt-4 bg-[#66fcf1] text-black font-bold text-xs px-4 py-2 rounded-lg hover:bg-[#45a29e] transition">
                     <i class="fa-solid fa-rotate-right mr-1"></i> Retry Stream
                 </button>
             </div>
         </div>
 
-        <!-- ==================== VIDEO DETAILS & CONTROLS ==================== -->
-        <div class="bg-[#1f2833] p-4 md:p-6 rounded-xl border border-gray-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
-                <div class="flex items-center gap-2 mb-1 flex-wrap">
-                    <span id="dubBadge" class="bg-emerald-500/20 text-emerald-400 text-xs font-bold px-2.5 py-0.5 rounded border border-emerald-500/30 uppercase">Official Dub</span>
-                    <span id="seasonBadge" class="bg-gray-800 text-gray-300 text-xs font-bold px-2.5 py-0.5 rounded border border-gray-700">Season 1</span>
-                    <!-- P2P Live Status Badge -->
-                    <span id="p2pStatusBadge" class="bg-cyan-500/20 text-cyan-400 text-xs font-bold px-2.5 py-0.5 rounded border border-cyan-500/30">
-                        <i class="fa-solid fa-network-wired mr-1"></i> P2P Active: <span id="p2pPeersCount">0 Peers</span>
-                    </span>
+        <!-- ==================== VIDEO DETAILS & CONTROLS CARD ==================== -->
+        <div class="bg-[#1f2833] p-4 md:p-6 rounded-xl border border-gray-800 flex flex-col gap-4">
+            
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <div class="flex items-center gap-2 mb-2 flex-wrap">
+                        <span id="dubBadge" class="bg-emerald-500/20 text-emerald-400 text-xs font-bold px-2.5 py-0.5 rounded border border-emerald-500/30 uppercase">Hindi Dubbed</span>
+                        <span id="seasonBadge" class="bg-gray-800 text-gray-300 text-xs font-bold px-2.5 py-0.5 rounded border border-gray-700">Season 1</span>
+                        
+                        <!-- Live P2P Status Badge -->
+                        <span id="p2pStatusBadge" class="bg-cyan-500/20 text-cyan-400 text-xs font-bold px-2.5 py-0.5 rounded border border-cyan-500/30 flex items-center gap-2">
+                            <span><i class="fa-solid fa-users mr-1"></i> Peers: <span id="p2pPeersCount" class="text-white">0</span></span>
+                            <span class="text-gray-500">|</span>
+                            <span><i class="fa-solid fa-arrow-down-long text-[#66fcf1] mr-1"></i> P2P Data: <span id="p2pDownloadedData" class="text-white">0 MB</span></span>
+                        </span>
+                    </div>
+
+                    <!-- AUDIO / VIDEO TYPE SELECTOR TOGGLE BUTTONS -->
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="text-xs text-gray-400 font-semibold"><i class="fa-solid fa-sliders text-[#66fcf1] mr-1"></i> Mode:</span>
+                        <div class="inline-flex rounded-md shadow-sm bg-gray-900 p-0.5 border border-gray-700">
+                            <button id="typeBtnOfficial" onclick="switchAudioType('official')" class="px-2.5 py-1 text-[11px] font-bold rounded text-gray-300 hover:text-white transition">
+                                Official
+                            </button>
+                            <button id="typeBtnUnofficial" onclick="switchAudioType('unofficial')" class="px-2.5 py-1 text-[11px] font-bold rounded text-gray-300 hover:text-white transition">
+                                Unofficial / Fan Dub
+                            </button>
+                        </div>
+                    </div>
+
+                    <h1 id="animeTitleDisplay" class="text-xl md:text-2xl font-bold text-white">Loading Anime Details...</h1>
+                    <p id="currentEpTitle" class="text-sm text-gray-400 mt-0.5">Episode 1</p>
                 </div>
-                <h1 id="animeTitleDisplay" class="text-xl md:text-2xl font-bold text-white">Loading Anime Details...</h1>
-                <p id="currentEpTitle" class="text-sm text-gray-400 mt-0.5">Episode 1</p>
+
+                <!-- BOT 3 DOWNLOAD & PREV/NEXT BUTTONS -->
+                <div class="flex flex-wrap items-center gap-2.5 w-full md:w-auto">
+                    <button 
+                        id="prevEpBtn" 
+                        onclick="playNextOrPrev(-1)" 
+                        class="bg-gray-800 hover:bg-gray-700 text-white font-semibold px-3 py-2.5 rounded-lg border border-gray-700 text-xs transition flex items-center gap-1 disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                        <i class="fa-solid fa-backward-step"></i> Prev
+                    </button>
+                    <button 
+                        id="nextEpBtn" 
+                        onclick="playNextOrPrev(1)" 
+                        class="bg-gray-800 hover:bg-gray-700 text-white font-semibold px-3 py-2.5 rounded-lg border border-gray-700 text-xs transition flex items-center gap-1 disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                        Next <i class="fa-solid fa-forward-step"></i>
+                    </button>
+
+                    <a 
+                        id="bot3DownloadBtn" 
+                        href="#" 
+                        target="_blank" 
+                        rel="noopener"
+                        class="bg-[#66fcf1] hover:bg-[#45a29e] text-black font-extrabold px-5 py-2.5 rounded-lg flex items-center justify-center gap-2 transition shadow-lg text-xs"
+                    >
+                        <i class="fa-solid fa-cloud-arrow-down text-sm"></i>
+                        <span>Download Episode</span>
+                    </a>
+                </div>
             </div>
 
-            <!-- BOT 3 DOWNLOAD & PREV/NEXT BUTTONS -->
-            <div class="flex flex-wrap items-center gap-2.5 w-full md:w-auto">
-                <button 
-                    id="prevEpBtn" 
-                    onclick="playNextOrPrev(-1)" 
-                    class="bg-gray-800 hover:bg-gray-700 text-white font-semibold px-3 py-2.5 rounded-lg border border-gray-700 text-xs transition flex items-center gap-1 disabled:opacity-40 disabled:cursor-not-allowed"
-                >
-                    <i class="fa-solid fa-backward-step"></i> Prev
-                </button>
-                <button 
-                    id="nextEpBtn" 
-                    onclick="playNextOrPrev(1)" 
-                    class="bg-gray-800 hover:bg-gray-700 text-white font-semibold px-3 py-2.5 rounded-lg border border-gray-700 text-xs transition flex items-center gap-1 disabled:opacity-40 disabled:cursor-not-allowed"
-                >
-                    Next <i class="fa-solid fa-forward-step"></i>
-                </button>
-
+            <!-- CARD KE NICHE "DOWNLOAD SEASONS" BUTTON -->
+            <div class="pt-3 border-t border-gray-700/60 flex items-center justify-between flex-wrap gap-3">
+                <div class="flex items-center gap-2 text-xs text-gray-400">
+                    <i class="fa-solid fa-folder-open text-[#66fcf1] text-sm"></i>
+                    <span>Is anime ke saare seasons aur episode packs yahan se download karein:</span>
+                </div>
+                
                 <a 
-                    id="bot3DownloadBtn" 
-                    href="#" 
-                    target="_blank" 
-                    class="bg-[#66fcf1] hover:bg-[#45a29e] text-black font-extrabold px-5 py-2.5 rounded-lg flex items-center justify-center gap-2 transition shadow-lg text-xs"
+                    id="downloadSeasonsCardBtn" 
+                    href="download.html" 
+                    class="w-full sm:w-auto bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-black font-extrabold px-6 py-2.5 rounded-lg flex items-center justify-center gap-2 transition shadow-lg text-xs tracking-wide"
                 >
-                    <i class="fa-solid fa-cloud-arrow-down text-sm"></i>
-                    <span>Download</span>
-                </a>
-
-                <a 
-                    id="fullDownloadPageBtn" 
-                    href="#" 
-                    class="bg-gray-800 hover:bg-gray-700 text-white font-semibold px-3.5 py-2.5 rounded-lg flex items-center justify-center gap-2 transition border border-gray-700 text-xs"
-                    title="All Episodes Download Page"
-                >
-                    <i class="fa-solid fa-list-check"></i>
-                    <span class="hidden sm:inline">Season Pack</span>
+                    <i class="fa-solid fa-layer-group text-sm"></i>
+                    <span>Download Seasons</span>
+                    <i class="fa-solid fa-arrow-right text-xs ml-1"></i>
                 </a>
             </div>
+
         </div>
 
         <!-- ==================== SEASON & EPISODE SELECTOR ==================== -->
@@ -137,20 +180,25 @@
 
     <!-- ==================== FOOTER ==================== -->
     <footer class="bg-[#1f2833] border-t border-gray-800 text-center py-6 text-sm text-gray-400 mt-auto">
-        <p>© 2026 7anime Engine. Streaming via Bot 2 | Downloads via Bot 3 | WebRTC P2P Enabled.</p>
+        <p>© 2026 7anime Engine. Streaming via Bot 2 | Downloads via Bot 3 | Admin via Bot 4 | WebRTC P2P Enabled.</p>
     </footer>
 
     <!-- ==================== JS LOGIC ==================== -->
     <script>
-        // UPDATED VERCEL API LINK
+        "use strict";
+
+        // 4-BOT API ENDPOINTS
         const BOT1_API = "https://sevenanime-bot1-scanner.onrender.com";
         const BOT2_STREAM_BASE = "https://sevenanime-bot2-streamer.onrender.com";
         const BOT3_DOWNLOAD_BASE = "https://sevenanime-bot3-downloader.onrender.com";
+        const BOT4_ADMIN_API = "https://sevenanime-bot4-admin.onrender.com";
 
         let animeData = null;
+        let siteCardData = null;
         let currentSeason = "1";
         let currentEpNum = 1;
         let activeEpisodeObj = null;
+        let preferredAudioType = "official";
         let art = null;
         let p2pEngine = null;
 
@@ -158,144 +206,238 @@
         const animeSlug = urlParams.get('anime') || 'solo_leveling';
         const errorOverlay = document.getElementById("playerErrorOverlay");
 
-        // Background Warm-up Ping for Streaming Server
-        async function wakeUpStreamServer() {
+        // Non-blocking ping to wake Render servers
+        function wakeUpServers() {
             try {
-                await fetch(BOT2_STREAM_BASE, { mode: 'no-cors' });
+                fetch(BOT2_STREAM_BASE, { mode: 'no-cors', cache: 'no-store' }).catch(()=>{});
+                fetch(BOT4_ADMIN_API, { mode: 'no-cors', cache: 'no-store' }).catch(()=>{});
+            } catch (e) {}
+        }
+
+        // Fetch Metadata quietly in background
+        async function fetchSiteDataMeta() {
+            try {
+                let res = await fetch(`${BOT4_ADMIN_API}/api/cards`);
+                if (!res.ok) {
+                    res = await fetch(`./site_data.json?v=${Date.now()}`);
+                }
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data && data.cards && data.cards[animeSlug]) {
+                        siteCardData = data.cards[animeSlug];
+                    }
+                }
             } catch (e) {
-                console.log("Waking up stream server...");
+                console.warn("Meta sync skipped:", e);
             }
         }
 
-        // Optimized ArtPlayer Setup with H.264/H.265 AAC + WebRTC P2P Support
+        // Complete instance cleanup guard
+        function destroyPlayerInstances() {
+            if (p2pEngine) {
+                try {
+                    if (typeof p2pEngine.destroy === 'function') p2pEngine.destroy();
+                } catch(e) {}
+                p2pEngine = null;
+            }
+            if (art) {
+                try {
+                    art.destroy(false);
+                } catch(e) {}
+                art = null;
+            }
+        }
+
+        // Optimized ArtPlayer setup
         function setupArtPlayer(videoUrl) {
             errorOverlay.classList.add("hidden");
 
-            // Clean up previous ArtPlayer instance
-            if (art) {
-                art.destroy(false);
-            }
+            destroyPlayerInstances();
 
-            // Clean up previous P2P Engine instance
-            if (p2pEngine && typeof p2pEngine.destroy === 'function') {
-                p2pEngine.destroy();
-                p2pEngine = null;
-            }
+            // Reset P2P Badges
+            document.getElementById("p2pPeersCount").textContent = "0";
+            document.getElementById("p2pDownloadedData").textContent = "0 MB";
 
-            art = new Artplayer({
-                container: '#artplayer',
-                url: videoUrl,
-                type: 'mp4',
-                autoplay: true,
-                pip: true,
-                setting: true,
-                fullscreen: true,
-                fullscreenWeb: true,
-                autoSize: false,
-                playbackRate: true,
-                aspectRatio: true,
-                theme: '#66fcf1',
-                icons: {
-                    state: '<i class="fa-solid fa-play text-4xl text-[#66fcf1]"></i>',
-                },
-                moreVideoAttr: {
-                    'playsinline': true,
-                    'webkit-playsinline': true,
-                    'preload': 'auto',
-                    'crossOrigin': 'anonymous'
-                }
-            });
-
-            // Initialize SwarmCloud WebRTC P2P Engine when Player is Ready
-            art.on('ready', () => {
-                errorOverlay.classList.add("hidden");
-
-                if (window.P2pEngineMp4 && P2pEngineMp4.isSupported()) {
-                    p2pEngine = new P2pEngineMp4({
-                        video: art.video,
-                        segmentId: videoUrl,
-                        trackerZone: 'global',
-                    });
-
-                    // Update Peer Count in UI
-                    p2pEngine.on('peers', (peers) => {
-                        const count = peers.length;
-                        const peerBadge = document.getElementById("p2pPeersCount");
-                        if (peerBadge) {
-                            peerBadge.innerText = `${count} ${count === 1 ? 'Peer' : 'Peers'}`;
-                        }
-                    });
-
-                    // Log Data Stats
-                    p2pEngine.on('stats', (stats) => {
-                        console.log(`[P2P Stats] P2P: ${(stats.totalP2PDownloaded / 1024 / 1024).toFixed(2)} MB | HTTP: ${(stats.totalHttpDownloaded / 1024 / 1024).toFixed(2)} MB`);
-                    });
-                }
-            });
-
-            // Hide error banner when video buffers properly
-            art.on('video:canplay', () => {
-                errorOverlay.classList.add("hidden");
-            });
-
-            art.on('ended', () => {
-                playNextOrPrev(1);
-            });
-
-            // Graceful Fail-safe check for H.264 / H.265 AAC errors
-            art.on('error', (err) => {
-                console.error("Stream Error:", err);
-                wakeUpStreamServer();
-
-                setTimeout(() => {
-                    if (art && art.video && (art.video.readyState === 0 || art.video.networkState === 3)) {
-                        errorOverlay.classList.remove("hidden");
-                    }
-                }, 8000);
-            });
-        }
-
-        // Initialize Player Page
-        async function initPlayer() {
             try {
-                errorOverlay.classList.add("hidden");
-                wakeUpStreamServer();
-
-                const res = await fetch(`${BOT1_API}/api/episodes/${animeSlug}`);
-                if(!res.ok) throw new Error("Anime API not found");
-                
-                animeData = await res.json();
-                
-                document.getElementById("animeTitleDisplay").innerText = animeData.title || animeSlug.replace(/_/g, ' ').toUpperCase();
-                document.getElementById("fullDownloadPageBtn").href = `download.html?anime=${animeSlug}`;
-
-                renderSeasonTabs();
-                
-                const seasons = Object.keys(animeData.seasons || {});
-                if(seasons.length > 0) {
-                    currentSeason = seasons[0];
-                    renderEpisodeGrid(currentSeason);
-                    
-                    const firstEpList = animeData.seasons[currentSeason];
-                    if(firstEpList && firstEpList.length > 0) {
-                        playEpisodeByNum(firstEpList[0].ep);
+                art = new Artplayer({
+                    container: '#artplayer',
+                    url: videoUrl,
+                    type: 'mp4',
+                    autoplay: true,
+                    pip: true,
+                    setting: true,
+                    fullscreen: true,
+                    fullscreenWeb: true,
+                    autoSize: false,
+                    playbackRate: true,
+                    aspectRatio: true,
+                    theme: '#66fcf1',
+                    icons: {
+                        state: '<i class="fa-solid fa-play text-4xl text-[#66fcf1]"></i>',
+                    },
+                    moreVideoAttr: {
+                        'playsinline': true,
+                        'webkit-playsinline': true,
+                        'preload': 'metadata',
+                        'crossOrigin': 'anonymous'
                     }
-                } else {
-                    throw new Error("No seasons data found");
-                }
-            } catch(err) {
-                console.error("Error loading episode data:", err);
-                document.getElementById("animeTitleDisplay").innerText = "Video Not Found";
+                });
+
+                art.on('ready', () => {
+                    errorOverlay.classList.add("hidden");
+
+                    if (window.P2pEngineMp4 && P2pEngineMp4.isSupported()) {
+                        p2pEngine = new P2pEngineMp4({
+                            video: art.video,
+                            segmentId: videoUrl,
+                            trackerZone: 'global',
+                        });
+
+                        let lastPeerCount = -1;
+                        p2pEngine.on('peers', (peers) => {
+                            const count = peers ? peers.length : 0;
+                            if (count !== lastPeerCount) {
+                                lastPeerCount = count;
+                                const peerBadge = document.getElementById("p2pPeersCount");
+                                if (peerBadge) peerBadge.textContent = count;
+                            }
+                        });
+
+                        let lastP2pMB = "";
+                        p2pEngine.on('stats', (stats) => {
+                            if (!stats) return;
+                            const p2pBytes = stats.totalP2PDownloaded || 0;
+                            const p2pMB = (p2pBytes / 1048576).toFixed(1) + " MB";
+                            if (p2pMB !== lastP2pMB) {
+                                lastP2pMB = p2pMB;
+                                const p2pDataElem = document.getElementById("p2pDownloadedData");
+                                if (p2pDataElem) p2pDataElem.textContent = p2pMB;
+                            }
+                        });
+                    }
+                });
+
+                art.on('video:canplay', () => errorOverlay.classList.add("hidden"));
+                art.on('ended', () => playNextOrPrev(1));
+
+                art.on('error', (err) => {
+                    console.error("Stream Error:", err);
+                    wakeUpServers();
+                    setTimeout(() => {
+                        if (art && art.video && (art.video.readyState === 0 || art.video.networkState === 3)) {
+                            errorOverlay.classList.remove("hidden");
+                        }
+                    }, 6000);
+                });
+
+            } catch(e) {
+                console.error("Player initialization failed:", e);
                 errorOverlay.classList.remove("hidden");
             }
         }
 
-        // Render Season Switcher Tabs
+        // Fail-proof Official vs Unofficial Resolver
+        function getEpisodeStreamAndDownloadUrl(epObj, targetType) {
+            let selectedType = epObj.type || "official";
+            let chat_id = epObj.chat_id;
+            let msg_id = epObj.msg_id;
+            let streamUrl = epObj.stream_url;
+            let downloadUrl = epObj.download_url;
+
+            if (epObj.sources && typeof epObj.sources === 'object') {
+                if (epObj.sources[targetType]) {
+                    const src = epObj.sources[targetType];
+                    chat_id = src.chat_id || chat_id;
+                    msg_id = src.msg_id || msg_id;
+                    streamUrl = src.stream_url || streamUrl;
+                    downloadUrl = src.download_url || downloadUrl;
+                    selectedType = targetType;
+                } else if (epObj.sources['official']) {
+                    const src = epObj.sources['official'];
+                    chat_id = src.chat_id || chat_id;
+                    msg_id = src.msg_id || msg_id;
+                    streamUrl = src.stream_url || streamUrl;
+                    downloadUrl = src.download_url || downloadUrl;
+                    selectedType = 'official';
+                }
+            }
+
+            if (!streamUrl && chat_id && msg_id) {
+                streamUrl = `${BOT2_STREAM_BASE}/stream/${chat_id}/${msg_id}.mp4`;
+            }
+            if (!downloadUrl && chat_id && msg_id) {
+                downloadUrl = `${BOT3_DOWNLOAD_BASE}/download/${chat_id}/${msg_id}`;
+            }
+
+            return { streamUrl, downloadUrl, activeType: selectedType };
+        }
+
+        function switchAudioType(type) {
+            if (preferredAudioType === type) return;
+            preferredAudioType = type;
+            updateTypeBtnStyles();
+            if (activeEpisodeObj) {
+                playEpisode(activeEpisodeObj);
+            }
+        }
+
+        function updateTypeBtnStyles() {
+            const btnOff = document.getElementById("typeBtnOfficial");
+            const btnUnoff = document.getElementById("typeBtnUnofficial");
+
+            if (preferredAudioType === "official") {
+                btnOff.className = "px-2.5 py-1 text-[11px] font-bold rounded type-btn-active transition";
+                btnUnoff.className = "px-2.5 py-1 text-[11px] font-bold rounded text-gray-300 hover:text-white transition";
+            } else {
+                btnOff.className = "px-2.5 py-1 text-[11px] font-bold rounded text-gray-300 hover:text-white transition";
+                btnUnoff.className = "px-2.5 py-1 text-[11px] font-bold rounded type-btn-active transition";
+            }
+        }
+
+        // Initialize Player Page Fast
+        async function initPlayer() {
+            try {
+                errorOverlay.classList.add("hidden");
+                wakeUpServers();
+                updateTypeBtnStyles();
+
+                fetchSiteDataMeta();
+
+                const res = await fetch(`${BOT1_API}/api/episodes/${animeSlug}`);
+                if (!res.ok) throw new Error("Anime API missing");
+                
+                animeData = await res.json();
+                
+                const title = animeData.title || (siteCardData ? siteCardData.title : animeSlug.replace(/_/g, ' ').toUpperCase());
+                document.getElementById("animeTitleDisplay").textContent = title;
+                document.getElementById("downloadSeasonsCardBtn").href = `download.html?anime=${animeSlug}`;
+
+                renderSeasonTabs();
+                
+                const seasons = Object.keys(animeData.seasons || {});
+                if (seasons.length > 0) {
+                    currentSeason = seasons[0];
+                    renderEpisodeGrid(currentSeason);
+                    
+                    const firstEpList = animeData.seasons[currentSeason];
+                    if (firstEpList && firstEpList.length > 0) {
+                        playEpisodeByNum(firstEpList[0].ep);
+                    }
+                } else {
+                    throw new Error("Empty seasons payload");
+                }
+            } catch (err) {
+                console.error("Player initialization failed:", err);
+                document.getElementById("animeTitleDisplay").textContent = "Video Not Found";
+                errorOverlay.classList.remove("hidden");
+            }
+        }
+
         function renderSeasonTabs() {
             const tabsContainer = document.getElementById("seasonTabsContainer");
             const seasons = Object.keys(animeData.seasons || {});
 
-            if(seasons.length <= 1) {
+            if (seasons.length <= 1) {
                 tabsContainer.innerHTML = `<span class="text-xs text-gray-400 font-semibold">Season 1</span>`;
                 return;
             }
@@ -313,14 +455,13 @@
             updateTabStyles();
         }
 
-        // Switch Active Season
         function switchSeason(seasonNum) {
-            currentSeason = seasonNum;
+            currentSeason = String(seasonNum);
             updateTabStyles();
-            renderEpisodeGrid(seasonNum);
+            renderEpisodeGrid(currentSeason);
             
-            const epList = animeData.seasons[seasonNum];
-            if(epList && epList.length > 0) {
+            const epList = animeData.seasons[currentSeason];
+            if (epList && epList.length > 0) {
                 playEpisodeByNum(epList[0].ep);
             }
         }
@@ -329,8 +470,8 @@
             const seasons = Object.keys(animeData.seasons || {});
             seasons.forEach(s => {
                 const tab = document.getElementById(`tab-s-${s}`);
-                if(tab) {
-                    if(s === currentSeason) {
+                if (tab) {
+                    if (String(s) === String(currentSeason)) {
                         tab.className = "px-3 py-1 text-xs font-bold rounded-md bg-[#66fcf1] text-black border border-[#66fcf1] transition whitespace-nowrap";
                     } else {
                         tab.className = "px-3 py-1 text-xs font-bold rounded-md bg-gray-800 text-gray-300 hover:bg-gray-700 border border-gray-700 transition whitespace-nowrap";
@@ -339,85 +480,79 @@
             });
         }
 
-        // Render Episodes Buttons Grid
         function renderEpisodeGrid(seasonNum) {
             const epGrid = document.getElementById("episodesGrid");
             const episodes = animeData.seasons[seasonNum] || [];
 
-            if(episodes.length === 0) {
+            if (episodes.length === 0) {
                 epGrid.innerHTML = `<p class="col-span-full text-xs text-gray-500 text-center py-4">No episodes found in this season.</p>`;
                 return;
             }
 
-            epGrid.innerHTML = episodes.map(ep => `
+            epGrid.innerHTML = episodes.map(ep => {
+                const epTypeLabel = ep.type === "unofficial" ? "Fan Dub" : "Official";
+                return `
                 <button 
                     id="ep-btn-${ep.ep}" 
-                    onclick="playEpisodeByNum(${ep.ep})"
+                    onclick="playEpisodeByNum('${ep.ep}')"
                     class="ep-card bg-gray-800/80 hover:bg-gray-700 border border-gray-700 text-white text-xs font-bold py-2.5 rounded-lg text-center transition flex flex-col items-center justify-center gap-1"
                 >
                     <span>EP ${ep.ep}</span>
-                    <span class="text-[9px] text-gray-400 font-normal uppercase">${ep.type || 'Official'}</span>
+                    <span class="text-[9px] text-gray-400 font-normal uppercase">${epTypeLabel}</span>
                 </button>
-            `).join("");
+            `;
+            }).join("");
         }
 
-        // Safe Episode Fetcher
         function playEpisodeByNum(epNum) {
             const epList = animeData.seasons[currentSeason] || [];
-            const foundEp = epList.find(e => e.ep == epNum);
-            if(foundEp) {
+            // Type-safe strict string comparison
+            const foundEp = epList.find(e => String(e.ep) === String(epNum));
+            if (foundEp) {
                 playEpisode(foundEp);
             }
         }
 
-        // Core Play Episode & Update Links
         function playEpisode(epObj) {
             currentEpNum = epObj.ep;
             activeEpisodeObj = epObj;
             errorOverlay.classList.add("hidden");
 
-            // 1. Construct Bot 2 Video Streaming Link
-            let streamUrl = epObj.stream_url;
-            if(!streamUrl) {
-                streamUrl = `${BOT2_STREAM_BASE}/stream/${epObj.chat_id}/${epObj.msg_id}.mp4`;
-            }
+            const resolved = getEpisodeStreamAndDownloadUrl(epObj, preferredAudioType);
 
-            // 2. Construct Bot 3 Direct Download Link
-            let downloadUrl = epObj.download_url;
-            if(!downloadUrl) {
-                downloadUrl = `${BOT3_DOWNLOAD_BASE}/download/${epObj.chat_id}/${epObj.msg_id}`;
-            }
+            setupArtPlayer(resolved.streamUrl);
 
-            // Load Video inside ArtPlayer + P2P Engine
-            setupArtPlayer(streamUrl);
-
-            // Update Download Button
             const downloadBtn = document.getElementById("bot3DownloadBtn");
-            downloadBtn.href = downloadUrl;
+            downloadBtn.href = resolved.downloadUrl || "#";
 
-            // Update Metadata UI
-            document.getElementById("currentEpTitle").innerText = `Season ${currentSeason} - Episode ${epObj.ep}`;
-            document.getElementById("seasonBadge").innerText = `Season ${currentSeason}`;
-            document.getElementById("dubBadge").innerText = epObj.type === "unofficial" ? "Fan Dub" : "Official Dub";
+            document.getElementById("currentEpTitle").textContent = `Season ${currentSeason} - Episode ${epObj.ep}`;
+            document.getElementById("seasonBadge").textContent = `Season ${currentSeason}`;
+            
+            const dubBadge = document.getElementById("dubBadge");
+            if (resolved.activeType === "unofficial" || epObj.type === "unofficial") {
+                dubBadge.textContent = "Fan Dub (Unofficial)";
+                dubBadge.className = "bg-amber-500/20 text-amber-400 text-xs font-bold px-2.5 py-0.5 rounded border border-amber-500/30 uppercase";
+            } else {
+                dubBadge.textContent = "Hindi Dubbed (Official)";
+                dubBadge.className = "bg-emerald-500/20 text-emerald-400 text-xs font-bold px-2.5 py-0.5 rounded border border-emerald-500/30 uppercase";
+            }
 
-            // Active Button Style Update
             document.querySelectorAll(".ep-card").forEach(btn => btn.classList.remove("ep-btn-active"));
             const activeBtn = document.getElementById(`ep-btn-${epObj.ep}`);
-            if(activeBtn) {
+            if (activeBtn) {
                 activeBtn.classList.add("ep-btn-active");
             }
 
             updateNavButtons();
         }
 
-        // Previous / Next Episode Navigation
         function playNextOrPrev(direction) {
             const epList = animeData.seasons[currentSeason] || [];
-            const currentIndex = epList.findIndex(e => e.ep == currentEpNum);
+            const currentIndex = epList.findIndex(e => String(e.ep) === String(currentEpNum));
             
-            if(currentIndex !== -1) {
+            if (currentIndex !== -1) {
                 const newIndex = currentIndex + direction;
-                if(newIndex >= 0 && newIndex < epList.length) {
+                if (newIndex >= 0 && newIndex < epList.length) {
                     playEpisode(epList[newIndex]);
                 }
             }
@@ -425,22 +560,21 @@
 
         function updateNavButtons() {
             const epList = animeData.seasons[currentSeason] || [];
-            const currentIndex = epList.findIndex(e => e.ep == currentEpNum);
+            const currentIndex = epList.findIndex(e => String(e.ep) === String(currentEpNum));
 
             document.getElementById("prevEpBtn").disabled = (currentIndex <= 0);
             document.getElementById("nextEpBtn").disabled = (currentIndex >= epList.length - 1);
         }
 
         function retryCurrentEpisode() {
-            wakeUpStreamServer();
-            if(activeEpisodeObj) {
+            wakeUpServers();
+            if (activeEpisodeObj) {
                 playEpisode(activeEpisodeObj);
             } else {
                 initPlayer();
             }
         }
 
-        // Start execution on DOM Load
         window.addEventListener("DOMContentLoaded", initPlayer);
     </script>
 </body>
