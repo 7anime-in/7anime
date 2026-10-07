@@ -121,7 +121,7 @@
             </div>
         </div>
 
-        <!-- 2. ARTPLAYER VIDEO CONTAINER (OPTIMIZED FOR SPEED) -->
+        <!-- 2. ARTPLAYER VIDEO CONTAINER -->
         <div class="bg-black rounded-2xl overflow-hidden shadow-2xl border border-gray-800 aspect-video relative flex items-center justify-center">
             <div id="artplayer" class="w-full h-full z-0"></div>
             
@@ -207,46 +207,13 @@
             </a>
         </div>
 
-        <!-- DISPLAY AD BANNER AT BOTTOM (UNBLOCKED & OPTIMIZED) -->
-        <div class="w-full flex justify-center items-center py-2 overflow-hidden">
-            <!-- Banner 728x90 for Desktop -->
-            <div class="hidden md:block">
-                <script>
-                  atOptions = {
-                    'key' : '266405efe3dce7546f9cf7fc8942276f',
-                    'format' : 'iframe',
-                    'height' : 90,
-                    'width' : 728,
-                    'params' : {}
-                  };
-                </script>
-                <script src="https://seenimplieddump.com/266405efe3dce7546f9cf7fc8942276f/invoke.js"></script>
-            </div>
-            <!-- Banner 320x50 for Mobile -->
-            <div class="block md:hidden">
-                <script>
-                  atOptions = {
-                    'key' : 'cc4edbceab156b82e59dfda602d17208',
-                    'format' : 'iframe',
-                    'height' : 50,
-                    'width' : 320,
-                    'params' : {}
-                  };
-                </script>
-                <script src="https://seenimplieddump.com/cc4edbceab156b82e59dfda602d17208/invoke.js"></script>
-            </div>
-        </div>
-
     </main>
 
     <footer class="bg-[#1f2833] border-t border-gray-800 text-center py-6 text-sm text-gray-400 mt-auto">
         <p>© 2026 7anime Engine. Streaming via Bot 2 | Downloads via Bot 3 | Admin via Bot 4 | WebRTC P2P Enabled.</p>
     </footer>
 
-    <!-- POPUNDER SCRIPT GLOBAL -->
-    <script src="https://seenimplieddump.com/ea/4f/e6/ea4fe66a53acc6c4fc7b48bc03a4acf5.js"></script>
-
-    <!-- OPTIMIZED & BUG-FREE JS LOGIC -->
+    <!-- SCRIPT LOGIC WITH GOOGLE DRIVE IMAGE FORMATTER -->
     <script>
         "use strict";
 
@@ -269,6 +236,16 @@
         const urlParams = new URLSearchParams(window.location.search);
         const animeSlug = urlParams.get('anime') || 'solo_leveling';
         const errorOverlay = document.getElementById("playerErrorOverlay");
+
+        // Google Drive Link Fixer Helper Service
+        function formatImageUrl(url) {
+            if (!url) return "https://via.placeholder.com/200x300?text=7anime";
+            const driveMatch = url.match(/\/d\/([a-zA-Z0-9_-]+)/) || url.match(/id=([a-zA-Z0-9_-]+)/);
+            if (driveMatch && driveMatch[1]) {
+                return `https://lh3.googleusercontent.com/d/${driveMatch[1]}`;
+            }
+            return url;
+        }
 
         function wakeUpServers() {
             try {
@@ -304,9 +281,16 @@
                 document.getElementById("metaJp").textContent = info.japanese_title || info.japanese;
             }
 
-            const posterUrl = info.poster || info.image || info.img || info.thumbnail || info.cover;
-            if (posterUrl) {
-                document.getElementById("animePosterImg").src = posterUrl;
+            // Using formatImageUrl to correctly handle Google Drive links from site_data.json
+            const rawPosterUrl = info.poster || info.image || info.img || info.thumbnail || info.cover;
+            const finalPosterUrl = formatImageUrl(rawPosterUrl);
+            
+            if (finalPosterUrl) {
+                const posterImg = document.getElementById("animePosterImg");
+                posterImg.src = finalPosterUrl;
+                posterImg.onerror = function() {
+                    this.src = 'https://via.placeholder.com/200x300?text=7anime';
+                };
             }
 
             if (info.synopsis || info.description) {
@@ -325,9 +309,11 @@
 
             const genresArr = info.genres || info.genre || ["Action", "Adventure", "Fantasy"];
             const genresContainer = document.getElementById("animeGenresContainer");
-            if (Array.isArray(genresArr) && genresArr.length > 0) {
-                genresContainer.innerHTML = genresArr.map(g => `
-                    <span class="bg-gray-800 text-gray-300 text-[11px] px-2 py-0.5 rounded-full border border-gray-700">${g}</span>
+            if (Array.isArray(genresArr)) {
+                // Handle if genres is string or array
+                const genresList = typeof genresArr === 'string' ? genresArr.split(',') : genresArr;
+                genresContainer.innerHTML = genresList.map(g => `
+                    <span class="bg-gray-800 text-gray-300 text-[11px] px-2 py-0.5 rounded-full border border-gray-700">${g.trim()}</span>
                 `).join("");
             }
         }
@@ -347,7 +333,6 @@
             }
         }
 
-        // HIGH-SPEED ARTPLAYER SETUP WITH PRELOAD AUTO
         function setupArtPlayer(videoUrl) {
             errorOverlay.classList.add("hidden");
             destroyPlayerInstances();
@@ -500,7 +485,8 @@
                 wakeUpServers();
                 updateTypeBtnStyles();
 
-                fetchSiteDataMeta();
+                // Fetch Card Metadata from site_data.json / Admin API
+                await fetchSiteDataMeta();
 
                 const res = await fetch(`${BOT1_API}/api/episodes/${animeSlug}`);
                 if (!res.ok) throw new Error("Anime API missing");
