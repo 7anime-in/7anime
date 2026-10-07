@@ -1,6 +1,7 @@
 import os
 import re
 import asyncio
+import traceback
 import httpx
 from typing import Optional
 from contextlib import asynccontextmanager
@@ -104,13 +105,15 @@ async def stream_video(chat_id: str, message_id: str, request: Request):
 
         msg = await pyro_client.get_messages(target_id, msg_id_clean)
     except FloodWait as e:
+        print(f"FloodWait error: {e.value}")
         return Response(
             content=b"Rate limited by Telegram", 
             status_code=429, 
             headers={"Retry-Address": str(e.value)}
         )
     except Exception as e:
-        print(f"Error fetching message: {e}")
+        error_detail = traceback.format_exc()
+        print(f"🔥 FULL ERROR TRACEBACK:\n{error_detail}")
         return Response(content=b"Video Message Not Found", media_type="text/plain", status_code=404)
 
     if not is_video_message(msg):
@@ -131,14 +134,16 @@ async def stream_video(chat_id: str, message_id: str, request: Request):
             telegram_cdn_url = f"https://api.telegram.org/file/bot{BOT_TOKEN}/{file_path}"
             return RedirectResponse(url=telegram_cdn_url, status_code=302)
         else:
+            print(f"Telegram API Error Response: {res_json}")
             return Response(content=b"Failed to fetch Telegram file path from API", media_type="text/plain", status_code=500)
             
     except Exception as e:
-        print(f"Redirect error: {e}")
+        error_detail = traceback.format_exc()
+        print(f"🔥 REDIRECT TRACEBACK:\n{error_detail}")
         return Response(content=f"Stream Redirect Error: {str(e)}".encode(), media_type="text/plain", status_code=500)
 
 if __name__ == "__main__":
     import uvicorn
     port = int(os.getenv("PORT", 8080))
     uvicorn.run("bot2_streamer:app", host="0.0.0.0", port=port, reload=False)
-    
+            
