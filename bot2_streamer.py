@@ -1,6 +1,7 @@
 import os
 import re
 import asyncio
+import httpx
 from typing import Optional
 from contextlib import asynccontextmanager
 
@@ -118,12 +119,19 @@ async def stream_video(chat_id: str, message_id: str, request: Request):
     media = msg.video or msg.document
 
     try:
-        file_info = await pyro_client.get_file(media.file_id)
-        if file_info and file_info.file_path:
-            telegram_cdn_url = f"https://api.telegram.org/file/bot{BOT_TOKEN}/{file_info.file_path}"
+        file_id = media.file_id
+        api_url = f"https://api.telegram.org/bot{BOT_TOKEN}/getFile?file_id={file_id}"
+        
+        async with httpx.AsyncClient() as client:
+            resp = await client.get(api_url)
+            res_json = resp.json()
+            
+        if res_json.get("ok"):
+            file_path = res_json["result"]["file_path"]
+            telegram_cdn_url = f"https://api.telegram.org/file/bot{BOT_TOKEN}/{file_path}"
             return RedirectResponse(url=telegram_cdn_url, status_code=302)
         else:
-            return Response(content=b"Failed to fetch Telegram file path", media_type="text/plain", status_code=500)
+            return Response(content=b"Failed to fetch Telegram file path from API", media_type="text/plain", status_code=500)
             
     except Exception as e:
         print(f"Redirect error: {e}")
