@@ -8,9 +8,12 @@
   ],
   "routes": [
     {
+      "src": "/stream/(.*)",
+      "destination": "/api/index.py"
+    },
+    {
       "src": "/(.*)",
-      "destination": "api/index.py"
+      "destination": "/$1"
     }
   ]
 }
-
