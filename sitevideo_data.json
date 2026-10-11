@@ -1,1 +1,20 @@
-{}
+{
+  "ranma1_2": {
+    "title": "Ranma1/2",
+    "seasons": {
+      "2": [
+        {
+          "ep": 8,
+          "chat_id": "4342403236",
+          "msg_id": 806,
+          "type": "official",
+          "format": "H.264 / AVC (AAC)",
+          "stream_url": "https://7anime-bot2-streamer.onrender.com/stream/4342403236/806.mp4",
+          "download_url": "https://7anime-bot3-downloader.onrender.com/download/4342403236/806",
+          "embed_url": "https://t.me/4342403236/806?embed=1",
+          "tg_url": "https://t.me/4342403236/806"
+        }
+      ]
+    }
+  }
+}
