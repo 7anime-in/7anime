@@ -1,1 +1,20 @@
-{}
+{
+  "tomb_raider_king": {
+    "title": "Tomb Raider King",
+    "seasons": {
+      "1": [
+        {
+          "ep": 1,
+          "chat_id": "4342403236",
+          "msg_id": 802,
+          "type": "official",
+          "format": "H.264 / AVC (AAC)",
+          "stream_url": "https://7anime-bot2-streamer.onrender.com/stream/4342403236/802.mp4",
+          "download_url": "https://7anime-bot3-downloader.onrender.com/download/4342403236/802",
+          "embed_url": "https://t.me/4342403236/802?embed=1",
+          "tg_url": "https://t.me/4342403236/802"
+        }
+      ]
+    }
+  }
+}
