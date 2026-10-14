@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>7anime - Testing Player</title>
+    <title>7anime - JSON & Bot Connection Checker</title>
     <!-- Plyr CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/plyr@3.7.8/dist/plyr.css" />
     <style>
@@ -21,13 +21,23 @@
         h1 {
             color: #ffcc00;
             font-size: 22px;
+            margin-bottom: 5px;
+        }
+        #status-box {
+            font-size: 14px;
+            color: #00ffcc;
             margin-bottom: 15px;
+            background: #1a1c23;
+            padding: 8px 12px;
+            border-radius: 5px;
+            border-left: 4px solid #00ffcc;
         }
         .player-wrapper {
             margin-bottom: 20px;
             background: #000;
             border-radius: 8px;
             overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
         }
         .episodes-section {
             background: #1a1c23;
@@ -65,7 +75,8 @@
 </head>
 <body>
     <div class="container">
-        <h1 id="anime-title">Ranma ½ - Testing Player</h1>
+        <h1 id="anime-title">Loading Anime Data...</h1>
+        <div id="status-box">⏳ Checking sitevideo_data.json and Bot connection...</div>
         
         <div class="player-wrapper">
             <video id="player" playsinline controls>
@@ -82,63 +93,82 @@
     <!-- Plyr JS -->
     <script src="https://cdn.jsdelivr.net/npm/plyr@3.7.8/dist/plyr.js"></script>
     <script>
-        // Tera sitevideo_data.json ka exact data structure
-        const siteData = {
-          "ranma1_2": {
-            "title": "Ranma ½",
-            "seasons": {
-              "1": [
-                { "ep": 1, "stream_url": "https://7anime-bot2-streamer.onrender.com/stream/ranma1_2_7anime/4.mp4" },
-                { "ep": 2, "stream_url": "https://7anime-bot2-streamer.onrender.com/stream/ranma1_2_7anime/15.mp4" },
-                { "ep": 3, "stream_url": "https://7anime-bot2-streamer.onrender.com/stream/ranma1_2_7anime/5.mp4" },
-                { "ep": 4, "stream_url": "https://7anime-bot2-streamer.onrender.com/stream/ranma1_2_7anime/6.mp4" },
-                { "ep": 5, "stream_url": "https://7anime-bot2-streamer.onrender.com/stream/ranma1_2_7anime/7.mp4" },
-                { "ep": 6, "stream_url": "https://7anime-bot2-streamer.onrender.com/stream/ranma1_2_7anime/8.mp4" },
-                { "ep": 7, "stream_url": "https://7anime-bot2-streamer.onrender.com/stream/ranma1_2_7anime/9.mp4" },
-                { "ep": 8, "stream_url": "https://7anime-bot2-streamer.onrender.com/stream/ranma1_2_7anime/10.mp4" },
-                { "ep": 9, "stream_url": "https://7anime-bot2-streamer.onrender.com/stream/ranma1_2_7anime/11.mp4" },
-                { "ep": 10, "stream_url": "https://7anime-bot2-streamer.onrender.com/stream/ranma1_2_7anime/12.mp4" },
-                { "ep": 11, "stream_url": "https://7anime-bot2-streamer.onrender.com/stream/ranma1_2_7anime/13.mp4" },
-                { "ep": 12, "stream_url": "https://7anime-bot2-streamer.onrender.com/stream/ranma1_2_7anime/14.mp4" }
-              ]
-            }
-          }
-        };
-
         const player = new Plyr('#player');
         const episodesContainer = document.getElementById('episodes-container');
         const animeTitle = document.getElementById('anime-title');
+        const statusBox = document.getElementById('status-box');
 
-        const anime = siteData.ranma1_2;
-        animeTitle.innerText = anime.title + " - Testing Player";
-        const season1Episodes = anime.seasons["1"];
+        // 🔍 sitevideo_data.json ko dynamically fetch karna
+        async function loadAnimeData() {
+            try {
+                statusBox.innerText = "⏳ Fetching sitevideo_data.json from repository...";
+                console.log("Fetching sitevideo_data.json...");
 
-        season1Episodes.forEach((epData, index) => {
-            const btn = document.createElement('button');
-            btn.className = 'ep-btn';
-            btn.innerText = `Ep ${epData.ep}`;
-            btn.onclick = () => {
-                document.querySelectorAll('.ep-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                
-                player.source = {
-                    type: 'video',
-                    sources: [
-                        {
-                            src: epData.stream_url,
-                            type: 'video/mp4',
-                        },
-                    ],
-                };
-                player.play();
-            };
-            episodesContainer.appendChild(btn);
+                const response = await fetch('sitevideo_data.json');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
 
-            // Pehla episode default load kar dega
-            if (index === 0) {
-                btn.click();
+                const siteData = await response.json();
+                console.log("✅ sitevideo_data.json loaded successfully:", siteData);
+                statusBox.innerText = "✅ sitevideo_data.json loaded successfully! Initializing episodes...";
+
+                // Ranma 1/2 data check karna
+                if (!siteData.ranma1_2) {
+                    throw new Error("ranma1_2 key not found in JSON data!");
+                }
+
+                const anime = siteData.ranma1_2;
+                animeTitle.innerText = anime.title + " - Player";
+                const season1Episodes = anime.seasons["1"];
+
+                episodesContainer.innerHTML = "";
+
+                season1Episodes.forEach((epData, index) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'ep-btn';
+                    btn.innerText = `Ep ${epData.ep}`;
+                    btn.onclick = () => {
+                        document.querySelectorAll('.ep-btn').forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                        
+                        console.log(`▶️ Playing Episode ${epData.ep} via URL: ${epData.stream_url}`);
+                        statusBox.innerText = `🔗 Connecting to Bot Backend for Episode ${epData.ep}...`;
+
+                        player.source = {
+                            type: 'video',
+                            sources: [
+                                {
+                                    src: epData.stream_url,
+                                    type: 'video/mp4',
+                                },
+                            ],
+                        };
+                        player.play().then(() => {
+                            statusBox.innerText = `🚀 Playing Episode ${epData.ep} successfully from Bot!`;
+                        }).catch(err => {
+                            console.error("Playback error:", err);
+                            statusBox.innerText = `⚠️ Playback error on Episode ${epData.ep}. Check console.`;
+                        });
+                    };
+                    episodesContainer.appendChild(btn);
+
+                    // Pehla episode automatically load karne ke liye
+                    if (index === 0) {
+                        btn.click();
+                    }
+                });
+
+            } catch (error) {
+                console.error("❌ Error loading JSON or connecting:", error);
+                statusBox.style.borderLeftColor = "#ff4d4d";
+                statusBox.style.color = "#ff4d4d";
+                statusBox.innerText = `❌ Failed: ${error.message}. Make sure sitevideo_data.json is in the same folder!`;
             }
-        });
+        }
+
+        // Run the checker function
+        loadAnimeData();
     </script>
 </body>
 </html>
