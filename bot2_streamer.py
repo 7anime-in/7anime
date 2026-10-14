@@ -3,9 +3,9 @@ import re
 import asyncio
 from typing import Optional
 from contextlib import asynccontextmanager
+import httpx
 
-# ==================== PYTHON 3.12+ EVENT LOOP FIX ====================
-# Yeh line Render par Pyrogram ka 'no current event loop' error solve karegi
+# ==================== PYTHON EVENT LOOP FIX ====================
 asyncio.set_event_loop(asyncio.new_event_loop())
 
 from fastapi import FastAPI, Request, Response
@@ -45,7 +45,7 @@ async def lifespan(app: FastAPI):
         api_id=API_ID,
         api_hash=API_HASH,
         bot_token=BOT_TOKEN,
-        in_memory=True  # Prevents SQLite DB locks on Render
+        in_memory=True
     )
 
     await pyro_client.start()
@@ -57,7 +57,6 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="Bot 2 - Direct CDN Streamer Engine", lifespan=lifespan)
 
-# Enable Full CORS for Web Player
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -118,16 +117,24 @@ async def get_stream_response(
     file_id = media.file_id
 
     try:
-        # Telegram se official direct file path nikalna (Zero Server Bandwidth)
-        file_info = await pyro_client.get_file(file_id)
-        direct_url = f"https://api.telegram.org/file/bot{BOT_TOKEN}/{file_info.file_path}"
+        # Telegram Bot API se direct file path nikalna using httpx (No Pyrogram get_file issues!)
+        api_url = f"https://api.telegram.org/bot{BOT_TOKEN}/getFile?file_id={file_id}"
+        async with httpx.AsyncClient() as http_client:
+            resp = await http_client.get(api_url)
+            data = resp.json()
+            
+        if not data.get("ok"):
+            raise Exception("Telegram getFile API failed to retrieve file path")
+            
+        file_path = data["result"]["file_path"]
+        direct_url = f"https://api.telegram.org/file/bot{BOT_TOKEN}/{file_path}"
         
         # Browser ko seedha Telegram CDN par redirect kar dena
         return RedirectResponse(url=direct_url, status_code=302)
 
     except Exception as e:
         print(f"CDN Redirect Error: {e}")
-        return Response(content=b"Failed to generate direct streaming link", media_type="text/plain", status_code=500)
+        return Response(content=f"Failed to generate direct streaming link: {str(e)}".encode(), media_type="text/plain", status_code=500)
 
 # ==================== ENDPOINTS ====================
 @app.api_route("/", methods=["GET", "HEAD"])
