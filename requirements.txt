@@ -2,3 +2,4 @@ fastapi
 uvicorn
 pyrogram
 tgcrypto
+httpx
