@@ -1,7 +1,12 @@
 import os
 import re
+import asyncio
 from typing import Optional
 from contextlib import asynccontextmanager
+
+# ==================== PYTHON 3.12+ EVENT LOOP FIX ====================
+# Yeh line Render par Pyrogram ka 'no current event loop' error solve karegi
+asyncio.set_event_loop(asyncio.new_event_loop())
 
 from fastapi import FastAPI, Request, Response
 from fastapi.responses import RedirectResponse
@@ -10,7 +15,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pyrogram import Client
 from pyrogram.errors import FloodWait
 
-# ==================== ENVIRONMENT VARIABLES ====================[span_1](start_span)[span_1](end_span)
+# ==================== ENVIRONMENT VARIABLES ====================
 API_ID = int(os.getenv("API_ID", "31169133"))
 API_HASH = os.getenv("API_HASH", "b836f4b836df4cf83c2d475a5ad3b285")
 BOT_TOKEN = os.getenv("BOT2_TOKEN") or os.getenv("BOT_TOKEN", "8946650986:AAGy6rYE-C42f7jcgeyS8Xl4-j9UAyIEwEk")
@@ -29,7 +34,7 @@ def is_video_message(message) -> bool:
             return True
     return False
 
-# ==================== LIFECYCLE HANDLER ====================[span_2](start_span)[span_2](end_span)
+# ==================== LIFECYCLE HANDLER ====================
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     global pyro_client
@@ -40,7 +45,7 @@ async def lifespan(app: FastAPI):
         api_id=API_ID,
         api_hash=API_HASH,
         bot_token=BOT_TOKEN,
-        in_memory=True  # Prevents SQLite DB locks on Render[span_3](start_span)[span_3](end_span)
+        in_memory=True  # Prevents SQLite DB locks on Render
     )
 
     await pyro_client.start()
@@ -52,7 +57,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="Bot 2 - Direct CDN Streamer Engine", lifespan=lifespan)
 
-# Enable Full CORS for Web Player[span_4](start_span)[span_4](end_span)
+# Enable Full CORS for Web Player
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
