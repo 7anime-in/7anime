@@ -37,7 +37,7 @@ def is_video_message(message) -> bool:
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     global pyro_client
-    print("🚀 Starting Bot 2 Streamer Engine on Render...")
+    print("🚀 Starting Bot 2 Clean Streamer Engine on Render...")
 
     pyro_client = Client(
         "bot2_streamer_session",
@@ -54,7 +54,7 @@ async def lifespan(app: FastAPI):
         await pyro_client.stop()
         print("🛑 Bot 2 Engine Stopped Cleanly.")
 
-app = FastAPI(title="Bot 2 - Streamer Engine", lifespan=lifespan)
+app = FastAPI(title="Bot 2 - Clean Streamer Engine", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -113,7 +113,6 @@ async def stream_video(chat_id: str, message_id: str, request: Request):
     media = msg.video or msg.document
     file_size = media.file_size
 
-    # Proper Async Generator Streaming (Handles files of any size without crashing)
     async def iter_file():
         async for chunk in pyro_client.stream_media(msg):
             yield chunk
@@ -129,7 +128,7 @@ async def stream_video(chat_id: str, message_id: str, request: Request):
 # ==================== ENDPOINTS ====================
 @app.api_route("/", methods=["GET", "HEAD"])
 def home():
-    return {"status": "Bot 2 Streamer Engine Active 🚀", "service": "7anime Engine"}
+    return {"status": "Bot 2 Clean Streamer Engine Active 🚀", "service": "7anime Engine"}
 
 @app.get("/health")
 def health_check():
