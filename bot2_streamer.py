@@ -8,7 +8,7 @@ from contextlib import asynccontextmanager
 asyncio.set_event_loop(asyncio.new_event_loop())
 
 from fastapi import FastAPI, Request, Response
-from fastapi.responses import RedirectResponse
+from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 
 from pyrogram import Client
@@ -37,7 +37,7 @@ def is_video_message(message) -> bool:
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     global pyro_client
-    print("🚀 Starting Bot 2 Pure Direct CDN Redirect Engine on Render...")
+    print("🚀 Starting Bot 2 Streamer Engine on Render...")
 
     pyro_client = Client(
         "bot2_streamer_session",
@@ -54,7 +54,7 @@ async def lifespan(app: FastAPI):
         await pyro_client.stop()
         print("🛑 Bot 2 Engine Stopped Cleanly.")
 
-app = FastAPI(title="Bot 2 - Pure Direct CDN Streamer Engine", lifespan=lifespan)
+app = FastAPI(title="Bot 2 - Streamer Engine", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -65,7 +65,7 @@ app.add_middleware(
     expose_headers=["Content-Range", "Content-Length", "Accept-Ranges", "Content-Type", "Content-Disposition"],
 )
 
-# ==================== DIRECT CDN REDIRECT ENGINE ====================
+# ==================== STREAMING ENGINE ====================
 @app.api_route("/stream/{chat_id}/{message_id}", methods=["GET", "HEAD", "OPTIONS"])
 @app.api_route("/stream/{chat_id}/{message_id}.mp4", methods=["GET", "HEAD", "OPTIONS"])
 async def stream_video(chat_id: str, message_id: str, request: Request):
@@ -111,27 +111,25 @@ async def stream_video(chat_id: str, message_id: str, request: Request):
         return Response(content=b"Target message is not a valid video file", media_type="text/plain", status_code=400)
 
     media = msg.video or msg.document
+    file_size = media.file_size
 
-    try:
-        # Pyrogram ke zariye direct file path nikalna (Bina server par download kiye)
-        file_info = await pyro_client.get_file(media)
-        
-        if not file_info or not file_info.file_path:
-            raise Exception("Failed to retrieve file_path from Telegram")
-            
-        direct_url = f"https://api.telegram.org/file/bot{BOT_TOKEN}/{file_info.file_path}"
-        
-        # 302 Redirect to Telegram Official CDN (Server Bandwidth = 0 GB)
-        return RedirectResponse(url=direct_url, status_code=302)
+    # Proper Async Generator Streaming (Handles files of any size without crashing)
+    async def iter_file():
+        async for chunk in pyro_client.stream_media(msg):
+            yield chunk
 
-    except Exception as e:
-        print(f"CDN Redirect Error: {e}")
-        return Response(content=f"Failed to generate direct streaming link: {str(e)}".encode(), media_type="text/plain", status_code=500)
+    headers = {
+        "Content-Length": str(file_size),
+        "Accept-Ranges": "bytes",
+        "Content-Type": "video/mp4",
+    }
+
+    return StreamingResponse(iter_file(), status_code=200, headers=headers)
 
 # ==================== ENDPOINTS ====================
 @app.api_route("/", methods=["GET", "HEAD"])
 def home():
-    return {"status": "Bot 2 Pure Direct CDN Streamer Engine Active 🚀", "service": "7anime Engine"}
+    return {"status": "Bot 2 Streamer Engine Active 🚀", "service": "7anime Engine"}
 
 @app.get("/health")
 def health_check():
