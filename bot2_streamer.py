@@ -37,7 +37,7 @@ def is_video_message(message) -> bool:
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     global pyro_client
-    print("🚀 Starting Bot 2 Direct Telegram CDN Redirect Engine on Render...")
+    print("🚀 Starting Bot 2 Pure Direct CDN Redirect Engine on Render...")
 
     pyro_client = Client(
         "bot2_streamer_session",
@@ -54,7 +54,7 @@ async def lifespan(app: FastAPI):
         await pyro_client.stop()
         print("🛑 Bot 2 Engine Stopped Cleanly.")
 
-app = FastAPI(title="Bot 2 - Direct CDN Streamer Engine", lifespan=lifespan)
+app = FastAPI(title="Bot 2 - Pure Direct CDN Streamer Engine", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -66,11 +66,9 @@ app.add_middleware(
 )
 
 # ==================== DIRECT CDN REDIRECT ENGINE ====================
-async def get_stream_response(
-    chat_id: str,
-    message_id: str,
-    request: Request
-):
+@app.api_route("/stream/{chat_id}/{message_id}", methods=["GET", "HEAD", "OPTIONS"])
+@app.api_route("/stream/{chat_id}/{message_id}.mp4", methods=["GET", "HEAD", "OPTIONS"])
+async def stream_video(chat_id: str, message_id: str, request: Request):
     if request.method == "OPTIONS":
         return Response(
             status_code=200, 
@@ -115,7 +113,7 @@ async def get_stream_response(
     media = msg.video or msg.document
 
     try:
-        # 🔑 FIX: Passing the actual media object directly to pyro_client.get_file()
+        # Pyrogram ke zariye direct file path nikalna (Bina server par download kiye)
         file_info = await pyro_client.get_file(media)
         
         if not file_info or not file_info.file_path:
@@ -123,7 +121,7 @@ async def get_stream_response(
             
         direct_url = f"https://api.telegram.org/file/bot{BOT_TOKEN}/{file_info.file_path}"
         
-        # Browser ko seedha Telegram CDN par redirect kar dena (302)
+        # 302 Redirect to Telegram Official CDN (Server Bandwidth = 0 GB)
         return RedirectResponse(url=direct_url, status_code=302)
 
     except Exception as e:
@@ -133,16 +131,11 @@ async def get_stream_response(
 # ==================== ENDPOINTS ====================
 @app.api_route("/", methods=["GET", "HEAD"])
 def home():
-    return {"status": "Bot 2 Direct CDN Streamer Engine Active 🚀", "service": "7anime Engine"}
+    return {"status": "Bot 2 Pure Direct CDN Streamer Engine Active 🚀", "service": "7anime Engine"}
 
 @app.get("/health")
 def health_check():
     return {"status": "ok", "connected": pyro_client.is_connected if pyro_client else False}
-
-@app.api_route("/stream/{chat_id}/{message_id}", methods=["GET", "HEAD", "OPTIONS"])
-@app.api_route("/stream/{chat_id}/{message_id}.mp4", methods=["GET", "HEAD", "OPTIONS"])
-async def stream_video(chat_id: str, message_id: str, request: Request):
-    return await get_stream_response(chat_id, message_id, request)
 
 if __name__ == "__main__":
     import uvicorn
