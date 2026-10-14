@@ -3,7 +3,6 @@ import re
 import asyncio
 from typing import Optional
 from contextlib import asynccontextmanager
-import httpx
 
 # ==================== PYTHON EVENT LOOP FIX ====================
 asyncio.set_event_loop(asyncio.new_event_loop())
@@ -114,22 +113,17 @@ async def get_stream_response(
         return Response(content=b"Target message is not a valid video file", media_type="text/plain", status_code=400)
 
     media = msg.video or msg.document
-    file_id = media.file_id
 
     try:
-        # Telegram Bot API se direct file path nikalna using httpx (No Pyrogram get_file issues!)
-        api_url = f"https://api.telegram.org/bot{BOT_TOKEN}/getFile?file_id={file_id}"
-        async with httpx.AsyncClient() as http_client:
-            resp = await http_client.get(api_url)
-            data = resp.json()
-            
-        if not data.get("ok"):
-            raise Exception("Telegram getFile API failed to retrieve file path")
-            
-        file_path = data["result"]["file_path"]
-        direct_url = f"https://api.telegram.org/file/bot{BOT_TOKEN}/{file_path}"
+        # 🔑 FIX: Passing the actual media object directly to pyro_client.get_file()
+        file_info = await pyro_client.get_file(media)
         
-        # Browser ko seedha Telegram CDN par redirect kar dena
+        if not file_info or not file_info.file_path:
+            raise Exception("Failed to retrieve file_path from Telegram")
+            
+        direct_url = f"https://api.telegram.org/file/bot{BOT_TOKEN}/{file_info.file_path}"
+        
+        # Browser ko seedha Telegram CDN par redirect kar dena (302)
         return RedirectResponse(url=direct_url, status_code=302)
 
     except Exception as e:
