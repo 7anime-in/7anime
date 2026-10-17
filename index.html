@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>7anime - Watch & Download Anime Free</title>
+    <title>7anime - Download Anime Free</title>
 
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -40,7 +40,6 @@
             background: #45a29e;
             border-radius: 4px;
         }
-        /* Smooth Fade Transition for Hero Slider */
         #heroSection {
             transition: background-image 0.6s ease-in-out;
         }
@@ -55,15 +54,12 @@
     <nav class="sticky top-0 z-[60] bg-[#1f2833]/95 backdrop-blur-md border-b border-gray-800 px-3 py-2">
         <div class="max-w-7xl mx-auto flex flex-col gap-2">
             
-            <!-- Top Row: Logo + Compact Search -->
             <div class="flex items-center justify-between gap-2">
-                <!-- Logo -->
                 <a href="index.html" class="flex items-center gap-1.5 text-xl font-extrabold text-[#66fcf1] shrink-0">
                     <i class="fa-solid fa-circle-play text-2xl"></i>
                     <span>7<span class="text-white">anime</span></span>
                 </a>
 
-                <!-- Compact Search Input in Navbar -->
                 <div class="relative flex-1 max-w-md">
                     <input 
                         type="text" 
@@ -75,13 +71,10 @@
                         autocomplete="off"
                     >
                     <i class="fa-solid fa-magnifying-glass absolute left-2.5 top-2 text-gray-400 text-xs"></i>
-
-                    <!-- LIVE SEARCH DROPDOWN BOX (NAVBAR) -->
                     <div id="searchDropdownNav" class="search-dropdown hidden absolute left-0 right-0 top-full mt-2 bg-[#1f2833] border border-gray-700 rounded-xl shadow-2xl z-50 max-h-72 overflow-y-auto"></div>
                 </div>
             </div>
 
-            <!-- Horizontal Category Tabs -->
             <div class="flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
                 <button onclick="filterCategory('all')" id="btn-all" class="cat-btn bg-[#66fcf1] text-black font-bold text-[11px] px-3 py-1 rounded-full transition shrink-0 flex items-center gap-1">
                     <i class="fa-solid fa-house text-[10px]"></i> Home
@@ -115,19 +108,18 @@
             
             <div class="flex items-center gap-2.5 mt-2">
                 <a id="bannerPlayBtn" href="#" class="bg-[#66fcf1] hover:bg-[#45a29e] text-black font-bold px-4 py-2 rounded-lg text-xs flex items-center gap-1.5 transition shadow-lg shadow-[#66fcf1]/20">
-                    <i class="fa-solid fa-play"></i> Watch Now
+                    <i class="fa-solid fa-download"></i> Download Links
                 </a>
                 <a id="bannerDownloadBtn" href="#" onclick="triggerSmartLink()" class="bg-gray-800/90 hover:bg-gray-700 text-white font-medium px-3.5 py-2 rounded-lg text-xs flex items-center gap-1.5 border border-gray-700 transition">
-                    <i class="fa-solid fa-download"></i> Download
+                    <i class="fa-solid fa-cloud-arrow-down"></i> Fast Server
                 </a>
             </div>
 
-            <!-- Carousel Slide Dots Indicator -->
             <div id="bannerDots" class="flex items-center gap-1.5 mt-3"></div>
         </div>
     </section>
 
-    <!-- ==================== DEDICATED MAIN SEARCH BAR (BELOW BANNER) ==================== -->
+    <!-- ==================== DEDICATED MAIN SEARCH BAR ==================== -->
     <section class="max-w-7xl mx-auto px-3 my-4 w-full">
         <div class="relative w-full bg-[#1f2833] p-2 sm:p-3 rounded-2xl border border-gray-800 shadow-xl">
             <div class="relative flex items-center">
@@ -142,7 +134,6 @@
                     autocomplete="off"
                 >
             </div>
-            <!-- LIVE SEARCH DROPDOWN BOX (MAIN) -->
             <div id="searchDropdownMain" class="search-dropdown hidden absolute left-2 right-2 top-full mt-2 bg-[#1f2833] border border-gray-700 rounded-xl shadow-2xl z-50 max-h-80 overflow-y-auto"></div>
         </div>
     </section>
@@ -155,9 +146,7 @@
             <span id="totalCardsCount" class="text-[11px] text-gray-400">Loading...</span>
         </div>
 
-        <!-- 2-Column Grid on Mobile, 3 on Tablet, 5 on Desktop -->
         <div id="animeGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
-            <!-- Skeleton Loading -->
             <div class="animate-pulse bg-[#1f2833] aspect-[2/3] rounded-xl"></div>
             <div class="animate-pulse bg-[#1f2833] aspect-[2/3] rounded-xl"></div>
         </div>
@@ -190,7 +179,7 @@
         <p>© 2026 7anime Engine</p>
     </footer>
 
-    <!-- ==================== JS LOGIC ==================== -->
+    <!-- ==================== JS LOGIC WITH ROBUST MULTI-DATABASE LOADER ==================== -->
     <script>
         const BOT1_API = "https://7anime-bot1-scanner.onrender.com";
         const SMART_LINK_URL = "https://seenimplieddump.com/r4encwrvs?key=991b24b9ac839ae4944305239012fd68";
@@ -198,25 +187,21 @@
         let allAnimeCards = [];
         let activeCategory = 'all';
 
-        // Default Fallback Banners for Automatic 4s Slider
+        const dbCategories = [
+            "animemovie",
+            "Animeseries",
+            "Animehatai",
+            "Movie",
+            "Series",
+            "18pulse"
+        ];
+
         let bannerList = [
             {
                 title: "Solo Leveling",
                 image: "https://m.media-amazon.com/images/M/MV5BODlhM2RmM2ItM2FkYi00ZGY2LTg2NzAtNjg4NTgwOGVhMDFkXkEyXkFqcGdeQXVyMTI1NDEyNTM5._V1_.jpg",
                 description: "In a world where hunters battle monsters, Sung Jinwoo awakens as the strongest shadow monarch.",
                 play_slug: "solo_leveling"
-            },
-            {
-                title: "The Exiled Heavy Knight Knows How To Game The System",
-                image: "https://lh3.googleusercontent.com/d/1_9I9ZqXk8m9o3V7kE3J1X3I4b5c6d7e",
-                description: "Follows Elma, a young noble born into a prestigious family who uses game knowledge to dominate.",
-                play_slug: "the_exiled_heavy_knight"
-            },
-            {
-                title: "Classroom of the Elite",
-                image: "https://m.media-amazon.com/images/M/MV5BYzA2Nzk5M2EtNWY4Yi00ZDY4LThjMGItNmU3MjlmYzE4NWFlXkEyXkFqcGdeQXVyNjAwNDUxODI@._V1_.jpg",
-                description: "Ayanokoji Kiyotaka navigates the cutthroat environment of Tokyo Metropolitan Advanced Nurturing High School.",
-                play_slug: "classroom_of_the_elite"
             }
         ];
 
@@ -246,17 +231,63 @@
 
         function getTypeBadge(type) {
             const normalizedType = (type || 'series').toLowerCase();
-            if (normalizedType === 'movie') {
-                return `<span class="bg-purple-600/80 backdrop-blur-md text-white font-bold text-[9px] px-1.5 py-0.5 rounded uppercase">Movie</span>`;
-            } else if (normalizedType === 'hentai') {
-                return `<span class="bg-red-600/80 backdrop-blur-md text-white font-bold text-[9px] px-1.5 py-0.5 rounded uppercase">18+</span>`;
+            if (normalizedType.includes('movie')) {
+                return `<span class="bg-purple-600/85 backdrop-blur-md text-white font-bold text-[9px] px-1.5 py-0.5 rounded uppercase">Movie</span>`;
+            } else if (normalizedType.includes('hentai') || normalizedType.includes('18') || normalizedType.includes('hatai') || normalizedType.includes('pulse')) {
+                return `<span class="bg-red-600/85 backdrop-blur-md text-white font-bold text-[9px] px-1.5 py-0.5 rounded uppercase">18+</span>`;
             }
-            return `<span class="bg-cyan-600/80 backdrop-blur-md text-white font-bold text-[9px] px-1.5 py-0.5 rounded uppercase">Series</span>`;
+            return `<span class="bg-cyan-600/85 backdrop-blur-md text-white font-bold text-[9px] px-1.5 py-0.5 rounded uppercase">Series</span>`;
         }
 
         async function initPage() {
-            await Promise.all([loadBannerAndAdminCards(), loadScannedAnime()]);
+            await loadAllMultiDatabases();
+            await loadBannerAndAdminCards();
             startBannerAutoSlide();
+        }
+
+        // Fixed Robust Multi-Database Loader (Scans _1 to _15 safely without breaking on missing gaps)
+        async function loadAllMultiDatabases() {
+            let loadedCardsMap = {};
+
+            for (let cat of dbCategories) {
+                for (let index = 1; index <= 15; index++) {
+                    const jsonFilename = `${cat}_${index}.json`;
+                    try {
+                        let res = await fetch(`./${jsonFilename}?v=${Date.now()}`);
+                        if (res.ok) {
+                            let data = await res.json();
+                            let cards = data.cards || data;
+                            if (cards && typeof cards === 'object') {
+                                Object.keys(cards).forEach(slug => {
+                                    let item = cards[slug];
+                                    let itemType = item.type || cat.toLowerCase();
+                                    
+                                    if (cat.toLowerCase().includes('movie')) itemType = 'movie';
+                                    else if (cat.toLowerCase().includes('hatai') || cat.toLowerCase().includes('pulse') || cat.toLowerCase().includes('18')) itemType = 'hentai';
+                                    else if (cat.toLowerCase().includes('series') || cat.toLowerCase().includes('animemovie')) itemType = item.type || 'series';
+
+                                    loadedCardsMap[slug] = {
+                                        title: item.title || slug.replace(/_/g, ' '),
+                                        image: item.poster || item.image || item.img || item.thumbnail || "https://via.placeholder.com/300x420/1f2833/66fcf1?text=7anime",
+                                        genres: Array.isArray(item.genres) ? item.genres.join(", ") : (item.genres || "Action, Anime"),
+                                        type: itemType,
+                                        rating: item.rating || item.score || "8.5",
+                                        language: item.audio_language || item.language || item.audio || "Dual Audio [Hindi - Jap]",
+                                        slug: slug
+                                    };
+                                });
+                            }
+                        }
+                    } catch (e) {
+                        // Ignore missing files gracefully
+                    }
+                }
+            }
+
+            let cardsArray = Object.values(loadedCardsMap);
+            if (cardsArray.length > 0) {
+                mergeCards(cardsArray);
+            }
         }
 
         async function loadBannerAndAdminCards() {
@@ -283,7 +314,6 @@
             }
         }
 
-        // Automatic Sliding Banner (Every 4 Seconds)
         function startBannerAutoSlide() {
             renderBannerDots();
             if (sliderTimer) clearInterval(sliderTimer);
@@ -301,8 +331,8 @@
             heroElem.style.backgroundImage = `url('${bgImg}')`;
             document.getElementById("bannerTitle").innerText = banner.title || "Solo Leveling";
             document.getElementById("bannerDesc").innerText = banner.description || "";
-            document.getElementById("bannerPlayBtn").href = `7anime_videoplayer.html?anime=${banner.play_slug || 'solo_leveling'}`;
-            document.getElementById("bannerDownloadBtn").href = `download.html?anime=${banner.play_slug || 'solo_leveling'}`;
+            document.getElementById("bannerPlayBtn").href = `anime.html?anime=${banner.play_slug || 'solo_leveling'}`;
+            document.getElementById("bannerDownloadBtn").href = `anime.html?anime=${banner.play_slug || 'solo_leveling'}`;
             updateBannerDots();
         }
 
@@ -328,31 +358,7 @@
         function setBannerSlide(index) {
             currentBannerIndex = index;
             renderHeroBanner(bannerList[currentBannerIndex]);
-            startBannerAutoSlide(); // Reset 4s timer on click
-        }
-
-        async function loadScannedAnime() {
-            try {
-                const res = await fetch(`${BOT1_API}/api/all-anime`);
-                if (!res.ok) throw new Error("Bot 1 Offline");
-                const scannedData = await res.json();
-
-                const formattedCards = Object.keys(scannedData).map(slug => {
-                    const item = scannedData[slug];
-                    return {
-                        title: item.title,
-                        image: "https://via.placeholder.com/300x420/1f2833/66fcf1?text=" + encodeURIComponent(item.title),
-                        genres: "Action, Anime",
-                        type: item.type || "series",
-                        rating: "8.5",
-                        slug: slug
-                    };
-                });
-
-                mergeCards(formattedCards);
-            } catch (err) {
-                console.warn("Could not fetch scanned anime:", err);
-            }
+            startBannerAutoSlide();
         }
 
         function mergeCards(newCards) {
@@ -401,7 +407,12 @@
 
             let filtered = allAnimeCards;
             if (cat !== 'all') {
-                filtered = allAnimeCards.filter(c => (c.type || 'series').toLowerCase() === cat);
+                filtered = allAnimeCards.filter(c => {
+                    let t = (c.type || 'series').toLowerCase();
+                    if (cat === 'movie') return t.includes('movie');
+                    if (cat === 'hentai') return t.includes('hentai') || t.includes('18') || t.includes('hatai') || t.includes('pulse');
+                    return !t.includes('movie') && !t.includes('hentai') && !t.includes('18') && !t.includes('hatai') && !t.includes('pulse');
+                });
             }
 
             filtered = shuffleArray([...filtered]);
@@ -419,7 +430,6 @@
             filterCategory('all');
         }
 
-        // Unified Live Search Handler for Both Search Inputs
         function handleSearch(source) {
             const inputElem = source === 'main' ? document.getElementById("searchInputMain") : document.getElementById("searchInputNav");
             const dropdown = source === 'main' ? document.getElementById("searchDropdownMain") : document.getElementById("searchDropdownNav");
@@ -440,7 +450,7 @@
                 dropdown.innerHTML = `<div class="p-3 text-center text-xs text-gray-400">No matching anime found</div>`;
             } else {
                 dropdown.innerHTML = matches.map(card => `
-                    <a href="7anime_videoplayer.html?anime=${card.slug}" class="flex items-center gap-2.5 p-2.5 hover:bg-[#0b0c10] border-b border-gray-800/60 transition group">
+                    <a href="anime.html?anime=${card.slug}" class="flex items-center gap-2.5 p-2.5 hover:bg-[#0b0c10] border-b border-gray-800/60 transition group">
                         <img src="${formatImageUrl(card.image)}" class="w-9 h-12 object-cover rounded shadow" onerror="this.src='https://via.placeholder.com/100x120/1f2833/ffffff?text=7A'">
                         <div class="flex flex-col flex-1 min-w-0">
                             <div class="flex items-center gap-1.5 mb-0.5">
@@ -448,6 +458,7 @@
                                 <span class="text-[10px] text-gray-400 truncate">${card.genres || 'Anime'}</span>
                             </div>
                             <span class="text-xs font-semibold text-white group-hover:text-[#66fcf1] truncate">${card.title}</span>
+                            <span class="text-[10px] text-gray-400 truncate">${card.language || 'Dual Audio'}</span>
                         </div>
                     </a>
                 `).join("");
@@ -456,7 +467,6 @@
             dropdown.classList.remove("hidden");
         }
 
-        // Close dropdowns on outside click
         document.addEventListener("click", (e) => {
             const navInput = document.getElementById("searchInputNav");
             const navDropdown = document.getElementById("searchDropdownNav");
@@ -482,7 +492,7 @@
 
             grid.innerHTML = cards.map(card => `
                 <div class="bg-[#1f2833] rounded-lg overflow-hidden shadow border border-gray-800/80 card-hover flex flex-col justify-between">
-                    <a href="7anime_videoplayer.html?anime=${card.slug}">
+                    <a href="anime.html?anime=${card.slug}">
                         <div class="relative aspect-[2/3] w-full overflow-hidden bg-gray-900">
                             <img src="${formatImageUrl(card.image)}" alt="${card.title}" class="w-full h-full object-cover" onerror="this.src='https://via.placeholder.com/300x420/1f2833/ffffff?text=7anime'">
                             
@@ -497,16 +507,17 @@
                     </a>
                     <div class="p-2 flex flex-col justify-between flex-1">
                         <div>
-                            <a href="7anime_videoplayer.html?anime=${card.slug}" class="font-bold text-white text-xs hover:text-[#66fcf1] line-clamp-1">
+                            <a href="anime.html?anime=${card.slug}" class="font-bold text-white text-xs hover:text-[#66fcf1] line-clamp-1">
                                 ${card.title}
                             </a>
+                            <p class="text-[10px] text-gray-400 mt-0.5 truncate">${card.language || 'Dual Audio [Hindi]'}</p>
                         </div>
                         <div class="flex items-center justify-between gap-1.5 mt-2 pt-1.5 border-t border-gray-800">
-                            <a href="7anime_videoplayer.html?anime=${card.slug}" class="flex-1 bg-[#66fcf1] hover:bg-[#45a29e] text-black text-[11px] font-bold py-1 rounded text-center transition">
-                                Watch
+                            <a href="anime.html?anime=${card.slug}" class="flex-1 bg-[#66fcf1] hover:bg-[#45a29e] text-black text-[11px] font-bold py-1 rounded text-center transition">
+                                Download
                             </a>
-                            <a href="download.html?anime=${card.slug}" onclick="triggerSmartLink()" class="bg-gray-800 hover:bg-gray-700 text-white text-[11px] p-1 rounded transition border border-gray-700" title="Download">
-                                <i class="fa-solid fa-download"></i>
+                            <a href="anime.html?anime=${card.slug}" class="bg-gray-800 hover:bg-gray-700 text-white text-[11px] p-1 rounded transition border border-gray-700" title="Details">
+                                <i class="fa-solid fa-arrow-right"></i>
                             </a>
                         </div>
                     </div>
