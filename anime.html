@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>7anime - Download Anime & Movies</title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body {
+            background-color: #0b0c10;
+            color: #c5c6c7;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #0b0c10; }
+        ::-webkit-scrollbar-thumb { background: #1f2833; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #66fcf1; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- NAVBAR -->
+    <nav class="sticky top-0 z-50 bg-[#1f2833]/95 backdrop-blur-md border-b border-gray-800 px-4 py-3 shadow-lg">
+        <div class="max-w-4xl mx-auto flex items-center justify-between">
+            <a href="index.html" class="flex items-center gap-2 text-2xl font-extrabold text-[#66fcf1]">
+                <i class="fa-solid fa-cloud-arrow-down text-3xl"></i>
+                <span>7<span class="text-white">anime</span></span>
+            </a>
+            <a href="index.html" class="text-sm text-gray-300 hover:text-[#66fcf1] transition flex items-center gap-1">
+                <i class="fa-solid fa-arrow-left"></i> Home
+            </a>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTAINER -->
+    <main class="max-w-3xl mx-auto px-4 py-6 flex-1 w-full flex flex-col gap-6">
+
+        <!-- TITLE & HEADER -->
+        <div class="bg-[#1f2833] p-5 rounded-xl border border-gray-800 shadow-xl text-center">
+            <h1 id="animeTitleDisplay" class="text-xl md:text-2xl font-black text-white uppercase tracking-wider mb-2">Loading Anime Details...</h1>
+            <p id="animeJpTitle" class="text-xs text-[#66fcf1] italic">Japanese Title...</p>
+        </div>
+
+        <!-- POSTER & INFO SECTION -->
+        <div class="bg-[#1f2833] p-4 md:p-6 rounded-xl border border-gray-800 flex flex-col md:flex-row gap-6 shadow-xl">
+            <!-- Poster -->
+            <div class="w-full md:w-56 flex-shrink-0 flex justify-center">
+                <img id="animePosterImg" src="https://via.placeholder.com/200x300?text=Anime+Poster" alt="Anime Poster" class="w-48 h-72 object-cover rounded-xl border border-gray-700 shadow-2xl">
+            </div>
+
+            <!-- Info Table -->
+            <div class="flex-1 flex flex-col justify-between gap-4">
+                <div class="bg-gray-900/80 p-4 rounded-xl border border-gray-800 text-xs md:text-sm space-y-2">
+                    <div class="grid grid-cols-2 gap-2">
+                        <div><span class="text-gray-500 font-semibold">Status:</span> <span id="metaStatus" class="text-white font-medium">Completed</span></div>
+                        <div><span class="text-gray-500 font-semibold">Total Ep:</span> <span id="metaTotalEp" class="text-white font-medium">12</span></div>
+                        <div><span class="text-gray-500 font-semibold">Audio:</span> <span id="metaAudio" class="text-white font-medium">Hindi + Japanese</span></div>
+                        <div><span class="text-gray-500 font-semibold">Quality:</span> <span class="text-amber-400 font-bold">480p, 720p, 1080p</span></div>
+                        <div><span class="text-gray-500 font-semibold">Studio:</span> <span id="metaStudio" class="text-white font-medium">N/A</span></div>
+                        <div><span class="text-gray-500 font-semibold">Rating:</span> <span id="badgeScore" class="text-amber-400 font-bold"><i class="fa-solid fa-star mr-1"></i>8.5</span></div>
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-2">
+                    <span class="text-xs text-gray-400 font-bold"><i class="fa-solid fa-tags text-[#66fcf1] mr-1"></i>Genres:</span>
+                    <div id="animeGenresContainer" class="flex flex-wrap gap-1.5">
+                        <span class="bg-gray-800 text-gray-300 text-[11px] px-2.5 py-0.5 rounded-full border border-gray-700">Action</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SYNOPSIS BLOCK -->
+        <div class="bg-[#1f2833] border-l-4 border-[#66fcf1] p-4 rounded-r-xl border-t border-r border-b border-gray-800 shadow-xl">
+            <h3 class="text-xs font-bold text-[#66fcf1] uppercase tracking-wider mb-1"><i class="fa-solid fa-book-open mr-1"></i> Synopsis / Storyline</h3>
+            <p id="animeSynopsis" class="text-xs md:text-sm text-gray-300 leading-relaxed">Loading plot description...</p>
+        </div>
+
+        <!-- SCREENSHOTS GRID (Quality Proof) -->
+        <div class="bg-[#1f2833] p-4 rounded-xl border border-gray-800 shadow-xl space-y-3">
+            <h3 class="text-xs font-bold text-white uppercase tracking-wider border-b border-gray-800 pb-2">
+                <i class="fa-solid fa-images text-[#66fcf1] mr-1"></i> Screenshots (Quality Proof)
+            </h3>
+            <div id="screenshotsGrid" class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                <img src="https://via.placeholder.com/300x170?text=Screenshot+1" class="rounded-lg border border-gray-700 object-cover w-full h-32" alt="Screenshot 1">
+                <img src="https://via.placeholder.com/300x170?text=Screenshot+2" class="rounded-lg border border-gray-700 object-cover w-full h-32" alt="Screenshot 2">
+                <img src="https://via.placeholder.com/300x170?text=Screenshot+3" class="rounded-lg border border-gray-700 object-cover w-full h-32" alt="Screenshot 3">
+            </div>
+        </div>
+
+        <!-- DOWNLOAD SECTIONS -->
+        <div class="bg-[#1f2833] p-4 md:p-6 rounded-xl border border-gray-800 shadow-xl space-y-4">
+            <h3 class="text-xs font-bold text-white uppercase tracking-wider border-b border-gray-800 pb-2 text-center">
+                <i class="fa-solid fa-cloud-arrow-down text-[#66fcf1] mr-1"></i> Download High-Speed Links
+            </h3>
+
+            <!-- Database Format & Language Info Text Line -->
+            <div class="bg-gray-900/90 border border-gray-800 px-3 py-2 rounded-lg text-center">
+                <p id="dbFormatInfoText" class="text-[11px] text-gray-300 font-medium">
+                    <i class="fa-solid fa-circle-info text-[#66fcf1] mr-1"></i> 
+                    Format: <span id="infoFormatType" class="text-amber-400 font-bold">MKV / WEB-DL</span> | Language: <span id="infoLangType" class="text-emerald-400 font-bold">Dual Audio (Hindi Org + Japanese)</span>
+                </p>
+            </div>
+
+            <!-- Quality Buttons Dynamic Container -->
+            <div id="qualityDownloadContainer" class="space-y-3">
+                <!-- Dynamically loaded quality buttons -->
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="bg-[#1f2833] border-t border-gray-800 text-center py-6 text-xs text-gray-400 mt-auto">
+        <p>© 2026 7anime. Direct Telegram & Server Downloads.</p>
+    </footer>
+
+    <!-- OPTIMIZED MULTI-DATABASE FALLBACK LOADER SCRIPT -->
+    <script>
+        "use strict";
+
+        const SMART_LINK_AD_URL = "https://seenimplieddump.com/r4encwrvs?key=991b24b9ac839ae4944305239012fd68";
+        let animeData = null;
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const animeSlug = urlParams.get('anime') || 'solo_leveling';
+
+        const dbCategories = [
+            "animemovie",
+            "Animeseries",
+            "Animehatai",
+            "Movie",
+            "Series",
+            "18pulse"
+        ];
+
+        function formatImageUrl(url) {
+            if (!url) return "https://via.placeholder.com/200x300?text=7anime";
+            const driveMatch = url.match(/\/d\/([a-zA-Z0-9_-]+)/) || url.match(/id=([a-zA-Z0-9_-]+)/);
+            if (driveMatch && driveMatch[1]) {
+                return `https://lh3.googleusercontent.com/d/${driveMatch[1]}`;
+            }
+            return url;
+        }
+
+        async function fetchAnimeFromMultiDatabases() {
+            for (let cat of dbCategories) {
+                let index = 1;
+                let consecutiveFailures = 0;
+
+                while (consecutiveFailures < 2 && index <= 15) {
+                    const jsonFilename = `${cat}_${index}.json`;
+                    try {
+                        let res = await fetch(`./${jsonFilename}?v=${Date.now()}`);
+                        if (res.ok) {
+                            let data = await res.json();
+                            let cards = data.cards || data;
+                            if (cards && cards[animeSlug]) {
+                                return cards[animeSlug];
+                            }
+                            consecutiveFailures = 0;
+                        } else {
+                            consecutiveFailures++;
+                        }
+                    } catch (e) {
+                        consecutiveFailures++;
+                    }
+                    index++;
+                }
+            }
+            return null;
+        }
+
+        async function initPage() {
+            try {
+                let res = await fetch(`./sitevideo_data.json?v=${Date.now()}`).catch(()=>{});
+                if (res && res.ok) {
+                    let data = await res.json();
+                    let cards = data.cards || data;
+                    if (cards && cards[animeSlug]) {
+                        animeData = cards[animeSlug];
+                    }
+                }
+
+                if (!animeData) {
+                    animeData = await fetchAnimeFromMultiDatabases();
+                }
+
+                if (!animeData) {
+                    animeData = {
+                        title: animeSlug.replace(/_/g, ' ').toUpperCase(),
+                        japanese_title: "Japanese Title Preview",
+                        poster: "https://via.placeholder.com/200x300?text=7anime",
+                        synopsis: "Demo Synopsis: Description will populate automatically once your JSON databases are linked correctly in your repository folder[span_1](start_span)[span_1](end_span).",
+                        genres: ["Action", "Fantasy", "Animation"],
+                        status: "Completed",
+                        total_episodes: "12",
+                        studio: "Studio Animation",
+                        score: "8.8",
+                        format: "MKV / WEB-DL",
+                        audio_language: "Dual Audio [Hindi Org + Japanese]",
+                        screenshots: [
+                            "https://via.placeholder.com/300x170?text=Screenshot+1",
+                            "https://via.placeholder.com/300x170?text=Screenshot+2",
+                            "https://via.placeholder.com/300x170?text=Screenshot+3"
+                        ],
+                        downloads: {
+                            "480p": "#",
+                            "720p": "#",
+                            "1080p": "#"
+                        }
+                    };
+                }
+
+                populateUI(animeData);
+                renderScreenshots(animeData.screenshots || animeData.images || animeData.ss);
+                renderQualityButtons(animeData.downloads || animeData.quality_links || animeData.links);
+
+            } catch (err) {
+                console.error("Critical initialization error:", err);
+            }
+        }
+
+        function populateUI(info) {
+            if (info.title) document.getElementById("animeTitleDisplay").textContent = info.title;
+            if (info.japanese_title || info.japanese) document.getElementById("animeJpTitle").textContent = info.japanese_title || info.japanese;
+            
+            const rawPoster = info.poster || info.image || info.img || info.thumbnail || info.cover;
+            const posterImg = document.getElementById("animePosterImg");
+            posterImg.src = formatImageUrl(rawPoster);
+            posterImg.onerror = function() { this.src = 'https://via.placeholder.com/200x300?text=7anime'; };
+
+            if (info.synopsis || info.description) document.getElementById("animeSynopsis").textContent = info.synopsis || info.description;
+            if (info.status) document.getElementById("metaStatus").textContent = info.status;
+            if (info.total_episodes || info.episodes) document.getElementById("metaTotalEp").textContent = info.total_episodes || info.episodes;
+            if (info.studio || info.studios) document.getElementById("metaStudio").textContent = info.studio || info.studios;
+            if (info.score || info.rating) document.getElementById("badgeScore").innerHTML = `<i class="fa-solid fa-star mr-1"></i>${info.score || info.rating}`;
+
+            if (info.format || info.video_format) {
+                document.getElementById("infoFormatType").textContent = info.format || info.video_format;
+            }
+            if (info.audio_language || info.language || info.audio) {
+                document.getElementById("infoLangType").textContent = info.audio_language || info.language || info.audio;
+            }
+
+            const genresArr = info.genres || info.genre || ["Action", "Fantasy"];
+            const genresContainer = document.getElementById("animeGenresContainer");
+            if (Array.isArray(genresArr)) {
+                genresContainer.innerHTML = genresArr.map(g => `
+                    <span class="bg-gray-800 text-gray-300 text-[11px] px-2.5 py-0.5 rounded-full border border-gray-700">${g.trim()}</span>
+                `).join("");
+            }
+        }
+
+        function renderScreenshots(ssList) {
+            const container = document.getElementById("screenshotsGrid");
+            if (!ssList || !Array.isArray(ssList) || ssList.length === 0) {
+                container.innerHTML = `<p class="col-span-full text-xs text-gray-500 text-center">No screenshots available.</p>`;
+                return;
+            }
+
+            container.innerHTML = ssList.slice(0, 5).map(imgUrl => `
+                <img src="${formatImageUrl(imgUrl)}" 
+                     onerror="this.src='https://via.placeholder.com/300x170?text=Preview+Unavailable'" 
+                     class="rounded-lg border border-gray-700 object-cover w-full h-32 shadow" 
+                     alt="Anime Screenshot">
+            `).join("");
+        }
+
+        function renderQualityButtons(downloadsObj) {
+            const container = document.getElementById("qualityDownloadContainer");
+            
+            if (!downloadsObj || typeof downloadsObj !== 'object' || Object.keys(downloadsObj).length === 0) {
+                container.innerHTML = `<p class="text-xs text-gray-500 text-center py-2">Download links abhi available nahi hain.</p>`;
+                return;
+            }
+
+            container.innerHTML = Object.entries(downloadsObj).map(([quality, link]) => {
+                if (!link) return '';
+                
+                let btnColor = "bg-emerald-600 hover:bg-emerald-500 text-white";
+                if (quality.includes("720")) btnColor = "bg-blue-600 hover:bg-blue-500 text-white";
+                if (quality.includes("1080")) btnColor = "bg-purple-600 hover:bg-purple-500 text-white";
+
+                return `
+                    <div class="flex items-center justify-between bg-gray-900 p-3 rounded-xl border border-gray-800">
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-video text-[#66fcf1]"></i>
+                            <span class="text-xs font-bold text-white uppercase">${quality} Download</span>
+                        </div>
+                        <a 
+                            href="${link}" 
+                            onclick="handleDownloadClick(event, '${link}')"
+                            class="${btnColor} font-extrabold text-xs px-5 py-2.5 rounded-lg transition shadow flex items-center gap-2"
+                        >
+                            <i class="fa-solid fa-download"></i> Download Now
+                        </a>
+                    </div>
+                `;
+            }).join("");
+        }
+
+        function handleDownloadClick(event, url) {
+            event.preventDefault();
+            if (SMART_LINK_AD_URL) {
+                window.open(SMART_LINK_AD_URL, '_blank');
+            }
+            if (url && url !== "#") {
+                window.location.href = url;
+            } else {
+                alert("Link update ho raha hai!");
+            }
+        }
+
+        window.addEventListener("DOMContentLoaded", initPage);
+    </script>
+</body>
+</html>
