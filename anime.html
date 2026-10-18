@@ -171,12 +171,45 @@
             return foundItem;
         }
 
+        async function fetchAnimeFromQualityDatabases() {
+            let mergedDownloads = {};
+            let fetchPromises = [];
+
+            dbCategories.forEach(cat => {
+                for (let index = 1; index <= 15; index++) {
+                    qualityTypes.forEach(q => {
+                        const jsonFilename = `${cat.toLowerCase()}_${index}_${q}.json`;
+                        fetchPromises.push(
+                            fetch(`./${jsonFilename}?v=${Date.now()}`)
+                                .then(res => res.ok ? res.json() : null)
+                                .then(data => {
+                                    if (!data) return;
+                                    let cards = data.cards || data;
+                                    if (cards && typeof cards === 'object') {
+                                        Object.keys(cards).forEach(slugKey => {
+                                            if (slugKey.toUpperCase() === animeSlugUpper || slugKey.toLowerCase() === animeSlugLower) {
+                                                let item = cards[slugKey];
+                                                if (item.downloads && typeof item.downloads === 'object') {
+                                                    Object.assign(mergedDownloads, item.downloads);
+                                                }
+                                            }
+                                        });
+                                    }
+                                }).catch(() => {})
+                        );
+                    });
+                }
+            });
+
+            await Promise.all(fetchPromises);
+            return mergedDownloads;
+        }
+
         async function initPage() {
             try {
-                // 1. Check ANIME_1.JSON to ANIME_15.JSON, MOVIE_1.JSON, HANTAI_1.JSON
+                // 1. Fetch card metadata (poster, synopsis, title)
                 animeData = await fetchAnimeFromCardDatabases();
 
-                // 2. Fallback to sitevideo_data.json if needed
                 if (!animeData) {
                     let res = await fetch(`./sitevideo_data.json?v=${Date.now()}`).catch(()=>{});
                     if (res && res.ok) {
@@ -193,7 +226,7 @@
                         title: rawSlug.replace(/_/g, ' ').toUpperCase(),
                         japanese_title: "Japanese Title Preview",
                         poster: "https://via.placeholder.com/200x300?text=7anime",
-                        synopsis: "Demo Synopsis: Description will populate automatically once your databases are linked correctly.",
+                        synopsis: "Demo Synopsis...",
                         genres: ["Action", "Fantasy", "Animation"],
                         status: "Completed",
                         total_episodes: "12",
@@ -204,6 +237,12 @@
                         screenshots: [],
                         downloads: {}
                     };
+                }
+
+                // 2. Fetch all episode download links from quality split databases
+                let qualityDownloads = await fetchAnimeFromQualityDatabases();
+                if (qualityDownloads && Object.keys(qualityDownloads).length > 0) {
+                    animeData.downloads = { ...(animeData.downloads || {}), ...qualityDownloads };
                 }
 
                 populateUI(animeData);
@@ -275,23 +314,23 @@
                 return;
             }
 
-            container.innerHTML = Object.entries(downloadsObj).map(([quality, link]) => {
+            container.innerHTML = Object.entries(downloadsObj).map(([qualityLabel, link]) => {
                 if (!link || link === "#") return '';
                 
                 let btnColor = "bg-emerald-600 hover:bg-emerald-500 text-white";
-                if (quality.includes("720")) btnColor = "bg-blue-600 hover:bg-blue-500 text-white";
-                if (quality.includes("1080")) btnColor = "bg-purple-600 hover:bg-purple-500 text-white";
-                if (quality.includes("4k")) btnColor = "bg-amber-600 hover:bg-amber-500 text-white";
+                if (qualityLabel.includes("720")) btnColor = "bg-blue-600 hover:bg-blue-500 text-white";
+                if (qualityLabel.includes("1080")) btnColor = "bg-purple-600 hover:bg-purple-500 text-white";
+                if (qualityLabel.includes("4k")) btnColor = "bg-amber-600 hover:bg-amber-500 text-white";
 
                 return `
                     <div class="flex items-center justify-between bg-gray-900 p-3 rounded-xl border border-gray-800">
                         <div class="flex items-center gap-2">
                             <i class="fa-solid fa-video text-[#66fcf1]"></i>
-                            <span class="text-xs font-bold text-white uppercase">${quality} Download</span>
+                            <span class="text-xs font-bold text-white uppercase">${qualityLabel}</span>
                         </div>
                         <a 
-                            href="ads1.html?anime=${rawSlug}&quality=${quality}" 
-                            onclick="handleAdRedirect(event, '${rawSlug}', '${quality}')"
+                            href="ads1.html?anime=${rawSlug}&quality=${encodeURIComponent(qualityLabel)}" 
+                            onclick="handleAdRedirect(event, '${rawSlug}', '${encodeURIComponent(qualityLabel)}')"
                             class="${btnColor} font-extrabold text-xs px-5 py-2.5 rounded-lg transition shadow flex items-center gap-2"
                         >
                             <i class="fa-solid fa-download"></i> Fast Download
