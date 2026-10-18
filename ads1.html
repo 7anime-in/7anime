@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>7anime - Verify & Download</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Social Bar Ad Script -->
+    <script src="https://seenimplieddump.com/77/c2/24/77c224c37e85a092112b37e82c893705.js"></script>
+
+    <style>
+        body { 
+            background-color: #0b0c10; 
+            color: #c5c6c7; 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-between p-4">
+
+    <!-- TOP HEADER -->
+    <div class="w-full max-w-md text-center py-4">
+        <a href="index.html" class="text-xl font-extrabold text-[#66fcf1]">
+            <i class="fa-solid fa-circle-play"></i> 7<span class="text-white">anime</span>
+        </a>
+    </div>
+
+    <!-- MAIN BOX -->
+    <div class="bg-[#1f2833] border border-gray-800 p-6 rounded-2xl max-w-md w-full text-center shadow-2xl space-y-5 my-auto">
+        <div class="w-14 h-14 bg-[#66fcf1]/10 border border-[#66fcf1]/30 text-[#66fcf1] rounded-full flex items-center justify-center mx-auto text-2xl animate-pulse">
+            <i class="fa-solid fa-shield-halved"></i>
+        </div>
+        
+        <h2 class="text-lg font-black text-white uppercase tracking-wider">Human Verification</h2>
+        <p class="text-xs text-gray-300">Click the verify button below to generate your secure download link.</p>
+
+        <!-- Advertisement Space Box -->
+        <div class="bg-gray-900 border border-gray-800 p-4 rounded-xl text-xs text-gray-500">
+            [ Advertisement Space ]
+        </div>
+
+        <!-- STEP 1: VERIFY BUTTON -->
+        <div id="verifyBox">
+            <button onclick="startVerification()" class="w-full bg-[#66fcf1] hover:bg-[#45a29e] text-black font-extrabold text-xs py-3.5 rounded-xl transition shadow-lg flex items-center justify-center gap-2">
+                <i class="fa-solid fa-check-to-slot"></i> Click Here to Verify
+            </button>
+        </div>
+
+        <!-- STEP 2: TIMER BOX (Hidden initially) -->
+        <div id="timerBox" class="hidden space-y-2">
+            <div class="text-xs font-bold text-amber-400">
+                Please wait <span id="countdown" class="text-white text-sm font-black">15</span> seconds...
+            </div>
+            <div class="w-full bg-gray-900 rounded-full h-2 overflow-hidden border border-gray-800">
+                <div id="progressBar" class="bg-[#66fcf1] h-full w-full transition-all duration-1000"></div>
+            </div>
+        </div>
+
+        <!-- STEP 3: SCROLL PROMPT (Hidden initially) -->
+        <div id="scrollPrompt" class="hidden text-xs text-[#66fcf1] font-semibold animate-bounce pt-2">
+            👇 Scroll down to get your download link 👇
+        </div>
+    </div>
+
+    <!-- SPACER TO ALLOW SCROLLING -->
+    <div class="h-[300px] flex items-center justify-center">
+        <p class="text-[11px] text-gray-600">Keep scrolling down...</p>
+    </div>
+
+    <!-- FINAL GET DOWNLOAD BUTTON SECTION (At bottom after scroll) -->
+    <div class="w-full max-w-md pb-10 px-4">
+        <div id="downloadSection" class="opacity-40 pointer-events-none transition-all duration-300 bg-[#1f2833] border border-gray-800 p-4 rounded-2xl text-center shadow-2xl">
+            <p class="text-xs text-gray-400 mb-3" id="dlStatusText">🔒 Complete verification above first</p>
+            <a id="getDownloadBtn" href="#" class="w-full block bg-emerald-600 text-white font-extrabold text-xs py-3.5 rounded-xl transition shadow-lg flex items-center justify-center gap-2 opacity-50 cursor-not-allowed">
+                <i class="fa-solid fa-cloud-arrow-down text-base"></i> GET DOWNLOAD BUTTON
+            </a>
+        </div>
+    </div>
+
+    <!-- SCRIPT -->
+    <script>
+        "use strict";
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const animeSlug = urlParams.get('anime') || 'solo_leveling';
+        const quality = urlParams.get('quality') || '720p';
+
+        const targetDownloadUrl = `download.html?anime=${animeSlug}&quality=${quality}`;
+
+        function startVerification() {
+            // Hide verify button, show timer box
+            document.getElementById("verifyBox").classList.add("hidden");
+            document.getElementById("timerBox").classList.remove("hidden");
+
+            let timeLeft = 15;
+            const countdownEl = document.getElementById("countdown");
+            const progressBar = document.getElementById("progressBar");
+            const scrollPrompt = document.getElementById("scrollPrompt");
+            const downloadSection = document.getElementById("downloadSection");
+            const getDownloadBtn = document.getElementById("getDownloadBtn");
+            const dlStatusText = document.getElementById("dlStatusText");
+
+            let timer = setInterval(() => {
+                timeLeft--;
+                countdownEl.textContent = timeLeft;
+                
+                let progressPercent = (timeLeft / 15) * 100;
+                progressBar.style.width = progressPercent + "%";
+
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    document.getElementById("timerBox").classList.add("hidden");
+                    scrollPrompt.classList.remove("hidden");
+
+                    // Unlock download button
+                    downloadSection.classList.remove("opacity-40", "pointer-events-none");
+                    getDownloadBtn.classList.remove("opacity-50", "cursor-not-allowed");
+                    getDownloadBtn.classList.add("hover:bg-emerald-500", "cursor-pointer");
+                    getDownloadBtn.href = targetDownloadUrl;
+                    dlStatusText.innerHTML = "✨ Link Ready! Click below to download:";
+                    dlStatusText.className = "text-xs text-emerald-400 font-bold mb-3";
+
+                    // Smooth scroll down slightly to guide user
+                    window.scrollTo({
+                        top: document.body.scrollHeight,
+                        behavior: 'smooth'
+                    });
+                }
+            }, 1000);
+        }
+    </script>
+</body>
+</html>
