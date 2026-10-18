@@ -181,13 +181,13 @@
 
     <!-- ==================== JS LOGIC ==================== -->
     <script>
-        const BOT1_API = "https://7anime-bot1-scanner.onrender.com";
         const SMART_LINK_URL = "https://seenimplieddump.com/r4encwrvs?key=991b24b9ac839ae4944305239012fd68";
 
         let allAnimeCards = [];
         let activeCategory = 'all';
 
-        const dbCategories = ["animemovie", "Animeseries", "Animehatai", "Movie", "Series", "18pulse"];
+        const cardPrefixes = ["ANIME", "MOVIE", "HANTAI"];
+        const videoCategories = ["animemovie", "Animeseries", "Animehatai", "Movie", "Series", "18pulse"];
         const qualityTypes = ["480p", "720p", "1080p", "4k"];
 
         let bannerList = [
@@ -195,7 +195,7 @@
                 title: "Solo Leveling",
                 image: "https://m.media-amazon.com/images/M/MV5BODlhM2RmM2ItM2FkYi00ZGY2LTg2NzAtNjg4NTgwOGVhMDFkXkEyXkFqcGdeQXVyMTI1NDEyNTM5._V1_.jpg",
                 description: "In a world where hunters battle monsters, Sung Jinwoo awakens as the strongest shadow monarch.",
-                play_slug: "solo_leveling"
+                play_slug: "SOLO_LEVELING"
             }
         ];
 
@@ -234,16 +234,62 @@
         }
 
         async function initPage() {
+            await loadAllSplitCardDatabases();
             await loadAllQualitySplitDatabases();
             await loadBannerAndAdminCards();
             startBannerAutoSlide();
         }
 
+        // Load ANIME_1.JSON to ANIME_15.JSON, MOVIE_1.JSON, HANTAI_1.JSON
+        async function loadAllSplitCardDatabases() {
+            let loadedCardsMap = {};
+            let fetchPromises = [];
+
+            cardPrefixes.forEach(prefix => {
+                for (let index = 1; index <= 15; index++) {
+                    const jsonFilename = `${prefix}_${index}.JSON`;
+                    fetchPromises.push(
+                        fetch(`./${jsonFilename}?v=${Date.now()}`)
+                            .then(res => res.ok ? res.json() : null)
+                            .then(data => {
+                                if (!data) return;
+                                let cards = data.cards || data;
+                                if (cards && typeof cards === 'object') {
+                                    Object.keys(cards).forEach(slug => {
+                                        let item = cards[slug];
+                                        let itemType = item.type || prefix.toLowerCase();
+                                        if (prefix === 'MOVIE') itemType = 'movie';
+                                        if (prefix === 'HANTAI') itemType = 'hentai';
+
+                                        if (!loadedCardsMap[slug]) {
+                                            loadedCardsMap[slug] = {
+                                                title: item.title || slug.replace(/_/g, ' '),
+                                                image: item.image || item.poster || item.img || "https://via.placeholder.com/300x420/1f2833/66fcf1?text=7anime",
+                                                genres: Array.isArray(item.genres) ? item.genres.join(", ") : (item.genres || "Action, Anime"),
+                                                type: itemType,
+                                                rating: item.rating || item.score || "8.5",
+                                                language: item.audio_language || item.language || item.audio || "Dual Audio [Hindi - Jap]",
+                                                slug: slug
+                                            };
+                                        }
+                                    });
+                                }
+                            }).catch(() => {})
+                    );
+                }
+            });
+
+            await Promise.all(fetchPromises);
+            let cardsArray = Object.values(loadedCardsMap);
+            if (cardsArray.length > 0) mergeCards(cardsArray);
+        }
+
+        // Load Video Quality Split Files (_1 to _15)
         async function loadAllQualitySplitDatabases() {
             let loadedCardsMap = {};
             let fetchPromises = [];
 
-            dbCategories.forEach(cat => {
+            videoCategories.forEach(cat => {
                 for (let index = 1; index <= 15; index++) {
                     qualityTypes.forEach(q => {
                         const jsonFilename = `${cat}_${index}_${q}.json`;
@@ -257,19 +303,17 @@
                                         Object.keys(cards).forEach(slug => {
                                             let item = cards[slug];
                                             let itemType = item.type || cat.toLowerCase();
-                                            
                                             if (cat.toLowerCase().includes('movie')) itemType = 'movie';
                                             else if (cat.toLowerCase().includes('hatai') || cat.toLowerCase().includes('pulse') || cat.toLowerCase().includes('18')) itemType = 'hentai';
-                                            else if (cat.toLowerCase().includes('series') || cat.toLowerCase().includes('animemovie')) itemType = item.type || 'series';
 
                                             if (!loadedCardsMap[slug]) {
                                                 loadedCardsMap[slug] = {
                                                     title: item.title || slug.replace(/_/g, ' '),
-                                                    image: item.poster || item.image || item.img || item.thumbnail || "https://via.placeholder.com/300x420/1f2833/66fcf1?text=7anime",
+                                                    image: item.poster || item.image || item.img || "https://via.placeholder.com/300x420/1f2833/66fcf1?text=7anime",
                                                     genres: Array.isArray(item.genres) ? item.genres.join(", ") : (item.genres || "Action, Anime"),
                                                     type: itemType,
                                                     rating: item.rating || item.score || "8.5",
-                                                    language: item.audio_language || item.language || item.audio || "Dual Audio [Hindi - Jap]",
+                                                    language: item.audio_language || item.language || "Dual Audio [Hindi - Jap]",
                                                     slug: slug
                                                 };
                                             }
@@ -282,11 +326,8 @@
             });
 
             await Promise.all(fetchPromises);
-
             let cardsArray = Object.values(loadedCardsMap);
-            if (cardsArray.length > 0) {
-                mergeCards(cardsArray);
-            }
+            if (cardsArray.length > 0) mergeCards(cardsArray);
         }
 
         async function loadBannerAndAdminCards() {
@@ -299,16 +340,11 @@
 
                 if (rawJson.banners && Array.isArray(rawJson.banners) && rawJson.banners.length > 0) {
                     bannerList = rawJson.banners;
-                } else if (rawJson.banner) {
-                    bannerList[0] = rawJson.banner;
                 }
 
                 renderHeroBanner(bannerList[0]);
-                if (cardsList.length > 0) {
-                    mergeCards(cardsList);
-                }
+                if (cardsList.length > 0) mergeCards(cardsList);
             } catch (err) {
-                console.warn("Using fallback banners:", err);
                 renderHeroBanner(bannerList[0]);
             }
         }
@@ -330,8 +366,8 @@
             heroElem.style.backgroundImage = `url('${bgImg}')`;
             document.getElementById("bannerTitle").innerText = banner.title || "Solo Leveling";
             document.getElementById("bannerDesc").innerText = banner.description || "";
-            document.getElementById("bannerPlayBtn").href = `anime.html?anime=${banner.play_slug || 'solo_leveling'}`;
-            document.getElementById("bannerDownloadBtn").href = `anime.html?anime=${banner.play_slug || 'solo_leveling'}`;
+            document.getElementById("bannerPlayBtn").href = `anime.html?anime=${banner.play_slug || 'SOLO_LEVELING'}`;
+            document.getElementById("bannerDownloadBtn").href = `anime.html?anime=${banner.play_slug || 'SOLO_LEVELING'}`;
             updateBannerDots();
         }
 
@@ -339,18 +375,16 @@
             const dotsBox = document.getElementById("bannerDots");
             if (!dotsBox) return;
             dotsBox.innerHTML = bannerList.map((_, idx) => `
-                <button onclick="setBannerSlide(${idx})" class="w-2.5 h-2.5 rounded-full transition-all duration-300 ${idx === currentBannerIndex ? 'bg-[#66fcf1] w-6' : 'bg-gray-600'}" aria-label="Slide ${idx+1}"></button>
+                <button onclick="setBannerSlide(${idx})" class="w-2.5 h-2.5 rounded-full transition-all duration-300 ${idx === currentBannerIndex ? 'bg-[#66fcf1] w-6' : 'bg-gray-600'}"></button>
             `).join("");
         }
 
         function updateBannerDots() {
             const dots = document.querySelectorAll("#bannerDots button");
             dots.forEach((dot, idx) => {
-                if (idx === currentBannerIndex) {
-                    dot.className = "w-6 h-2.5 rounded-full bg-[#66fcf1] transition-all duration-300";
-                } else {
-                    dot.className = "w-2.5 h-2.5 rounded-full bg-gray-600 transition-all duration-300";
-                }
+                dot.className = idx === currentBannerIndex 
+                    ? "w-6 h-2.5 rounded-full bg-[#66fcf1] transition-all duration-300"
+                    : "w-2.5 h-2.5 rounded-full bg-gray-600 transition-all duration-300";
             });
         }
 
@@ -389,19 +423,12 @@
 
             const activeBtn = document.getElementById(`btn-${cat}`);
             if (activeBtn) {
-                if (cat === 'hentai') {
-                    activeBtn.className = "cat-btn bg-red-600 text-white font-bold text-[11px] px-3 py-1 rounded-full transition shrink-0 flex items-center gap-1 shadow-sm";
-                } else {
-                    activeBtn.className = "cat-btn bg-[#66fcf1] text-black font-bold text-[11px] px-3 py-1 rounded-full transition shrink-0 flex items-center gap-1 shadow-sm";
-                }
+                activeBtn.className = cat === 'hentai' 
+                    ? "cat-btn bg-red-600 text-white font-bold text-[11px] px-3 py-1 rounded-full transition shrink-0 flex items-center gap-1 shadow-sm"
+                    : "cat-btn bg-[#66fcf1] text-black font-bold text-[11px] px-3 py-1 rounded-full transition shrink-0 flex items-center gap-1 shadow-sm";
             }
 
-            const titles = {
-                'all': 'Explore Anime',
-                'series': 'Anime Series',
-                'movie': 'Anime Movies',
-                'hentai': '18+ Hentai'
-            };
+            const titles = { 'all': 'Explore Anime', 'series': 'Anime Series', 'movie': 'Anime Movies', 'hentai': '18+ Hentai' };
             document.getElementById("gridTitle").innerText = titles[cat] || 'Explore Anime';
 
             let filtered = allAnimeCards;
@@ -472,12 +499,8 @@
             const mainInput = document.getElementById("searchInputMain");
             const mainDropdown = document.getElementById("searchDropdownMain");
 
-            if (navInput && navDropdown && !navInput.contains(e.target) && !navDropdown.contains(e.target)) {
-                navDropdown.classList.add("hidden");
-            }
-            if (mainInput && mainDropdown && !mainInput.contains(e.target) && !mainDropdown.contains(e.target)) {
-                mainDropdown.classList.add("hidden");
-            }
+            if (navInput && navDropdown && !navInput.contains(e.target) && !navDropdown.contains(e.target)) navDropdown.classList.add("hidden");
+            if (mainInput && mainDropdown && !mainInput.contains(e.target) && !mainDropdown.contains(e.target)) mainDropdown.classList.add("hidden");
         });
 
         function renderCardsGrid(cards) {
@@ -506,7 +529,7 @@
                     </a>
                     <div class="p-2 flex flex-col justify-between flex-1">
                         <div>
-                            <a href="anime.html?anime=${card.slug}" class="font-bold text-white text-xs hover:text-[#66fcf1] line-clamp-1">
+                            <a href="anime.html?anime=${card.slug}" class="font-divider font-bold text-white text-xs hover:text-[#66fcf1] line-clamp-1">
                                 ${card.title}
                             </a>
                             <p class="text-[10px] text-gray-400 mt-0.5 truncate">${card.language || 'Dual Audio [Hindi]'}</p>
