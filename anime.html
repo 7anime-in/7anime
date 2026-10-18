@@ -5,9 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>7anime - Download Anime & Movies</title>
 
-    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
@@ -24,7 +22,6 @@
 </head>
 <body class="min-h-screen flex flex-col">
 
-    <!-- NAVBAR -->
     <nav class="sticky top-0 z-50 bg-[#1f2833]/95 backdrop-blur-md border-b border-gray-800 px-4 py-3 shadow-lg">
         <div class="max-w-4xl mx-auto flex items-center justify-between">
             <a href="index.html" class="flex items-center gap-2 text-2xl font-extrabold text-[#66fcf1]">
@@ -37,23 +34,18 @@
         </div>
     </nav>
 
-    <!-- MAIN CONTAINER -->
     <main class="max-w-3xl mx-auto px-4 py-6 flex-1 w-full flex flex-col gap-6">
 
-        <!-- TITLE & HEADER -->
         <div class="bg-[#1f2833] p-5 rounded-xl border border-gray-800 shadow-xl text-center">
             <h1 id="animeTitleDisplay" class="text-xl md:text-2xl font-black text-white uppercase tracking-wider mb-2">Loading Anime Details...</h1>
             <p id="animeJpTitle" class="text-xs text-[#66fcf1] italic">Japanese Title...</p>
         </div>
 
-        <!-- POSTER & INFO SECTION -->
         <div class="bg-[#1f2833] p-4 md:p-6 rounded-xl border border-gray-800 flex flex-col md:flex-row gap-6 shadow-xl">
-            <!-- Poster -->
             <div class="w-full md:w-56 flex-shrink-0 flex justify-center">
                 <img id="animePosterImg" src="https://via.placeholder.com/200x300?text=Anime+Poster" alt="Anime Poster" class="w-48 h-72 object-cover rounded-xl border border-gray-700 shadow-2xl">
             </div>
 
-            <!-- Info Table -->
             <div class="flex-1 flex flex-col justify-between gap-4">
                 <div class="bg-gray-900/80 p-4 rounded-xl border border-gray-800 text-xs md:text-sm space-y-2">
                     <div class="grid grid-cols-2 gap-2">
@@ -75,13 +67,11 @@
             </div>
         </div>
 
-        <!-- SYNOPSIS BLOCK -->
         <div class="bg-[#1f2833] border-l-4 border-[#66fcf1] p-4 rounded-r-xl border-t border-r border-b border-gray-800 shadow-xl">
             <h3 class="text-xs font-bold text-[#66fcf1] uppercase tracking-wider mb-1"><i class="fa-solid fa-book-open mr-1"></i> Synopsis / Storyline</h3>
             <p id="animeSynopsis" class="text-xs md:text-sm text-gray-300 leading-relaxed">Loading plot description...</p>
         </div>
 
-        <!-- SCREENSHOTS GRID -->
         <div class="bg-[#1f2833] p-4 rounded-xl border border-gray-800 shadow-xl space-y-3">
             <h3 class="text-xs font-bold text-white uppercase tracking-wider border-b border-gray-800 pb-2">
                 <i class="fa-solid fa-images text-[#66fcf1] mr-1"></i> Screenshots (Quality Proof)
@@ -93,7 +83,6 @@
             </div>
         </div>
 
-        <!-- DOWNLOAD SECTIONS -->
         <div class="bg-[#1f2833] p-4 md:p-6 rounded-xl border border-gray-800 shadow-xl space-y-4">
             <h3 class="text-xs font-bold text-white uppercase tracking-wider border-b border-gray-800 pb-2 text-center">
                 <i class="fa-solid fa-cloud-arrow-down text-[#66fcf1] mr-1"></i> Download High-Speed Links
@@ -107,7 +96,6 @@
             </div>
 
             <div id="qualityDownloadContainer" class="space-y-3">
-                <!-- Dynamically loaded quality buttons -->
             </div>
         </div>
 
@@ -117,7 +105,6 @@
         <p>© 2026 7anime. Direct Telegram & Server Downloads.</p>
     </footer>
 
-    <!-- SCRIPT -->
     <script>
         "use strict";
 
@@ -207,7 +194,6 @@
 
         async function initPage() {
             try {
-                // 1. Fetch card metadata (poster, synopsis, title)
                 animeData = await fetchAnimeFromCardDatabases();
 
                 if (!animeData) {
@@ -239,7 +225,6 @@
                     };
                 }
 
-                // 2. Fetch all episode download links from quality split databases
                 let qualityDownloads = await fetchAnimeFromQualityDatabases();
                 if (qualityDownloads && Object.keys(qualityDownloads).length > 0) {
                     animeData.downloads = { ...(animeData.downloads || {}), ...qualityDownloads };
