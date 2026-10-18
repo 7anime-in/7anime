@@ -60,7 +60,7 @@
                         <div><span class="text-gray-500 font-semibold">Status:</span> <span id="metaStatus" class="text-white font-medium">Completed</span></div>
                         <div><span class="text-gray-500 font-semibold">Total Ep:</span> <span id="metaTotalEp" class="text-white font-medium">12</span></div>
                         <div><span class="text-gray-500 font-semibold">Audio:</span> <span id="metaAudio" class="text-white font-medium">Hindi + Japanese</span></div>
-                        <div><span class="text-gray-500 font-semibold">Quality:</span> <span class="text-amber-400 font-bold">480p, 720p, 1080p</span></div>
+                        <div><span class="text-gray-500 font-semibold">Quality:</span> <span class="text-amber-400 font-bold">480p, 720p, 1080p, 4k</span></div>
                         <div><span class="text-gray-500 font-semibold">Studio:</span> <span id="metaStudio" class="text-white font-medium">N/A</span></div>
                         <div><span class="text-gray-500 font-semibold">Rating:</span> <span id="badgeScore" class="text-amber-400 font-bold"><i class="fa-solid fa-star mr-1"></i>8.5</span></div>
                     </div>
@@ -81,7 +81,7 @@
             <p id="animeSynopsis" class="text-xs md:text-sm text-gray-300 leading-relaxed">Loading plot description...</p>
         </div>
 
-        <!-- SCREENSHOTS GRID (Quality Proof) -->
+        <!-- SCREENSHOTS GRID -->
         <div class="bg-[#1f2833] p-4 rounded-xl border border-gray-800 shadow-xl space-y-3">
             <h3 class="text-xs font-bold text-white uppercase tracking-wider border-b border-gray-800 pb-2">
                 <i class="fa-solid fa-images text-[#66fcf1] mr-1"></i> Screenshots (Quality Proof)
@@ -99,7 +99,6 @@
                 <i class="fa-solid fa-cloud-arrow-down text-[#66fcf1] mr-1"></i> Download High-Speed Links
             </h3>
 
-            <!-- Database Format & Language Info Text Line -->
             <div class="bg-gray-900/90 border border-gray-800 px-3 py-2 rounded-lg text-center">
                 <p id="dbFormatInfoText" class="text-[11px] text-gray-300 font-medium">
                     <i class="fa-solid fa-circle-info text-[#66fcf1] mr-1"></i> 
@@ -107,7 +106,6 @@
                 </p>
             </div>
 
-            <!-- Quality Buttons Dynamic Container -->
             <div id="qualityDownloadContainer" class="space-y-3">
                 <!-- Dynamically loaded quality buttons -->
             </div>
@@ -119,7 +117,7 @@
         <p>© 2026 7anime. Direct Telegram & Server Downloads.</p>
     </footer>
 
-    <!-- OPTIMIZED MULTI-DATABASE FALLBACK LOADER SCRIPT -->
+    <!-- SCRIPT -->
     <script>
         "use strict";
 
@@ -129,14 +127,8 @@
         const urlParams = new URLSearchParams(window.location.search);
         const animeSlug = urlParams.get('anime') || 'solo_leveling';
 
-        const dbCategories = [
-            "animemovie",
-            "Animeseries",
-            "Animehatai",
-            "Movie",
-            "Series",
-            "18pulse"
-        ];
+        const dbCategories = ["animemovie", "Animeseries", "Animehatai", "Movie", "Series", "18pulse"];
+        const qualityTypes = ["480p", "720p", "1080p", "4k"];
 
         function formatImageUrl(url) {
             if (!url) return "https://via.placeholder.com/200x300?text=7anime";
@@ -147,30 +139,42 @@
             return url;
         }
 
-        async function fetchAnimeFromMultiDatabases() {
-            for (let cat of dbCategories) {
-                let index = 1;
-                let consecutiveFailures = 0;
+        async function fetchAnimeFromQualityDatabases() {
+            let mergedItem = null;
+            let mergedDownloads = {};
+            let fetchPromises = [];
 
-                while (consecutiveFailures < 2 && index <= 15) {
-                    const jsonFilename = `${cat}_${index}.json`;
-                    try {
-                        let res = await fetch(`./${jsonFilename}?v=${Date.now()}`);
-                        if (res.ok) {
-                            let data = await res.json();
-                            let cards = data.cards || data;
-                            if (cards && cards[animeSlug]) {
-                                return cards[animeSlug];
-                            }
-                            consecutiveFailures = 0;
-                        } else {
-                            consecutiveFailures++;
-                        }
-                    } catch (e) {
-                        consecutiveFailures++;
-                    }
-                    index++;
+            dbCategories.forEach(cat => {
+                for (let index = 1; index <= 15; index++) {
+                    qualityTypes.forEach(q => {
+                        const jsonFilename = `${cat}_${index}_${q}.json`;
+                        fetchPromises.push(
+                            fetch(`./${jsonFilename}?v=${Date.now()}`)
+                                .then(res => res.ok ? res.json() : null)
+                                .then(data => {
+                                    if (!data) return;
+                                    let cards = data.cards || data;
+                                    if (cards && cards[animeSlug]) {
+                                        let item = cards[animeSlug];
+                                        if (!mergedItem) {
+                                            mergedItem = { ...item };
+                                        }
+                                        let qLink = item.download_link || item.link || (item.downloads && item.downloads[q]) || item[q];
+                                        if (qLink) {
+                                            mergedDownloads[q] = qLink;
+                                        }
+                                    }
+                                }).catch(() => {})
+                        );
+                    });
                 }
+            });
+
+            await Promise.all(fetchPromises);
+
+            if (mergedItem) {
+                mergedItem.downloads = mergedDownloads;
+                return mergedItem;
             }
             return null;
         }
@@ -187,7 +191,7 @@
                 }
 
                 if (!animeData) {
-                    animeData = await fetchAnimeFromMultiDatabases();
+                    animeData = await fetchAnimeFromQualityDatabases();
                 }
 
                 if (!animeData) {
@@ -195,7 +199,7 @@
                         title: animeSlug.replace(/_/g, ' ').toUpperCase(),
                         japanese_title: "Japanese Title Preview",
                         poster: "https://via.placeholder.com/200x300?text=7anime",
-                        synopsis: "Demo Synopsis: Description will populate automatically once your JSON databases are linked correctly in your repository folder[span_1](start_span)[span_1](end_span).",
+                        synopsis: "Demo Synopsis: Description will populate automatically once your quality-split JSON databases are linked correctly.",
                         genres: ["Action", "Fantasy", "Animation"],
                         status: "Completed",
                         total_episodes: "12",
@@ -211,7 +215,8 @@
                         downloads: {
                             "480p": "#",
                             "720p": "#",
-                            "1080p": "#"
+                            "1080p": "#",
+                            "4k": "#"
                         }
                     };
                 }
@@ -280,11 +285,12 @@
             }
 
             container.innerHTML = Object.entries(downloadsObj).map(([quality, link]) => {
-                if (!link) return '';
+                if (!link || link === "#") return '';
                 
                 let btnColor = "bg-emerald-600 hover:bg-emerald-500 text-white";
                 if (quality.includes("720")) btnColor = "bg-blue-600 hover:bg-blue-500 text-white";
                 if (quality.includes("1080")) btnColor = "bg-purple-600 hover:bg-purple-500 text-white";
+                if (quality.includes("4k")) btnColor = "bg-amber-600 hover:bg-amber-500 text-white";
 
                 return `
                     <div class="flex items-center justify-between bg-gray-900 p-3 rounded-xl border border-gray-800">
@@ -293,27 +299,23 @@
                             <span class="text-xs font-bold text-white uppercase">${quality} Download</span>
                         </div>
                         <a 
-                            href="${link}" 
-                            onclick="handleDownloadClick(event, '${link}')"
+                            href="ads1.html?anime=${animeSlug}&quality=${quality}" 
+                            onclick="handleAdRedirect(event, '${animeSlug}', '${quality}')"
                             class="${btnColor} font-extrabold text-xs px-5 py-2.5 rounded-lg transition shadow flex items-center gap-2"
                         >
-                            <i class="fa-solid fa-download"></i> Download Now
+                            <i class="fa-solid fa-download"></i> Fast Download
                         </a>
                     </div>
                 `;
             }).join("");
         }
 
-        function handleDownloadClick(event, url) {
+        function handleAdRedirect(event, slug, quality) {
             event.preventDefault();
             if (SMART_LINK_AD_URL) {
                 window.open(SMART_LINK_AD_URL, '_blank');
             }
-            if (url && url !== "#") {
-                window.location.href = url;
-            } else {
-                alert("Link update ho raha hai!");
-            }
+            window.location.href = `ads1.html?anime=${slug}&quality=${quality}`;
         }
 
         window.addEventListener("DOMContentLoaded", initPage);
