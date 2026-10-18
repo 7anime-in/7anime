@@ -125,8 +125,11 @@
         let animeData = null;
 
         const urlParams = new URLSearchParams(window.location.search);
-        const animeSlug = urlParams.get('anime') || 'solo_leveling';
+        const rawSlug = urlParams.get('anime') || 'solo_leveling';
+        const animeSlugUpper = rawSlug.toUpperCase();
+        const animeSlugLower = rawSlug.toLowerCase();
 
+        const cardPrefixes = ["ANIME", "MOVIE", "HANTAI"];
         const dbCategories = ["animemovie", "Animeseries", "Animehatai", "Movie", "Series", "18pulse"];
         const qualityTypes = ["480p", "720p", "1080p", "4k"];
 
@@ -139,67 +142,58 @@
             return url;
         }
 
-        async function fetchAnimeFromQualityDatabases() {
-            let mergedItem = null;
-            let mergedDownloads = {};
+        async function fetchAnimeFromCardDatabases() {
+            let foundItem = null;
             let fetchPromises = [];
 
-            dbCategories.forEach(cat => {
+            cardPrefixes.forEach(prefix => {
                 for (let index = 1; index <= 15; index++) {
-                    qualityTypes.forEach(q => {
-                        const jsonFilename = `${cat}_${index}_${q}.json`;
-                        fetchPromises.push(
-                            fetch(`./${jsonFilename}?v=${Date.now()}`)
-                                .then(res => res.ok ? res.json() : null)
-                                .then(data => {
-                                    if (!data) return;
-                                    let cards = data.cards || data;
-                                    if (cards && cards[animeSlug]) {
-                                        let item = cards[animeSlug];
-                                        if (!mergedItem) {
-                                            mergedItem = { ...item };
+                    const jsonFilename = `${prefix}_${index}.JSON`;
+                    fetchPromises.push(
+                        fetch(`./${jsonFilename}?v=${Date.now()}`)
+                            .then(res => res.ok ? res.json() : null)
+                            .then(data => {
+                                if (!data) return;
+                                let cards = data.cards || data;
+                                if (cards && typeof cards === 'object') {
+                                    Object.keys(cards).forEach(slugKey => {
+                                        if (slugKey.toUpperCase() === animeSlugUpper || slugKey.toLowerCase() === animeSlugLower) {
+                                            foundItem = cards[slugKey];
                                         }
-                                        let qLink = item.download_link || item.link || (item.downloads && item.downloads[q]) || item[q];
-                                        if (qLink) {
-                                            mergedDownloads[q] = qLink;
-                                        }
-                                    }
-                                }).catch(() => {})
-                        );
-                    });
+                                    });
+                                }
+                            }).catch(() => {})
+                    );
                 }
             });
 
             await Promise.all(fetchPromises);
-
-            if (mergedItem) {
-                mergedItem.downloads = mergedDownloads;
-                return mergedItem;
-            }
-            return null;
+            return foundItem;
         }
 
         async function initPage() {
             try {
-                let res = await fetch(`./sitevideo_data.json?v=${Date.now()}`).catch(()=>{});
-                if (res && res.ok) {
-                    let data = await res.json();
-                    let cards = data.cards || data;
-                    if (cards && cards[animeSlug]) {
-                        animeData = cards[animeSlug];
+                // 1. Check ANIME_1.JSON to ANIME_15.JSON, MOVIE_1.JSON, HANTAI_1.JSON
+                animeData = await fetchAnimeFromCardDatabases();
+
+                // 2. Fallback to sitevideo_data.json if needed
+                if (!animeData) {
+                    let res = await fetch(`./sitevideo_data.json?v=${Date.now()}`).catch(()=>{});
+                    if (res && res.ok) {
+                        let data = await res.json();
+                        let cards = data.cards || data;
+                        if (cards && cards[rawSlug]) {
+                            animeData = cards[rawSlug];
+                        }
                     }
                 }
 
                 if (!animeData) {
-                    animeData = await fetchAnimeFromQualityDatabases();
-                }
-
-                if (!animeData) {
                     animeData = {
-                        title: animeSlug.replace(/_/g, ' ').toUpperCase(),
+                        title: rawSlug.replace(/_/g, ' ').toUpperCase(),
                         japanese_title: "Japanese Title Preview",
                         poster: "https://via.placeholder.com/200x300?text=7anime",
-                        synopsis: "Demo Synopsis: Description will populate automatically once your quality-split JSON databases are linked correctly.",
+                        synopsis: "Demo Synopsis: Description will populate automatically once your databases are linked correctly.",
                         genres: ["Action", "Fantasy", "Animation"],
                         status: "Completed",
                         total_episodes: "12",
@@ -207,17 +201,8 @@
                         score: "8.8",
                         format: "MKV / WEB-DL",
                         audio_language: "Dual Audio [Hindi Org + Japanese]",
-                        screenshots: [
-                            "https://via.placeholder.com/300x170?text=Screenshot+1",
-                            "https://via.placeholder.com/300x170?text=Screenshot+2",
-                            "https://via.placeholder.com/300x170?text=Screenshot+3"
-                        ],
-                        downloads: {
-                            "480p": "#",
-                            "720p": "#",
-                            "1080p": "#",
-                            "4k": "#"
-                        }
+                        screenshots: [],
+                        downloads: {}
                     };
                 }
 
@@ -254,10 +239,16 @@
 
             const genresArr = info.genres || info.genre || ["Action", "Fantasy"];
             const genresContainer = document.getElementById("animeGenresContainer");
-            if (Array.isArray(genresArr)) {
-                genresContainer.innerHTML = genresArr.map(g => `
-                    <span class="bg-gray-800 text-gray-300 text-[11px] px-2.5 py-0.5 rounded-full border border-gray-700">${g.trim()}</span>
-                `).join("");
+            if (genresArr) {
+                if (typeof genresArr === 'string') {
+                    genresContainer.innerHTML = genresArr.split(',').map(g => `
+                        <span class="bg-gray-800 text-gray-300 text-[11px] px-2.5 py-0.5 rounded-full border border-gray-700">${g.trim()}</span>
+                    `).join("");
+                } else if (Array.isArray(genresArr)) {
+                    genresContainer.innerHTML = genresArr.map(g => `
+                        <span class="bg-gray-800 text-gray-300 text-[11px] px-2.5 py-0.5 rounded-full border border-gray-700">${g.trim()}</span>
+                    `).join("");
+                }
             }
         }
 
@@ -299,8 +290,8 @@
                             <span class="text-xs font-bold text-white uppercase">${quality} Download</span>
                         </div>
                         <a 
-                            href="ads1.html?anime=${animeSlug}&quality=${quality}" 
-                            onclick="handleAdRedirect(event, '${animeSlug}', '${quality}')"
+                            href="ads1.html?anime=${rawSlug}&quality=${quality}" 
+                            onclick="handleAdRedirect(event, '${rawSlug}', '${quality}')"
                             class="${btnColor} font-extrabold text-xs px-5 py-2.5 rounded-lg transition shadow flex items-center gap-2"
                         >
                             <i class="fa-solid fa-download"></i> Fast Download
