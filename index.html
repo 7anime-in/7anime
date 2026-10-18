@@ -119,7 +119,7 @@
         </div>
     </section>
 
-    <!-- ==================== DEDICATED MAIN SEARCH BAR ==================== -->
+    <!-- ==================== SEARCH BAR ==================== -->
     <section class="max-w-7xl mx-auto px-3 my-4 w-full">
         <div class="relative w-full bg-[#1f2833] p-2 sm:p-3 rounded-2xl border border-gray-800 shadow-xl">
             <div class="relative flex items-center">
@@ -138,7 +138,7 @@
         </div>
     </section>
 
-    <!-- ==================== ANIME CARDS GRID SECTION ==================== -->
+    <!-- ==================== ANIME CARDS GRID ==================== -->
     <main class="max-w-7xl mx-auto px-3 sm:px-4 py-3 flex-1 w-full">
         
         <div class="flex items-center justify-between mb-4">
@@ -153,7 +153,7 @@
 
     </main>
 
-    <!-- ==================== 18+ AGE RESTRICTION MODAL ==================== -->
+    <!-- ==================== 18+ MODAL ==================== -->
     <div id="ageModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-[100] hidden flex items-center justify-center p-4">
         <div class="bg-[#1f2833] border border-red-800/80 rounded-2xl p-6 max-w-sm w-full text-center shadow-2xl">
             <div class="w-12 h-12 bg-red-950/60 border border-red-800 text-red-500 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl">
@@ -179,7 +179,7 @@
         <p>© 2026 7anime Engine</p>
     </footer>
 
-    <!-- ==================== JS LOGIC WITH ROBUST MULTI-DATABASE LOADER ==================== -->
+    <!-- ==================== JS LOGIC ==================== -->
     <script>
         const BOT1_API = "https://7anime-bot1-scanner.onrender.com";
         const SMART_LINK_URL = "https://seenimplieddump.com/r4encwrvs?key=991b24b9ac839ae4944305239012fd68";
@@ -187,14 +187,8 @@
         let allAnimeCards = [];
         let activeCategory = 'all';
 
-        const dbCategories = [
-            "animemovie",
-            "Animeseries",
-            "Animehatai",
-            "Movie",
-            "Series",
-            "18pulse"
-        ];
+        const dbCategories = ["animemovie", "Animeseries", "Animehatai", "Movie", "Series", "18pulse"];
+        const qualityTypes = ["480p", "720p", "1080p", "4k"];
 
         let bannerList = [
             {
@@ -240,49 +234,54 @@
         }
 
         async function initPage() {
-            await loadAllMultiDatabases();
+            await loadAllQualitySplitDatabases();
             await loadBannerAndAdminCards();
             startBannerAutoSlide();
         }
 
-        // Fixed Robust Multi-Database Loader (Scans _1 to _15 safely without breaking on missing gaps)
-        async function loadAllMultiDatabases() {
+        async function loadAllQualitySplitDatabases() {
             let loadedCardsMap = {};
+            let fetchPromises = [];
 
-            for (let cat of dbCategories) {
+            dbCategories.forEach(cat => {
                 for (let index = 1; index <= 15; index++) {
-                    const jsonFilename = `${cat}_${index}.json`;
-                    try {
-                        let res = await fetch(`./${jsonFilename}?v=${Date.now()}`);
-                        if (res.ok) {
-                            let data = await res.json();
-                            let cards = data.cards || data;
-                            if (cards && typeof cards === 'object') {
-                                Object.keys(cards).forEach(slug => {
-                                    let item = cards[slug];
-                                    let itemType = item.type || cat.toLowerCase();
-                                    
-                                    if (cat.toLowerCase().includes('movie')) itemType = 'movie';
-                                    else if (cat.toLowerCase().includes('hatai') || cat.toLowerCase().includes('pulse') || cat.toLowerCase().includes('18')) itemType = 'hentai';
-                                    else if (cat.toLowerCase().includes('series') || cat.toLowerCase().includes('animemovie')) itemType = item.type || 'series';
+                    qualityTypes.forEach(q => {
+                        const jsonFilename = `${cat}_${index}_${q}.json`;
+                        fetchPromises.push(
+                            fetch(`./${jsonFilename}?v=${Date.now()}`)
+                                .then(res => res.ok ? res.json() : null)
+                                .then(data => {
+                                    if (!data) return;
+                                    let cards = data.cards || data;
+                                    if (cards && typeof cards === 'object') {
+                                        Object.keys(cards).forEach(slug => {
+                                            let item = cards[slug];
+                                            let itemType = item.type || cat.toLowerCase();
+                                            
+                                            if (cat.toLowerCase().includes('movie')) itemType = 'movie';
+                                            else if (cat.toLowerCase().includes('hatai') || cat.toLowerCase().includes('pulse') || cat.toLowerCase().includes('18')) itemType = 'hentai';
+                                            else if (cat.toLowerCase().includes('series') || cat.toLowerCase().includes('animemovie')) itemType = item.type || 'series';
 
-                                    loadedCardsMap[slug] = {
-                                        title: item.title || slug.replace(/_/g, ' '),
-                                        image: item.poster || item.image || item.img || item.thumbnail || "https://via.placeholder.com/300x420/1f2833/66fcf1?text=7anime",
-                                        genres: Array.isArray(item.genres) ? item.genres.join(", ") : (item.genres || "Action, Anime"),
-                                        type: itemType,
-                                        rating: item.rating || item.score || "8.5",
-                                        language: item.audio_language || item.language || item.audio || "Dual Audio [Hindi - Jap]",
-                                        slug: slug
-                                    };
-                                });
-                            }
-                        }
-                    } catch (e) {
-                        // Ignore missing files gracefully
-                    }
+                                            if (!loadedCardsMap[slug]) {
+                                                loadedCardsMap[slug] = {
+                                                    title: item.title || slug.replace(/_/g, ' '),
+                                                    image: item.poster || item.image || item.img || item.thumbnail || "https://via.placeholder.com/300x420/1f2833/66fcf1?text=7anime",
+                                                    genres: Array.isArray(item.genres) ? item.genres.join(", ") : (item.genres || "Action, Anime"),
+                                                    type: itemType,
+                                                    rating: item.rating || item.score || "8.5",
+                                                    language: item.audio_language || item.language || item.audio || "Dual Audio [Hindi - Jap]",
+                                                    slug: slug
+                                                };
+                                            }
+                                        });
+                                    }
+                                }).catch(() => {})
+                        );
+                    });
                 }
-            }
+            });
+
+            await Promise.all(fetchPromises);
 
             let cardsArray = Object.values(loadedCardsMap);
             if (cardsArray.length > 0) {
