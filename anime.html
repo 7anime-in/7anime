@@ -117,7 +117,8 @@
         const animeSlugLower = rawSlug.toLowerCase();
 
         const cardPrefixes = ["ANIME", "MOVIE", "HANTAI"];
-        const dbCategories = ["animemovie", "Animeseries", "Animehatai", "Movie", "Series", "18pulse"];
+        // Updated dbCategories to match app.py exact category lowercase names (anime, movie, hantai, 18pulse)
+        const dbCategories = ["anime", "movie", "hantai", "18pulse", "animemovie", "animeseries", "animehatai", "series"];
         const qualityTypes = ["480p", "720p", "1080p", "4k"];
 
         function formatImageUrl(url) {
@@ -165,7 +166,7 @@
             dbCategories.forEach(cat => {
                 for (let index = 1; index <= 15; index++) {
                     qualityTypes.forEach(q => {
-                        const jsonFilename = `${cat.toLowerCase()}_${index}_${q}.json`;
+                        const jsonFilename = `${cat.toLowerCase()}_${index}_${q.toLowerCase()}.json`;
                         fetchPromises.push(
                             fetch(`./${jsonFilename}?v=${Date.now()}`)
                                 .then(res => res.ok ? res.json() : null)
