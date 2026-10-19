@@ -95,6 +95,7 @@
                 </p>
             </div>
 
+            <!-- Season and Quality Download Buttons Container -->
             <div id="qualityDownloadContainer" class="space-y-3">
             </div>
         </div>
@@ -117,7 +118,6 @@
         const animeSlugLower = rawSlug.toLowerCase();
 
         const cardPrefixes = ["ANIME", "MOVIE", "HANTAI"];
-        // Updated dbCategories to match app.py exact category lowercase names (anime, movie, hantai, 18pulse)
         const dbCategories = ["anime", "movie", "hantai", "18pulse", "animemovie", "animeseries", "animehatai", "series"];
         const qualityTypes = ["480p", "720p", "1080p", "4k"];
 
@@ -159,8 +159,9 @@
             return foundItem;
         }
 
-        async function fetchAnimeFromQualityDatabases() {
-            let mergedDownloads = {};
+        // Fetch available qualities and seasons instead of individual episode links
+        async function fetchAvailableQualitiesAndSeasons() {
+            let detectedCombos = new Set(); // Grouping unique Season + Quality combinations
             let fetchPromises = [];
 
             dbCategories.forEach(cat => {
@@ -177,8 +178,15 @@
                                         Object.keys(cards).forEach(slugKey => {
                                             if (slugKey.toUpperCase() === animeSlugUpper || slugKey.toLowerCase() === animeSlugLower) {
                                                 let item = cards[slugKey];
-                                                if (item.downloads && typeof item.downloads === 'object') {
-                                                    Object.assign(mergedDownloads, item.downloads);
+                                                let downloads = item.downloads || {};
+                                                
+                                                // Extract Season numbers or default to Season 1
+                                                let title = item.title || "";
+                                                let seasonMatch = title.match(/S(\d+)/i) || title.match(/Season\s*(\d+)/i);
+                                                let seasonStr = seasonMatch ? `Season ${seasonMatch[1]}` : "Season 1";
+
+                                                if (Object.keys(downloads).length > 0) {
+                                                    detectedCombos.add(`${seasonStr}|${q}`);
                                                 }
                                             }
                                         });
@@ -190,7 +198,7 @@
             });
 
             await Promise.all(fetchPromises);
-            return mergedDownloads;
+            return Array.from(detectedCombos);
         }
 
         async function initPage() {
@@ -221,19 +229,22 @@
                         score: "8.8",
                         format: "MKV / WEB-DL",
                         audio_language: "Dual Audio [Hindi Org + Japanese]",
-                        screenshots: [],
-                        downloads: {}
+                        screenshots: []
                     };
-                }
-
-                let qualityDownloads = await fetchAnimeFromQualityDatabases();
-                if (qualityDownloads && Object.keys(qualityDownloads).length > 0) {
-                    animeData.downloads = { ...(animeData.downloads || {}), ...qualityDownloads };
                 }
 
                 populateUI(animeData);
                 renderScreenshots(animeData.screenshots || animeData.images || animeData.ss);
-                renderQualityButtons(animeData.downloads || animeData.quality_links || animeData.links);
+
+                // Detect seasons and qualities from DB
+                let availableCombos = await fetchAvailableQualitiesAndSeasons();
+                
+                // Fallback buttons if database is still empty
+                if (availableCombos.length === 0) {
+                    availableCombos = ["Season 1|480p", "Season 1|720p", "Season 1|1080p"];
+                }
+
+                renderBatchQualityButtons(availableCombos);
 
             } catch (err) {
                 console.error("Critical initialization error:", err);
@@ -292,31 +303,27 @@
             `).join("");
         }
 
-        function renderQualityButtons(downloadsObj) {
+        // Renders Single Combined Download Buttons per Season + Quality
+        function renderBatchQualityButtons(comboList) {
             const container = document.getElementById("qualityDownloadContainer");
             
-            if (!downloadsObj || typeof downloadsObj !== 'object' || Object.keys(downloadsObj).length === 0) {
-                container.innerHTML = `<p class="text-xs text-gray-500 text-center py-2">Download links abhi available nahi hain.</p>`;
-                return;
-            }
-
-            container.innerHTML = Object.entries(downloadsObj).map(([qualityLabel, link]) => {
-                if (!link || link === "#") return '';
+            container.innerHTML = comboList.map(combo => {
+                const [seasonName, quality] = combo.split('|');
                 
                 let btnColor = "bg-emerald-600 hover:bg-emerald-500 text-white";
-                if (qualityLabel.includes("720")) btnColor = "bg-blue-600 hover:bg-blue-500 text-white";
-                if (qualityLabel.includes("1080")) btnColor = "bg-purple-600 hover:bg-purple-500 text-white";
-                if (qualityLabel.includes("4k")) btnColor = "bg-amber-600 hover:bg-amber-500 text-white";
+                if (quality.includes("720")) btnColor = "bg-blue-600 hover:bg-blue-500 text-white";
+                if (quality.includes("1080")) btnColor = "bg-purple-600 hover:bg-purple-500 text-white";
+                if (quality.includes("4k")) btnColor = "bg-amber-600 hover:bg-amber-500 text-white";
 
                 return `
-                    <div class="flex items-center justify-between bg-gray-900 p-3 rounded-xl border border-gray-800">
+                    <div class="flex items-center justify-between bg-gray-900 p-3.5 rounded-xl border border-gray-800 shadow">
                         <div class="flex items-center gap-2">
-                            <i class="fa-solid fa-video text-[#66fcf1]"></i>
-                            <span class="text-xs font-bold text-white uppercase">${qualityLabel}</span>
+                            <i class="fa-solid fa-folder-closed text-[#66fcf1]"></i>
+                            <span class="text-xs font-extrabold text-white uppercase">${seasonName} (${quality.toUpperCase()})</span>
                         </div>
                         <a 
-                            href="ads1.html?anime=${rawSlug}&quality=${encodeURIComponent(qualityLabel)}" 
-                            onclick="handleAdRedirect(event, '${rawSlug}', '${encodeURIComponent(qualityLabel)}')"
+                            href="ads1.html?anime=${rawSlug}&season=${encodeURIComponent(seasonName)}&quality=${encodeURIComponent(quality)}" 
+                            onclick="handleAdRedirect(event, '${rawSlug}', '${encodeURIComponent(seasonName)}', '${encodeURIComponent(quality)}')"
                             class="${btnColor} font-extrabold text-xs px-5 py-2.5 rounded-lg transition shadow flex items-center gap-2"
                         >
                             <i class="fa-solid fa-download"></i> Fast Download
@@ -326,12 +333,12 @@
             }).join("");
         }
 
-        function handleAdRedirect(event, slug, quality) {
+        function handleAdRedirect(event, slug, season, quality) {
             event.preventDefault();
             if (SMART_LINK_AD_URL) {
                 window.open(SMART_LINK_AD_URL, '_blank');
             }
-            window.location.href = `ads1.html?anime=${slug}&quality=${quality}`;
+            window.location.href = `ads1.html?anime=${slug}&season=${season}&quality=${quality}`;
         }
 
         window.addEventListener("DOMContentLoaded", initPage);
