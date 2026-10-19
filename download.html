@@ -98,16 +98,18 @@
 
     <!-- ==================== FOOTER ==================== -->
     <footer class="bg-[#1f2833] border-t border-gray-800 text-center py-6 text-sm text-gray-400 mt-auto">
-        <p>© 2026 7anime Engine. Powered by Direct Database & Instant Cache Architecture.</p>
+        <p>© 2026 7anime Engine. Powered by Render Direct Downloader Backend.</p>
     </footer>
 
     <!-- Container for invisible background frames -->
     <div id="iframeContainer" style="display:none;"></div>
 
-    <!-- ==================== JS LOGIC (INSTANT CACHE READER) ==================== -->
+    <!-- ==================== JS LOGIC (RENDER BACKEND INTEGRATION) ==================== -->
     <script>
         let animeData = null;
         let currentSeason = "Season 1";
+
+        const RENDER_BACKEND_URL = "https://sevenanime-mgwx.onrender.com";
 
         const urlParams = new URLSearchParams(window.location.search);
         const animeSlug = urlParams.get('anime') || 'solo_leveling';
@@ -124,25 +126,55 @@
             return url;
         }
 
+        // Helper function to convert telegram raw links or message IDs into Render backend stream links
+        function processDownloadUrl(rawUrl) {
+            if (!rawUrl) return "#";
+            
+            // Agar link already http ya https se shuru hota hai (jaise direct web link), toh wahi rehne do
+            if (rawUrl.startsWith("http://") || rawUrl.startsWith("https://")) {
+                // Agar t.me link hai toh usko render backend me convert karne ki koshish karo
+                if (rawUrl.includes("t.me/")) {
+                    let parts = rawUrl.split("t.me/");
+                    if (parts.length > 1) {
+                        let subParts = parts[1].split("/");
+                        if (subParts.length >= 2) {
+                            let chatId = subParts[0];
+                            let msgId = subParts[1].split("?")[0];
+                            return `${RENDER_BACKEND_URL}/download/${chatId}/${msgId}`;
+                        }
+                    }
+                }
+                return rawUrl;
+            }
+
+            // Agar database me format "chat_id/message_id" ya sirf message ID hai
+            if (rawUrl.includes("/")) {
+                let [chatId, msgId] = rawUrl.split("/");
+                return `${RENDER_BACKEND_URL}/download/${chatId}/${msgId}`;
+            } else if (!isNaN(rawUrl)) {
+                // Default chat ID agar sirf message id ho (apne channel/group ke hisab se adjust kar sakte hain)
+                return `${RENDER_BACKEND_URL}/download/@7anime_backup/${rawUrl}`;
+            }
+
+            return rawUrl;
+        }
+
         async function initDownloader() {
             try {
                 let foundCardItem = null;
                 let downloads = null;
 
-                // Check if data was already pre-fetched in ads1.html (Instant 0ms load)
                 const cacheKey = `cache_7anime_${animeSlug}_${requestedQuality}`;
                 const cachedRaw = localStorage.getItem(cacheKey);
 
                 if (cachedRaw) {
                     const cachedData = JSON.parse(cachedRaw);
-                    // Check if cache is fresh (less than 10 minutes old)
                     if (cachedData && (Date.now() - cachedData.timestamp < 600000)) {
                         foundCardItem = cachedData.card;
                         downloads = cachedData.downloads;
                     }
                 }
 
-                // Fallback: If cache is missing, fetch normally in parallel
                 if (!downloads) {
                     let targetDbFile = dbFile || `anime_1_${requestedQuality}.json`;
                     const indexFiles = ['anime_index.json', 'movie_index.json', 'hantai_index.json'];
@@ -181,7 +213,6 @@
                     }
                 }
 
-                // Parse downloads into seasons map
                 let seasonsMap = {};
                 if (downloads) {
                     Object.keys(downloads).forEach(dlKey => {
@@ -202,7 +233,7 @@
                             seasonsMap[seasonName].push({
                                 ep: epNum,
                                 quality: epQuality,
-                                download_url: downloads[dlKey],
+                                download_url: processDownloadUrl(downloads[dlKey]),
                                 type: "official"
                             });
                         }
@@ -219,7 +250,6 @@
                     seasons: seasonsMap
                 };
 
-                // UI Updates
                 document.getElementById("animeTitle").innerText = animeData.title;
                 document.getElementById("watchNowBtn").href = `anime.html?anime=${animeSlug}`;
                 document.getElementById("navWatchLink").href = `anime.html?anime=${animeSlug}`;
