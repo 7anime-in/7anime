@@ -50,11 +50,12 @@
                 <div class="bg-gray-900/80 p-4 rounded-xl border border-gray-800 text-xs md:text-sm space-y-2">
                     <div class="grid grid-cols-2 gap-2">
                         <div><span class="text-gray-500 font-semibold">Status:</span> <span id="metaStatus" class="text-white font-medium">Completed</span></div>
-                        <div><span class="text-gray-500 font-semibold">Total Ep:</span> <span id="metaTotalEp" class="text-white font-medium">12</span></div>
+                        <div><span class="text-gray-500 font-semibold">Total Ep:</span> <span id="metaTotalEp" class="text-white font-medium">N/A</span></div>
+                        <div><span class="text-gray-500 font-semibold">Seasons:</span> <span id="metaSeasons" class="text-cyan-400 font-bold">Season 1</span></div>
                         <div><span class="text-gray-500 font-semibold">Audio:</span> <span id="metaAudio" class="text-white font-medium">Hindi + Japanese</span></div>
-                        <div><span class="text-gray-500 font-semibold">Quality:</span> <span class="text-amber-400 font-bold">480p, 720p, 1080p, 4k</span></div>
+                        <div><span class="text-gray-500 font-semibold">Quality:</span> <span id="metaQuality" class="text-amber-400 font-bold">480p, 720p</span></div>
                         <div><span class="text-gray-500 font-semibold">Studio:</span> <span id="metaStudio" class="text-white font-medium">N/A</span></div>
-                        <div><span class="text-gray-500 font-semibold">Rating:</span> <span id="badgeScore" class="text-amber-400 font-bold"><i class="fa-solid fa-star mr-1"></i>8.5</span></div>
+                        <div class="col-span-2"><span class="text-gray-500 font-semibold">Rating:</span> <span id="badgeScore" class="text-amber-400 font-bold"><i class="fa-solid fa-star mr-1"></i>8.5</span></div>
                     </div>
                 </div>
 
@@ -105,7 +106,7 @@
         <p>© 2026 7anime. Direct Telegram & Server Downloads.</p>
     </footer>
 
-    <!-- ==================== JS LOGIC (MASTER INDEX DRIVEN) ==================== -->
+    <!-- ==================== JS LOGIC ==================== -->
     <script>
         "use strict";
 
@@ -126,7 +127,6 @@
             return url;
         }
 
-        // 🔥 Direct Master Index Pointer Fetcher (No blind loops!)
         async function fetchAnimeViaMasterIndex() {
             let indexFilename = 'anime_index.json';
             if (categoryParam.includes('movie')) indexFilename = 'movie_index.json';
@@ -141,7 +141,6 @@
                 if (!entry) return null;
 
                 let cardDetails = null;
-                // Fetch exact card file specified in Master Index pointer
                 if (entry.card_file) {
                     try {
                         const cardRes = await fetch(`./${entry.card_file}?v=${Date.now()}`);
@@ -155,16 +154,20 @@
                     } catch (e) {}
                 }
 
-                // Fetch quality files pointers from entry.video_files
-                let videoFilesData = {};
-                let availableCombos = new Set();
+                let availableCombos = [];
+                let detectedQualities = new Set();
+                let detectedSeasons = new Set();
+                let maxEpisodes = 0;
+
                 let qualities = entry.qualities || Object.keys(entry.video_files || {});
 
                 for (let q of qualities) {
+                    detectedQualities.add(q.toUpperCase());
                     let vInfo = entry.video_files[q];
-                    let vFilename = typeof vInfo === 'string' ? vInfo : (vInfo ? vInfo.file : null);
+                    let vFilename = typeof vInfo === 'string' ? vInfo : (vInfo ? vInfo.file : 'N/A');
+                    let vLineNum = (vInfo && typeof vInfo === 'object') ? (vInfo.line || 1) : 1;
 
-                    if (vFilename) {
+                    if (vFilename && vFilename !== 'N/A') {
                         try {
                             const vRes = await fetch(`./${vFilename}?v=${Date.now()}`);
                             if (vRes.ok) {
@@ -172,17 +175,29 @@
                                 const vDict = vJson.cards || vJson;
                                 if (vDict[rawSlug]) {
                                     let item = vDict[rawSlug];
-                                    videoFilesData[q] = item;
                                     let downloads = item.downloads || {};
+
+                                    let epCount = Object.keys(downloads).length;
+                                    if (epCount > maxEpisodes) {
+                                        maxEpisodes = epCount;
+                                    }
 
                                     Object.keys(downloads).forEach(dlKey => {
                                         let sMatch = dlKey.match(/Season\s*(\d+)/i) || dlKey.match(/S(\d+)/i);
                                         let seasonNum = sMatch ? sMatch[1] : "1";
                                         let seasonStr = `Season ${seasonNum}`;
+                                        detectedSeasons.add(seasonStr);
+
                                         let qMatch = dlKey.match(/(480p|720p|1080p|4k)/i);
                                         let detectedQuality = qMatch ? qMatch[1].toLowerCase() : q;
+                                        detectedQualities.add(detectedQuality.toUpperCase());
 
-                                        availableCombos.add(`${seasonStr}|${detectedQuality}`);
+                                        availableCombos.push({
+                                            season: seasonStr,
+                                            quality: detectedQuality,
+                                            dbFile: vFilename,
+                                            lineNum: vLineNum
+                                        });
                                     });
                                 }
                             }
@@ -190,11 +205,20 @@
                     }
                 }
 
+                // Fallback to master index entry seasons if empty
+                if (detectedSeasons.size === 0 && entry.seasons) {
+                    entry.seasons.forEach(s => detectedSeasons.add(s));
+                }
+                if (detectedSeasons.size === 0) {
+                    detectedSeasons.add("Season 1");
+                }
+
                 return {
                     card: cardDetails || { title: rawSlug.replace(/_/g, ' ').toUpperCase() },
-                    combos: Array.from(availableCombos),
-                    videoFiles: videoFilesData,
-                    seasons: entry.seasons || ["Season 1"]
+                    combos: availableCombos,
+                    qualities: Array.from(detectedQualities),
+                    seasons: Array.from(detectedSeasons),
+                    totalEpisodes: maxEpisodes > 0 ? maxEpisodes : (cardDetails?.total_episodes || cardDetails?.episodes || "12")
                 };
 
             } catch (err) {
@@ -208,16 +232,22 @@
 
                 if (masterResult && masterResult.card) {
                     animeData = masterResult.card;
+                    animeData.dynamicSeasons = masterResult.seasons;
+                    animeData.dynamicQualities = masterResult.qualities;
+                    animeData.dynamicTotalEp = masterResult.totalEpisodes;
+
                     populateUI(animeData);
                     renderScreenshots(animeData.screenshots || animeData.images || animeData.ss);
 
                     let combos = masterResult.combos;
                     if (combos.length === 0) {
-                        combos = ["Season 1|480p", "Season 1|720p", "Season 1|1080p"];
+                        combos = [
+                            { season: "Season 1", quality: "480p", dbFile: "anime_1_480p.json", lineNum: 1 },
+                            { season: "Season 1", quality: "720p", dbFile: "anime_1_720p.json", lineNum: 1 }
+                        ];
                     }
                     renderBatchQualityButtons(combos);
                 } else {
-                    // Fallback demo data if slug not found in master index
                     animeData = {
                         title: rawSlug.replace(/_/g, ' ').toUpperCase(),
                         japanese_title: "Japanese Title Preview",
@@ -230,10 +260,15 @@
                         score: "8.5",
                         format: "MKV / WEB-DL",
                         audio_language: "Dual Audio [Hindi Org + Japanese]",
-                        screenshots: []
+                        screenshots: [],
+                        dynamicSeasons: ["Season 1"],
+                        dynamicQualities: ["480p", "720p"],
+                        dynamicTotalEp: "12"
                     };
                     populateUI(animeData);
-                    renderBatchQualityButtons(["Season 1|480p", "Season 1|720p"]);
+                    renderBatchQualityButtons([
+                        { season: "Season 1", quality: "480p", dbFile: "anime_1_480p.json", lineNum: 1 }
+                    ]);
                 }
 
             } catch (err) {
@@ -252,7 +287,20 @@
 
             if (info.synopsis || info.description) document.getElementById("animeSynopsis").textContent = info.synopsis || info.description;
             if (info.status) document.getElementById("metaStatus").textContent = info.status;
-            if (info.total_episodes || info.episodes) document.getElementById("metaTotalEp").textContent = info.total_episodes || info.episodes;
+            
+            // Dynamic Total Episodes
+            document.getElementById("metaTotalEp").textContent = info.dynamicTotalEp || info.total_episodes || info.episodes || "12";
+
+            // Dynamic Seasons
+            if (info.dynamicSeasons && info.dynamicSeasons.length > 0) {
+                document.getElementById("metaSeasons").textContent = info.dynamicSeasons.join(", ");
+            }
+
+            // Dynamic Qualities
+            if (info.dynamicQualities && info.dynamicQualities.length > 0) {
+                document.getElementById("metaQuality").textContent = info.dynamicQualities.join(", ");
+            }
+
             if (info.studio || info.studios) document.getElementById("metaStudio").textContent = info.studio || info.studios;
             if (info.score || info.rating) document.getElementById("badgeScore").innerHTML = `<i class="fa-solid fa-star mr-1"></i>${info.score || info.rating}`;
 
@@ -263,19 +311,32 @@
                 document.getElementById("infoLangType").textContent = info.audio_language || info.language || info.audio;
             }
 
-            const genresArr = info.genres || info.genre || ["Action", "Fantasy"];
-            const genresContainer = document.getElementById("animeGenresContainer");
-            if (genresArr) {
-                if (typeof genresArr === 'string') {
-                    genresContainer.innerHTML = genresArr.split(',').map(g => `
-                        <span class="bg-gray-800 text-gray-300 text-[11px] px-2.5 py-0.5 rounded-full border border-gray-700">${g.trim()}</span>
-                    `).join("");
-                } else if (Array.isArray(genresArr)) {
-                    genresContainer.innerHTML = genresArr.map(g => `
-                        <span class="bg-gray-800 text-gray-300 text-[11px] px-2.5 py-0.5 rounded-full border border-gray-700">${g.trim()}</span>
-                    `).join("");
+            // Robust Genre Parsing (Checks genres, genre, ganr, or extracts from synopsis)[span_3](start_span)[span_3](end_span)
+            let genresRaw = info.genres || info.genre || info.ganr;
+            let genresArray = [];
+
+            if (typeof genresRaw === 'string') {
+                genresArray = genresRaw.split(',').map(g => g.trim()).filter(g => g.length > 0);
+            } else if (Array.isArray(genresRaw)) {
+                genresArray = genresRaw.map(g => typeof g === 'string' ? g.trim() : '').filter(g => g.length > 0);
+            }
+
+            if (genresArray.length === 0 && (info.synopsis || info.description)) {
+                let syn = info.synopsis || info.description;
+                let match = syn.match(/Ganr\s*[:-]\s*([^\n]+)/i);
+                if (match && match[1]) {
+                    genresArray = match[1].split(',').map(g => g.trim()).filter(g => g.length > 0);
                 }
             }
+
+            if (genresArray.length === 0) {
+                genresArray = ["Action", "Fantasy"];
+            }
+
+            const genresContainer = document.getElementById("animeGenresContainer");
+            genresContainer.innerHTML = genresArray.map(g => `
+                <span class="bg-gray-800 text-gray-300 text-[11px] px-2.5 py-0.5 rounded-full border border-gray-700">${g}</span>
+            `).join("");
         }
 
         function renderScreenshots(ssList) {
@@ -297,7 +358,10 @@
             const container = document.getElementById("qualityDownloadContainer");
             
             container.innerHTML = comboList.map(combo => {
-                const [seasonName, quality] = combo.split('|');
+                const seasonName = combo.season;
+                const quality = combo.quality;
+                const dbFile = combo.dbFile;
+                const lineNum = combo.lineNum;
                 
                 let btnColor = "bg-emerald-600 hover:bg-emerald-500 text-white";
                 if (quality.includes("720")) btnColor = "bg-blue-600 hover:bg-blue-500 text-white";
@@ -311,8 +375,8 @@
                             <span class="text-xs font-extrabold text-white uppercase">${seasonName} (${quality.toUpperCase()})</span>
                         </div>
                         <a 
-                            href="ads1.html?anime=${rawSlug}&season=${encodeURIComponent(seasonName)}&quality=${encodeURIComponent(quality)}" 
-                            onclick="handleAdRedirect(event, '${rawSlug}', '${encodeURIComponent(seasonName)}', '${encodeURIComponent(quality)}')"
+                            href="ads1.html?anime=${rawSlug}&season=${encodeURIComponent(seasonName)}&quality=${encodeURIComponent(quality)}&db=${encodeURIComponent(dbFile)}&line=${lineNum}" 
+                            onclick="handleAdRedirect(event, '${rawSlug}', '${encodeURIComponent(seasonName)}', '${encodeURIComponent(quality)}', '${encodeURIComponent(dbFile)}', '${lineNum}')"
                             class="${btnColor} font-extrabold text-xs px-5 py-2.5 rounded-lg transition shadow flex items-center gap-2"
                         >
                             <i class="fa-solid fa-download"></i> Fast Download
@@ -322,12 +386,12 @@
             }).join("");
         }
 
-        function handleAdRedirect(event, slug, season, quality) {
+        function handleAdRedirect(event, slug, season, quality, dbFile, lineNum) {
             event.preventDefault();
             if (SMART_LINK_AD_URL) {
                 window.open(SMART_LINK_AD_URL, '_blank');
             }
-            window.location.href = `ads1.html?anime=${slug}&season=${season}&quality=${quality}`;
+            window.location.href = `ads1.html?anime=${slug}&season=${season}&quality=${quality}&db=${dbFile}&line=${lineNum}`;
         }
 
         window.addEventListener("DOMContentLoaded", initPage);
