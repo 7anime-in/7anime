@@ -85,9 +85,15 @@
 
         const urlParams = new URLSearchParams(window.location.search);
         const animeSlug = urlParams.get('anime') || 'solo_leveling';
-        const quality = urlParams.get('quality') || '720p';
+        const seasonParam = urlParams.get('season') || 'Season 1';
+        const qualityParam = urlParams.get('quality') || '720p';
+        const dbParam = urlParams.get('db') || '';
+        const lineParam = urlParams.get('line') || '';
 
-        const targetDownloadUrl = `download.html?anime=${animeSlug}&quality=${quality}`;
+        // FIXED: Passing all parameters including db and line dynamically to download.html[span_2](start_span)[span_2](end_span)
+        let targetDownloadUrl = `download.html?anime=${encodeURIComponent(animeSlug)}&season=${encodeURIComponent(seasonParam)}&quality=${encodeURIComponent(qualityParam)}`;
+        if (dbParam) targetDownloadUrl += `&db=${encodeURIComponent(dbParam)}`;
+        if (lineParam) targetDownloadUrl += `&line=${encodeURIComponent(lineParam)}`;
 
         function startVerification() {
             // Hide verify button, show timer box
