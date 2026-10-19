@@ -159,9 +159,9 @@
             return foundItem;
         }
 
-        // Fetch available qualities and seasons instead of individual episode links
+        // FIXED: Extract seasons directly from download keys in DB (Supports Season 1, Season 2, etc.)
         async function fetchAvailableQualitiesAndSeasons() {
-            let detectedCombos = new Set(); // Grouping unique Season + Quality combinations
+            let detectedCombos = new Set();
             let fetchPromises = [];
 
             dbCategories.forEach(cat => {
@@ -180,14 +180,17 @@
                                                 let item = cards[slugKey];
                                                 let downloads = item.downloads || {};
                                                 
-                                                // Extract Season numbers or default to Season 1
-                                                let title = item.title || "";
-                                                let seasonMatch = title.match(/S(\d+)/i) || title.match(/Season\s*(\d+)/i);
-                                                let seasonStr = seasonMatch ? `Season ${seasonMatch[1]}` : "Season 1";
+                                                // Scan all download keys to find Season numbers (e.g. "Season 2 - 480p - Ep 1")[span_3](start_span)[span_3](end_span)
+                                                Object.keys(downloads).forEach(dlKey => {
+                                                    let sMatch = dlKey.match(/Season\s*(\d+)/i) || dlKey.match(/S(\d+)/i);
+                                                    let seasonNum = sMatch ? sMatch[1] : "1";
+                                                    let seasonStr = `Season ${seasonNum}`;
+                                                    
+                                                    let qMatch = dlKey.match(/(480p|720p|1080p|4k)/i);
+                                                    let detectedQuality = qMatch ? qMatch[1].toLowerCase() : q;
 
-                                                if (Object.keys(downloads).length > 0) {
-                                                    detectedCombos.add(`${seasonStr}|${q}`);
-                                                }
+                                                    detectedCombos.add(`${seasonStr}|${detectedQuality}`);
+                                                });
                                             }
                                         });
                                     }
@@ -236,10 +239,8 @@
                 populateUI(animeData);
                 renderScreenshots(animeData.screenshots || animeData.images || animeData.ss);
 
-                // Detect seasons and qualities from DB
                 let availableCombos = await fetchAvailableQualitiesAndSeasons();
                 
-                // Fallback buttons if database is still empty
                 if (availableCombos.length === 0) {
                     availableCombos = ["Season 1|480p", "Season 1|720p", "Season 1|1080p"];
                 }
@@ -303,7 +304,6 @@
             `).join("");
         }
 
-        // Renders Single Combined Download Buttons per Season + Quality
         function renderBatchQualityButtons(comboList) {
             const container = document.getElementById("qualityDownloadContainer");
             
