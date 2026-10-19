@@ -95,7 +95,6 @@
                 </p>
             </div>
 
-            <!-- Season and Quality Download Buttons Container -->
             <div id="qualityDownloadContainer" class="space-y-3">
             </div>
         </div>
@@ -106,6 +105,7 @@
         <p>© 2026 7anime. Direct Telegram & Server Downloads.</p>
     </footer>
 
+    <!-- ==================== JS LOGIC (MASTER INDEX DRIVEN) ==================== -->
     <script>
         "use strict";
 
@@ -114,12 +114,8 @@
 
         const urlParams = new URLSearchParams(window.location.search);
         const rawSlug = urlParams.get('anime') || 'solo_leveling';
-        const animeSlugUpper = rawSlug.toUpperCase();
-        const animeSlugLower = rawSlug.toLowerCase();
-
-        const cardPrefixes = ["ANIME", "MOVIE", "HANTAI"];
-        const dbCategories = ["anime", "movie", "hantai", "18pulse", "animemovie", "animeseries", "animehatai", "series"];
-        const qualityTypes = ["480p", "720p", "1080p", "4k"];
+        const categoryParam = (urlParams.get('cat') || 'series').toLowerCase();
+        const lineParam = urlParams.get('line');
 
         function formatImageUrl(url) {
             if (!url) return "https://via.placeholder.com/200x300?text=7anime";
@@ -130,122 +126,115 @@
             return url;
         }
 
-        async function fetchAnimeFromCardDatabases() {
-            let foundItem = null;
-            let fetchPromises = [];
+        // 🔥 Direct Master Index Pointer Fetcher (No blind loops!)
+        async function fetchAnimeViaMasterIndex() {
+            let indexFilename = 'anime_index.json';
+            if (categoryParam.includes('movie')) indexFilename = 'movie_index.json';
+            else if (categoryParam.includes('hentai') || categoryParam.includes('18') || categoryParam.includes('hatai') || categoryParam.includes('pulse')) indexFilename = 'hantai_index.json';
 
-            cardPrefixes.forEach(prefix => {
-                for (let index = 1; index <= 15; index++) {
-                    const jsonFilename = `${prefix}_${index}.JSON`;
-                    fetchPromises.push(
-                        fetch(`./${jsonFilename}?v=${Date.now()}`)
-                            .then(res => res.ok ? res.json() : null)
-                            .then(data => {
-                                if (!data) return;
-                                let cards = data.cards || data;
-                                if (cards && typeof cards === 'object') {
-                                    Object.keys(cards).forEach(slugKey => {
-                                        if (slugKey.toUpperCase() === animeSlugUpper || slugKey.toLowerCase() === animeSlugLower) {
-                                            foundItem = cards[slugKey];
-                                        }
+            try {
+                const idxRes = await fetch(`./${indexFilename}?v=${Date.now()}`);
+                if (!idxRes.ok) throw new Error("Index not found");
+                const indexJson = await idxRes.json();
+
+                const entry = indexJson[rawSlug];
+                if (!entry) return null;
+
+                let cardDetails = null;
+                // Fetch exact card file specified in Master Index pointer
+                if (entry.card_file) {
+                    try {
+                        const cardRes = await fetch(`./${entry.card_file}?v=${Date.now()}`);
+                        if (cardRes.ok) {
+                            const cardJson = await cardRes.json();
+                            const cardsDict = cardJson.cards || cardJson;
+                            if (cardsDict[rawSlug]) {
+                                cardDetails = cardsDict[rawSlug];
+                            }
+                        }
+                    } catch (e) {}
+                }
+
+                // Fetch quality files pointers from entry.video_files
+                let videoFilesData = {};
+                let availableCombos = new Set();
+                let qualities = entry.qualities || Object.keys(entry.video_files || {});
+
+                for (let q of qualities) {
+                    let vInfo = entry.video_files[q];
+                    let vFilename = typeof vInfo === 'string' ? vInfo : (vInfo ? vInfo.file : null);
+
+                    if (vFilename) {
+                        try {
+                            const vRes = await fetch(`./${vFilename}?v=${Date.now()}`);
+                            if (vRes.ok) {
+                                const vJson = await vRes.json();
+                                const vDict = vJson.cards || vJson;
+                                if (vDict[rawSlug]) {
+                                    let item = vDict[rawSlug];
+                                    videoFilesData[q] = item;
+                                    let downloads = item.downloads || {};
+
+                                    Object.keys(downloads).forEach(dlKey => {
+                                        let sMatch = dlKey.match(/Season\s*(\d+)/i) || dlKey.match(/S(\d+)/i);
+                                        let seasonNum = sMatch ? sMatch[1] : "1";
+                                        let seasonStr = `Season ${seasonNum}`;
+                                        let qMatch = dlKey.match(/(480p|720p|1080p|4k)/i);
+                                        let detectedQuality = qMatch ? qMatch[1].toLowerCase() : q;
+
+                                        availableCombos.add(`${seasonStr}|${detectedQuality}`);
                                     });
                                 }
-                            }).catch(() => {})
-                    );
+                            }
+                        } catch (e) {}
+                    }
                 }
-            });
 
-            await Promise.all(fetchPromises);
-            return foundItem;
-        }
+                return {
+                    card: cardDetails || { title: rawSlug.replace(/_/g, ' ').toUpperCase() },
+                    combos: Array.from(availableCombos),
+                    videoFiles: videoFilesData,
+                    seasons: entry.seasons || ["Season 1"]
+                };
 
-        // FIXED: Extract seasons directly from download keys in DB (Supports Season 1, Season 2, etc.)
-        async function fetchAvailableQualitiesAndSeasons() {
-            let detectedCombos = new Set();
-            let fetchPromises = [];
-
-            dbCategories.forEach(cat => {
-                for (let index = 1; index <= 15; index++) {
-                    qualityTypes.forEach(q => {
-                        const jsonFilename = `${cat.toLowerCase()}_${index}_${q.toLowerCase()}.json`;
-                        fetchPromises.push(
-                            fetch(`./${jsonFilename}?v=${Date.now()}`)
-                                .then(res => res.ok ? res.json() : null)
-                                .then(data => {
-                                    if (!data) return;
-                                    let cards = data.cards || data;
-                                    if (cards && typeof cards === 'object') {
-                                        Object.keys(cards).forEach(slugKey => {
-                                            if (slugKey.toUpperCase() === animeSlugUpper || slugKey.toLowerCase() === animeSlugLower) {
-                                                let item = cards[slugKey];
-                                                let downloads = item.downloads || {};
-                                                
-                                                // Scan all download keys to find Season numbers (e.g. "Season 2 - 480p - Ep 1")[span_3](start_span)[span_3](end_span)
-                                                Object.keys(downloads).forEach(dlKey => {
-                                                    let sMatch = dlKey.match(/Season\s*(\d+)/i) || dlKey.match(/S(\d+)/i);
-                                                    let seasonNum = sMatch ? sMatch[1] : "1";
-                                                    let seasonStr = `Season ${seasonNum}`;
-                                                    
-                                                    let qMatch = dlKey.match(/(480p|720p|1080p|4k)/i);
-                                                    let detectedQuality = qMatch ? qMatch[1].toLowerCase() : q;
-
-                                                    detectedCombos.add(`${seasonStr}|${detectedQuality}`);
-                                                });
-                                            }
-                                        });
-                                    }
-                                }).catch(() => {})
-                        );
-                    });
-                }
-            });
-
-            await Promise.all(fetchPromises);
-            return Array.from(detectedCombos);
+            } catch (err) {
+                return null;
+            }
         }
 
         async function initPage() {
             try {
-                animeData = await fetchAnimeFromCardDatabases();
+                let masterResult = await fetchAnimeViaMasterIndex();
 
-                if (!animeData) {
-                    let res = await fetch(`./sitevideo_data.json?v=${Date.now()}`).catch(()=>{});
-                    if (res && res.ok) {
-                        let data = await res.json();
-                        let cards = data.cards || data;
-                        if (cards && cards[rawSlug]) {
-                            animeData = cards[rawSlug];
-                        }
+                if (masterResult && masterResult.card) {
+                    animeData = masterResult.card;
+                    populateUI(animeData);
+                    renderScreenshots(animeData.screenshots || animeData.images || animeData.ss);
+
+                    let combos = masterResult.combos;
+                    if (combos.length === 0) {
+                        combos = ["Season 1|480p", "Season 1|720p", "Season 1|1080p"];
                     }
-                }
-
-                if (!animeData) {
+                    renderBatchQualityButtons(combos);
+                } else {
+                    // Fallback demo data if slug not found in master index
                     animeData = {
                         title: rawSlug.replace(/_/g, ' ').toUpperCase(),
                         japanese_title: "Japanese Title Preview",
                         poster: "https://via.placeholder.com/200x300?text=7anime",
-                        synopsis: "Demo Synopsis...",
-                        genres: ["Action", "Fantasy", "Animation"],
+                        synopsis: "Master index entry not found for this slug.",
+                        genres: ["Action", "Fantasy"],
                         status: "Completed",
                         total_episodes: "12",
                         studio: "Studio Animation",
-                        score: "8.8",
+                        score: "8.5",
                         format: "MKV / WEB-DL",
                         audio_language: "Dual Audio [Hindi Org + Japanese]",
                         screenshots: []
                     };
+                    populateUI(animeData);
+                    renderBatchQualityButtons(["Season 1|480p", "Season 1|720p"]);
                 }
-
-                populateUI(animeData);
-                renderScreenshots(animeData.screenshots || animeData.images || animeData.ss);
-
-                let availableCombos = await fetchAvailableQualitiesAndSeasons();
-                
-                if (availableCombos.length === 0) {
-                    availableCombos = ["Season 1|480p", "Season 1|720p", "Season 1|1080p"];
-                }
-
-                renderBatchQualityButtons(availableCombos);
 
             } catch (err) {
                 console.error("Critical initialization error:", err);
