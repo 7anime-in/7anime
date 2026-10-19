@@ -106,7 +106,7 @@
         <p>© 2026 7anime. Direct Telegram & Server Downloads.</p>
     </footer>
 
-    <!-- ==================== JS LOGIC ==================== -->
+    <!-- ==================== JS LOGIC (FULLY AUTOMATIC MULTI-ANIME POINTER RESOLUTION) ==================== -->
     <script>
         "use strict";
 
@@ -115,7 +115,6 @@
 
         const urlParams = new URLSearchParams(window.location.search);
         const rawSlug = urlParams.get('anime') || 'solo_leveling';
-        const categoryParam = (urlParams.get('cat') || 'series').toLowerCase();
 
         function formatImageUrl(url) {
             if (!url) return "https://via.placeholder.com/200x300?text=7anime";
@@ -127,103 +126,105 @@
         }
 
         async function fetchAnimeViaMasterIndex() {
-            let indexFilename = 'anime_index.json';
-            if (categoryParam.includes('movie')) indexFilename = 'movie_index.json';
-            else if (categoryParam.includes('hentai') || categoryParam.includes('18') || categoryParam.includes('hatai') || categoryParam.includes('pulse')) indexFilename = 'hantai_index.json';
+            const indexFiles = ['anime_index.json', 'movie_index.json', 'hantai_index.json'];
+            let entry = null;
 
-            try {
-                const idxRes = await fetch(`./${indexFilename}?v=${Date.now()}`);
-                if (!idxRes.ok) throw new Error("Index not found");
-                const indexJson = await idxRes.json();
+            for (let idxFile of indexFiles) {
+                try {
+                    const res = await fetch(`./${idxFile}?v=${Date.now()}`);
+                    if (res.ok) {
+                        const json = await res.json();
+                        if (json[rawSlug]) {
+                            entry = json[rawSlug];
+                            break;
+                        }
+                    }
+                } catch (e) {}
+            }
 
-                const entry = indexJson[rawSlug];
-                if (!entry) return null;
+            if (!entry) return null;
 
-                let cardDetails = null;
-                if (entry.card_file) {
+            let cardDetails = null;
+            if (entry.card_file) {
+                try {
+                    const cardRes = await fetch(`./${entry.card_file}?v=${Date.now()}`);
+                    if (cardRes.ok) {
+                        const cardJson = await cardRes.json();
+                        const cardsDict = cardJson.cards || cardJson;
+                        if (cardsDict[rawSlug]) {
+                            cardDetails = cardsDict[rawSlug];
+                        }
+                    }
+                } catch (e) {}
+            }
+
+            let uniqueCombosMap = new Map();
+            let detectedQualities = new Set();
+            let detectedSeasons = new Set();
+            let maxEpisodes = 0;
+
+            let qualities = entry.qualities || Object.keys(entry.video_files || {});
+
+            for (let q of qualities) {
+                let vInfo = entry.video_files[q];
+                let vFilename = typeof vInfo === 'string' ? vInfo : (vInfo ? vInfo.file : 'N/A');
+                let vLineNum = (vInfo && typeof vInfo === 'object') ? (vInfo.line || 1) : 1;
+
+                if (vFilename && vFilename !== 'N/A') {
                     try {
-                        const cardRes = await fetch(`./${entry.card_file}?v=${Date.now()}`);
-                        if (cardRes.ok) {
-                            const cardJson = await cardRes.json();
-                            const cardsDict = cardJson.cards || cardJson;
-                            if (cardsDict[rawSlug]) {
-                                cardDetails = cardsDict[rawSlug];
+                        const vRes = await fetch(`./${vFilename}?v=${Date.now()}`);
+                        if (vRes.ok) {
+                            const vJson = await vRes.json();
+                            const vDict = vJson.cards || vJson;
+                            if (vDict[rawSlug]) {
+                                let item = vDict[rawSlug];
+                                let downloads = item.downloads || {};
+
+                                let epCount = Object.keys(downloads).length;
+                                if (epCount > maxEpisodes) {
+                                    maxEpisodes = epCount;
+                                }
+
+                                Object.keys(downloads).forEach(dlKey => {
+                                    let sMatch = dlKey.match(/Season\s*(\d+)/i) || dlKey.match(/S(\d+)/i);
+                                    let seasonNum = sMatch ? sMatch[1] : "1";
+                                    let seasonStr = `Season ${seasonNum}`;
+                                    detectedSeasons.add(seasonStr);
+
+                                    let qMatch = dlKey.match(/(480p|720p|1080p|4k)/i);
+                                    let detectedQuality = qMatch ? qMatch[1].toLowerCase() : q;
+                                    detectedQualities.add(detectedQuality.toUpperCase());
+
+                                    let comboKey = `${seasonStr}|${detectedQuality}`;
+                                    if (!uniqueCombosMap.has(comboKey)) {
+                                        uniqueCombosMap.set(comboKey, {
+                                            season: seasonStr,
+                                            quality: detectedQuality,
+                                            dbFile: vFilename,
+                                            lineNum: vLineNum
+                                        });
+                                    }
+                                });
                             }
                         }
                     } catch (e) {}
                 }
-
-                let uniqueCombosMap = new Map();
-                let detectedQualities = new Set();
-                let detectedSeasons = new Set();
-                let maxEpisodes = 0;
-
-                let qualities = entry.qualities || Object.keys(entry.video_files || {});
-
-                for (let q of qualities) {
-                    let vInfo = entry.video_files[q];
-                    let vFilename = typeof vInfo === 'string' ? vInfo : (vInfo ? vInfo.file : 'N/A');
-                    let vLineNum = (vInfo && typeof vInfo === 'object') ? (vInfo.line || 1) : 1;
-
-                    if (vFilename && vFilename !== 'N/A') {
-                        try {
-                            const vRes = await fetch(`./${vFilename}?v=${Date.now()}`);
-                            if (vRes.ok) {
-                                const vJson = await vRes.json();
-                                const vDict = vJson.cards || vJson;
-                                if (vDict[rawSlug]) {
-                                    let item = vDict[rawSlug];
-                                    let downloads = item.downloads || {};
-
-                                    let epCount = Object.keys(downloads).length;
-                                    if (epCount > maxEpisodes) {
-                                        maxEpisodes = epCount;
-                                    }
-
-                                    Object.keys(downloads).forEach(dlKey => {
-                                        let sMatch = dlKey.match(/Season\s*(\d+)/i) || dlKey.match(/S(\d+)/i);
-                                        let seasonNum = sMatch ? sMatch[1] : "1";
-                                        let seasonStr = `Season ${seasonNum}`;
-                                        detectedSeasons.add(seasonStr);
-
-                                        let qMatch = dlKey.match(/(480p|720p|1080p|4k)/i);
-                                        let detectedQuality = qMatch ? qMatch[1].toLowerCase() : q;
-                                        detectedQualities.add(detectedQuality.toUpperCase());
-
-                                        let comboKey = `${seasonStr}|${detectedQuality}`;
-                                        if (!uniqueCombosMap.has(comboKey)) {
-                                            uniqueCombosMap.set(comboKey, {
-                                                season: seasonStr,
-                                                quality: detectedQuality,
-                                                dbFile: vFilename,
-                                                lineNum: vLineNum
-                                            });
-                                        }
-                                    });
-                                }
-                            }
-                        } catch (e) {}
-                    }
-                }
-
-                if (detectedSeasons.size === 0 && entry.seasons) {
-                    entry.seasons.forEach(s => detectedSeasons.add(s));
-                }
-                if (detectedSeasons.size === 0) {
-                    detectedSeasons.add("Season 1");
-                }
-
-                return {
-                    card: cardDetails || { title: rawSlug.replace(/_/g, ' ').toUpperCase() },
-                    combos: Array.from(uniqueCombosMap.values()),
-                    qualities: Array.from(detectedQualities),
-                    seasons: Array.from(detectedSeasons),
-                    totalEpisodes: maxEpisodes > 0 ? maxEpisodes : (cardDetails?.total_episodes || cardDetails?.episodes || "12")
-                };
-
-            } catch (err) {
-                return null;
             }
+
+            if (detectedSeasons.size === 0 && entry.seasons) {
+                entry.seasons.forEach(s => detectedSeasons.add(s));
+            }
+            if (detectedSeasons.size === 0) {
+                detectedSeasons.add("Season 1");
+            }
+
+            return {
+                card: cardDetails || { title: rawSlug.replace(/_/g, ' ').toUpperCase() },
+                combos: Array.from(uniqueCombosMap.values()),
+                qualities: Array.from(detectedQualities),
+                seasons: Array.from(detectedSeasons),
+                totalEpisodes: maxEpisodes > 0 ? maxEpisodes : (cardDetails?.total_episodes || cardDetails?.episodes || "12")
+            };
         }
 
         async function initPage() {
