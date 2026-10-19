@@ -98,13 +98,13 @@
 
     <!-- ==================== FOOTER ==================== -->
     <footer class="bg-[#1f2833] border-t border-gray-800 text-center py-6 text-sm text-gray-400 mt-auto">
-        <p>© 2026 7anime Engine. Powered by Direct Database & Pointer Architecture.</p>
+        <p>© 2026 7anime Engine. Powered by Direct Database & Instant Cache Architecture.</p>
     </footer>
 
     <!-- Container for invisible background frames -->
     <div id="iframeContainer" style="display:none;"></div>
 
-    <!-- ==================== JS LOGIC ==================== -->
+    <!-- ==================== JS LOGIC (INSTANT CACHE READER) ==================== -->
     <script>
         let animeData = null;
         let currentSeason = "Season 1";
@@ -114,7 +114,6 @@
         const requestedSeason = urlParams.get('season') || 'Season 1';
         const requestedQuality = (urlParams.get('quality') || '480p').toLowerCase();
         const dbFile = urlParams.get('db');
-        const lineParam = urlParams.get('line');
 
         function formatImageUrl(url) {
             if (!url) return "https://via.placeholder.com/300x420?text=7anime";
@@ -128,118 +127,86 @@
         async function initDownloader() {
             try {
                 let foundCardItem = null;
-                let foundVideoItem = null;
+                let downloads = null;
 
-                const indexFiles = ['anime_index.json', 'movie_index.json', 'hantai_index.json'];
-                let entry = null;
+                // Check if data was already pre-fetched in ads1.html (Instant 0ms load)
+                const cacheKey = `cache_7anime_${animeSlug}_${requestedQuality}`;
+                const cachedRaw = localStorage.getItem(cacheKey);
 
-                for (let idxFile of indexFiles) {
-                    try {
-                        const res = await fetch(`./${idxFile}?v=${Date.now()}`);
-                        if (res.ok) {
-                            const json = await res.json();
-                            if (json[animeSlug]) {
-                                entry = json[animeSlug];
-                                break;
-                            }
-                        }
-                    } catch (e) {}
+                if (cachedRaw) {
+                    const cachedData = JSON.parse(cachedRaw);
+                    // Check if cache is fresh (less than 10 minutes old)
+                    if (cachedData && (Date.now() - cachedData.timestamp < 600000)) {
+                        foundCardItem = cachedData.card;
+                        downloads = cachedData.downloads;
+                    }
                 }
 
-                if (entry && entry.card_file) {
-                    try {
-                        const cardRes = await fetch(`./${entry.card_file}?v=${Date.now()}`);
-                        if (cardRes.ok) {
-                            const cardJson = await cardRes.json();
-                            const cardsDict = cardJson.cards || cardJson;
-                            if (cardsDict[animeSlug]) {
-                                foundCardItem = cardsDict[animeSlug];
-                            }
-                        }
-                    } catch (e) {}
-                }
+                // Fallback: If cache is missing, fetch normally in parallel
+                if (!downloads) {
+                    let targetDbFile = dbFile || `anime_1_${requestedQuality}.json`;
+                    const indexFiles = ['anime_index.json', 'movie_index.json', 'hantai_index.json'];
+                    let cardFileToFetch = null;
 
-                let targetDbFile = dbFile;
-                if (!targetDbFile && entry && entry.video_files) {
-                    let vInfo = entry.video_files[requestedQuality] || entry.video_files[Object.keys(entry.video_files)[0]];
-                    targetDbFile = typeof vInfo === 'string' ? vInfo : (vInfo ? vInfo.file : null);
-                }
-
-                let seasonsMap = {};
-
-                if (targetDbFile) {
-                    try {
-                        const vRes = await fetch(`./${targetDbFile}?v=${Date.now()}`);
-                        if (vRes.ok) {
-                            const vJson = await vRes.json();
-                            const vDict = vJson.cards || vJson;
-                            if (vDict[animeSlug]) {
-                                foundVideoItem = vDict[animeSlug];
-                                const downloads = foundVideoItem.downloads || {};
-
-                                Object.keys(downloads).forEach(dlKey => {
-                                    let sMatch = dlKey.match(/Season\s*(\d+)/i) || dlKey.match(/S(\d+)/i);
-                                    let seasonName = sMatch ? `Season ${sMatch[1]}` : "Season 1";
-                                    
-                                    let epMatch = dlKey.match(/Ep\s*(\d+)/i) || dlKey.match(/Episode\s*(\d+)/i) || dlKey.match(/-\s*(\d+)$/);
-                                    let epNum = epMatch ? parseInt(epMatch[1]) : 1;
-
-                                    let qMatch = dlKey.match(/(480p|720p|1080p|4k)/i);
-                                    let epQuality = qMatch ? qMatch[1].toLowerCase() : requestedQuality;
-
-                                    if (!seasonsMap[seasonName]) {
-                                        seasonsMap[seasonName] = [];
-                                    }
-
-                                    if (!seasonsMap[seasonName].some(e => e.ep === epNum && e.quality === epQuality)) {
-                                        seasonsMap[seasonName].push({
-                                            ep: epNum,
-                                            quality: epQuality,
-                                            download_url: downloads[dlKey],
-                                            type: "official"
-                                        });
-                                    }
-                                });
-                            }
-                        }
-                    } catch (e) {}
-                }
-
-                if (Object.keys(seasonsMap).length === 0 && entry && entry.video_files) {
-                    for (let qKey of Object.keys(entry.video_files)) {
-                        let info = entry.video_files[qKey];
-                        let file = typeof info === 'string' ? info : info.file;
-                        if (!file) continue;
+                    for (let idxFile of indexFiles) {
                         try {
-                            let res = await fetch(`./${file}?v=${Date.now()}`);
+                            const res = await fetch(`./${idxFile}?v=${Date.now()}`);
                             if (res.ok) {
-                                let j = await res.json();
-                                let dict = j.cards || j;
-                                if (dict[animeSlug]) {
-                                    let item = dict[animeSlug];
-                                    let dls = item.downloads || {};
-                                    Object.keys(dls).forEach(dlKey => {
-                                        let sMatch = dlKey.match(/Season\s*(\d+)/i) || dlKey.match(/S(\d+)/i);
-                                        let seasonName = sMatch ? `Season ${sMatch[1]}` : "Season 1";
-                                        let epMatch = dlKey.match(/Ep\s*(\d+)/i) || dlKey.match(/Episode\s*(\d+)/i) || dlKey.match(/-\s*(\d+)$/);
-                                        let epNum = epMatch ? parseInt(epMatch[1]) : 1;
-                                        let qMatch = dlKey.match(/(480p|720p|1080p|4k)/i);
-                                        let epQuality = qMatch ? qMatch[1].toLowerCase() : qKey;
-
-                                        if (!seasonsMap[seasonName]) seasonsMap[seasonName] = [];
-                                        if (!seasonsMap[seasonName].some(e => e.ep === epNum && e.quality === epQuality)) {
-                                            seasonsMap[seasonName].push({
-                                                ep: epNum,
-                                                quality: epQuality,
-                                                download_url: dls[dlKey],
-                                                type: "official"
-                                            });
-                                        }
-                                    });
+                                const json = await res.json();
+                                if (json[animeSlug]) {
+                                    if (json[animeSlug].card_file) cardFileToFetch = json[animeSlug].card_file;
+                                    if (!dbFile && json[animeSlug].video_files) {
+                                        let vInfo = json[animeSlug].video_files[requestedQuality] || json[animeSlug].video_files[Object.keys(json[animeSlug].video_files)[0]];
+                                        targetDbFile = typeof vInfo === 'string' ? vInfo : (vInfo ? vInfo.file : targetDbFile);
+                                    }
+                                    break;
                                 }
                             }
                         } catch (e) {}
                     }
+
+                    let pList = [];
+                    if (cardFileToFetch) pList.push(fetch(`./${cardFileToFetch}?v=${Date.now()}`).then(r => r.ok ? r.json() : null).catch(() => null));
+                    else pList.push(Promise.resolve(null));
+
+                    pList.push(fetch(`./${targetDbFile}?v=${Date.now()}`).then(r => r.ok ? r.json() : null).catch(() => null));
+
+                    const [cardRes, dbRes] = await Promise.all(pList);
+
+                    if (cardRes) {
+                        foundCardItem = cardRes.cards?.[animeSlug] || cardRes?.[animeSlug] || null;
+                    }
+                    if (dbRes) {
+                        downloads = dbRes.cards?.[animeSlug]?.downloads || dbRes?.[animeSlug]?.downloads || {};
+                    }
+                }
+
+                // Parse downloads into seasons map
+                let seasonsMap = {};
+                if (downloads) {
+                    Object.keys(downloads).forEach(dlKey => {
+                        let sMatch = dlKey.match(/Season\s*(\d+)/i) || dlKey.match(/S(\d+)/i);
+                        let seasonName = sMatch ? `Season ${sMatch[1]}` : "Season 1";
+                        
+                        let epMatch = dlKey.match(/Ep\s*(\d+)/i) || dlKey.match(/Episode\s*(\d+)/i) || dlKey.match(/-\s*(\d+)$/);
+                        let epNum = epMatch ? parseInt(epMatch[1]) : 1;
+
+                        let qMatch = dlKey.match(/(480p|720p|1080p|4k)/i);
+                        let epQuality = qMatch ? qMatch[1].toLowerCase() : requestedQuality;
+
+                        if (!seasonsMap[seasonName]) {
+                            seasonsMap[seasonName] = [];
+                        }
+
+                        if (!seasonsMap[seasonName].some(e => e.ep === epNum && e.quality === epQuality)) {
+                            seasonsMap[seasonName].push({
+                                ep: epNum,
+                                quality: epQuality,
+                                download_url: downloads[dlKey],
+                                type: "official"
+                            });
+                        }
+                    });
                 }
 
                 Object.keys(seasonsMap).forEach(s => {
@@ -247,175 +214,12 @@
                 });
 
                 animeData = {
-                    title: foundCardItem?.title || foundVideoItem?.title || animeSlug.replace(/_/g, ' ').toUpperCase(),
-                    poster: foundCardItem?.poster || foundCardItem?.image || foundVideoItem?.poster || "",
+                    title: foundCardItem?.title || animeSlug.replace(/_/g, ' ').toUpperCase(),
+                    poster: foundCardItem?.poster || foundCardItem?.image || "",
                     seasons: seasonsMap
                 };
 
-                document.getElementById("animeTitle").innerText = animeData.title;
-                document.getElementById("watchNowBtn").href = `anime.html?anime=${animeSlug}`;
-                document.getElementById("navWatchLink").href = `anime.html?anime=${animeSlug}`;
-
-                let posterUrl = formatImageUrl(animeData.poster);
-                if(posterUrl) {
-                    document.getElementById("animePoster").src = posterUrl;
-                } else {
-                    document.getElementById("animePoster").src = `https://via.placeholder.com/300x420/1f2833/66fcf1?text=${encodeURIComponent(animeData.title)}`;
-                }
-
-                renderSeasonTabs();
-
-                const seasons = Object.keys(animeData.seasons);
-                if(seasons.length > 0) {
-                    currentSeason = seasons.includes(requestedSeason) ? requestedSeason : seasons[0];
-                    renderEpisodeDownloadList(currentSeason);
-<script>
-        let animeData = null;
-        let currentSeason = "Season 1";
-
-        const urlParams = new URLSearchParams(window.location.search);
-        const animeSlug = urlParams.get('anime') || 'solo_leveling';
-        const requestedSeason = urlParams.get('season') || 'Season 1';
-        const requestedQuality = (urlParams.get('quality') || '480p').toLowerCase();
-        const dbFile = urlParams.get('db');
-        const lineParam = urlParams.get('line');
-
-        function formatImageUrl(url) {
-            if (!url) return "https://via.placeholder.com/300x420?text=7anime";
-            const driveMatch = url.match(/\/d\/([a-zA-Z0-9_-]+)/) || url.match(/id=([a-zA-Z0-9_-]+)/);
-            if (driveMatch && driveMatch[1]) {
-                return `https://lh3.googleusercontent.com/d/${driveMatch[1]}`;
-            }
-            return url;
-        }
-
-        async function initDownloader() {
-            try {
-                let foundCardItem = null;
-                let foundVideoItem = null;
-
-                const indexFiles = ['anime_index.json', 'movie_index.json', 'hantai_index.json'];
-                let entry = null;
-
-                for (let idxFile of indexFiles) {
-                    try {
-                        const res = await fetch(`./${idxFile}?v=${Date.now()}`);
-                        if (res.ok) {
-                            const json = await res.json();
-                            if (json[animeSlug]) {
-                                entry = json[animeSlug];
-                                break;
-                            }
-                        }
-                    } catch (e) {}
-                }
-
-                if (entry && entry.card_file) {
-                    try {
-                        const cardRes = await fetch(`./${entry.card_file}?v=${Date.now()}`);
-                        if (cardRes.ok) {
-                            const cardJson = await cardRes.json();
-                            const cardsDict = cardJson.cards || cardJson;
-                            if (cardsDict[animeSlug]) {
-                                foundCardItem = cardsDict[animeSlug];
-                            }
-                        }
-                    } catch (e) {}
-                }
-
-                let targetDbFile = dbFile;
-                if (!targetDbFile && entry && entry.video_files) {
-                    let vInfo = entry.video_files[requestedQuality] || entry.video_files[Object.keys(entry.video_files)[0]];
-                    targetDbFile = typeof vInfo === 'string' ? vInfo : (vInfo ? vInfo.file : null);
-                }
-
-                let seasonsMap = {};
-
-                if (targetDbFile) {
-                    try {
-                        const vRes = await fetch(`./${targetDbFile}?v=${Date.now()}`);
-                        if (vRes.ok) {
-                            const vJson = await vRes.json();
-                            const vDict = vJson.cards || vJson;
-                            if (vDict[animeSlug]) {
-                                foundVideoItem = vDict[animeSlug];
-                                const downloads = foundVideoItem.downloads || {};
-
-                                Object.keys(downloads).forEach(dlKey => {
-                                    let sMatch = dlKey.match(/Season\s*(\d+)/i) || dlKey.match(/S(\d+)/i);
-                                    let seasonName = sMatch ? `Season ${sMatch[1]}` : "Season 1";
-                                    
-                                    let epMatch = dlKey.match(/Ep\s*(\d+)/i) || dlKey.match(/Episode\s*(\d+)/i) || dlKey.match(/-\s*(\d+)$/);
-                                    let epNum = epMatch ? parseInt(epMatch[1]) : 1;
-
-                                    let qMatch = dlKey.match(/(480p|720p|1080p|4k)/i);
-                                    let epQuality = qMatch ? qMatch[1].toLowerCase() : requestedQuality;
-
-                                    if (!seasonsMap[seasonName]) {
-                                        seasonsMap[seasonName] = [];
-                                    }
-
-                                    if (!seasonsMap[seasonName].some(e => e.ep === epNum && e.quality === epQuality)) {
-                                        seasonsMap[seasonName].push({
-                                            ep: epNum,
-                                            quality: epQuality,
-                                            download_url: downloads[dlKey],
-                                            type: "official"
-                                        });
-                                    }
-                                });
-                            }
-                        }
-                    } catch (e) {}
-                }
-
-                if (Object.keys(seasonsMap).length === 0 && entry && entry.video_files) {
-                    for (let qKey of Object.keys(entry.video_files)) {
-                        let info = entry.video_files[qKey];
-                        let file = typeof info === 'string' ? info : info.file;
-                        if (!file) continue;
-                        try {
-                            let res = await fetch(`./${file}?v=${Date.now()}`);
-                            if (res.ok) {
-                                let j = await res.json();
-                                let dict = j.cards || j;
-                                if (dict[animeSlug]) {
-                                    let item = dict[animeSlug];
-                                    let dls = item.downloads || {};
-                                    Object.keys(dls).forEach(dlKey => {
-                                        let sMatch = dlKey.match(/Season\s*(\d+)/i) || dlKey.match(/S(\d+)/i);
-                                        let seasonName = sMatch ? `Season ${sMatch[1]}` : "Season 1";
-                                        let epMatch = dlKey.match(/Ep\s*(\d+)/i) || dlKey.match(/Episode\s*(\d+)/i) || dlKey.match(/-\s*(\d+)$/);
-                                        let epNum = epMatch ? parseInt(epMatch[1]) : 1;
-                                        let qMatch = dlKey.match(/(480p|720p|1080p|4k)/i);
-                                        let epQuality = qMatch ? qMatch[1].toLowerCase() : qKey;
-
-                                        if (!seasonsMap[seasonName]) seasonsMap[seasonName] = [];
-                                        if (!seasonsMap[seasonName].some(e => e.ep === epNum && e.quality === epQuality)) {
-                                            seasonsMap[seasonName].push({
-                                                ep: epNum,
-                                                quality: epQuality,
-                                                download_url: dls[dlKey],
-                                                type: "official"
-                                            });
-                                        }
-                                    });
-                                }
-                            }
-                        } catch (e) {}
-                    }
-                }
-
-                Object.keys(seasonsMap).forEach(s => {
-                    seasonsMap[s].sort((a, b) => a.ep - b.ep);
-                });
-
-                animeData = {
-                    title: foundCardItem?.title || foundVideoItem?.title || animeSlug.replace(/_/g, ' ').toUpperCase(),
-                    poster: foundCardItem?.poster || foundCardItem?.image || foundVideoItem?.poster || "",
-                    seasons: seasonsMap
-                };
-
+                // UI Updates
                 document.getElementById("animeTitle").innerText = animeData.title;
                 document.getElementById("watchNowBtn").href = `anime.html?anime=${animeSlug}`;
                 document.getElementById("navWatchLink").href = `anime.html?anime=${animeSlug}`;
