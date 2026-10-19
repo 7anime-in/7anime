@@ -43,9 +43,6 @@
         #heroSection {
             transition: background-image 0.6s ease-in-out;
         }
-        iframe {
-            max-width: 100% !important;
-        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col selection:bg-[#66fcf1] selection:text-black">
@@ -94,10 +91,10 @@
     </nav>
 
     <!-- ==================== HERO SLIDING BANNER ==================== -->
-    <section id="heroSection" class="relative w-full h-[260px] sm:h-[360px] md:h-[430px] bg-cover bg-center flex items-end">
+    <section id="heroSection" class="relative w-full h-[280px] sm:h-[380px] md:h-[430px] bg-cover bg-center flex items-end">
         <div class="absolute inset-0 hero-gradient"></div>
         
-        <div class="relative max-w-7xl mx-auto px-4 pb-5 w-full z-10 flex flex-col gap-1.5">
+        <div class="relative max-w-7xl mx-auto px-4 pb-6 w-full z-10 flex flex-col gap-2">
             <div class="flex items-center gap-2">
                 <span class="bg-[#66fcf1] text-black font-extrabold text-[10px] uppercase px-2 py-0.5 rounded w-fit tracking-wider">FEATURED</span>
                 <span id="bannerBadge" class="bg-black/60 backdrop-blur-md text-[#66fcf1] text-[10px] font-bold px-2 py-0.5 rounded border border-[#66fcf1]/30">Auto Slide</span>
@@ -107,8 +104,8 @@
             <p id="bannerDesc" class="text-xs sm:text-sm text-gray-300 max-w-xl line-clamp-2 text-ellipsis">Loading banner description...</p>
             
             <div class="flex items-center gap-2.5 mt-2">
-                <a id="bannerPlayBtn" href="#" class="bg-[#66fcf1] hover:bg-[#45a29e] text-black font-bold px-4 py-2 rounded-lg text-xs flex items-center gap-1.5 transition shadow-lg shadow-[#66fcf1]/20">
-                    <i class="fa-solid fa-download"></i> Download Links
+                <a id="bannerPlayBtn" href="#" class="bg-[#66fcf1] hover:bg-[#45a29e] text-black font-bold px-4 py-2 rounded-lg text-xs flex items-center gap-1.5 transition shadow-lg shadow-[#66fcf1]/25">
+                    <i class="fa-solid fa-play"></i> Watch / Download
                 </a>
                 <a id="bannerDownloadBtn" href="#" onclick="triggerSmartLink()" class="bg-gray-800/90 hover:bg-gray-700 text-white font-medium px-3.5 py-2 rounded-lg text-xs flex items-center gap-1.5 border border-gray-700 transition">
                     <i class="fa-solid fa-cloud-arrow-down"></i> Fast Server
@@ -121,7 +118,7 @@
 
     <!-- ==================== SEARCH BAR ==================== -->
     <section class="max-w-7xl mx-auto px-3 my-4 w-full">
-        <div class="relative w-full bg-[#1f2833] p-2 sm:p-3 rounded-2xl border border-gray-800 shadow-xl">
+        <div class="relative w-full bg-[#1f2833] p-2.5 sm:p-3 rounded-2xl border border-gray-800 shadow-xl">
             <div class="relative flex items-center">
                 <i class="fa-solid fa-magnifying-glass absolute left-3.5 text-[#66fcf1] text-base"></i>
                 <input 
@@ -179,23 +176,19 @@
         <p>© 2026 7anime Engine</p>
     </footer>
 
-    <!-- ==================== JS LOGIC ==================== -->
+    <!-- ==================== JS LOGIC (MASTER INDEX & ORIGINAL STRUCTURE) ==================== -->
     <script>
         const SMART_LINK_URL = "https://seenimplieddump.com/r4encwrvs?key=991b24b9ac839ae4944305239012fd68";
 
         let allAnimeCards = [];
         let activeCategory = 'all';
 
-        const cardPrefixes = ["ANIME", "MOVIE", "HANTAI"];
-        const videoCategories = ["animemovie", "Animeseries", "Animehatai", "Movie", "Series", "18pulse"];
-        const qualityTypes = ["480p", "720p", "1080p", "4k"];
-
         let bannerList = [
             {
                 title: "Solo Leveling",
                 image: "https://m.media-amazon.com/images/M/MV5BODlhM2RmM2ItM2FkYi00ZGY2LTg2NzAtNjg4NTgwOGVhMDFkXkEyXkFqcGdeQXVyMTI1NDEyNTM5._V1_.jpg",
                 description: "In a world where hunters battle monsters, Sung Jinwoo awakens as the strongest shadow monarch.",
-                play_slug: "SOLO_LEVELING"
+                play_slug: "solo_leveling"
             }
         ];
 
@@ -215,7 +208,7 @@
         }
 
         function formatImageUrl(url) {
-            if (!url) return "https://via.placeholder.com/300x420/1f2833/ffffff?text=7anime";
+            if (!url) return "https://via.placeholder.com/300x420/1f2833/66fcf1?text=7anime";
             const driveMatch = url.match(/\/d\/([a-zA-Z0-9_-]+)/) || url.match(/id=([a-zA-Z0-9_-]+)/);
             if (driveMatch && driveMatch[1]) {
                 return `https://lh3.googleusercontent.com/d/${driveMatch[1]}`;
@@ -224,129 +217,125 @@
         }
 
         function getTypeBadge(type) {
-            const normalizedType = (type || 'series').toLowerCase();
-            if (normalizedType.includes('movie')) {
+            const t = (type || 'series').toLowerCase();
+            if (t.includes('movie')) {
                 return `<span class="bg-purple-600/85 backdrop-blur-md text-white font-bold text-[9px] px-1.5 py-0.5 rounded uppercase">Movie</span>`;
-            } else if (normalizedType.includes('hentai') || normalizedType.includes('18') || normalizedType.includes('hatai') || normalizedType.includes('pulse')) {
+            } else if (t.includes('hentai') || t.includes('18') || t.includes('hatai') || t.includes('pulse')) {
                 return `<span class="bg-red-600/85 backdrop-blur-md text-white font-bold text-[9px] px-1.5 py-0.5 rounded uppercase">18+</span>`;
             }
             return `<span class="bg-cyan-600/85 backdrop-blur-md text-white font-bold text-[9px] px-1.5 py-0.5 rounded uppercase">Series</span>`;
         }
 
         async function initPage() {
-            await loadAllSplitCardDatabases();
-            await loadAllQualitySplitDatabases();
-            await loadBannerAndAdminCards();
+            await loadMasterIndexesAndBanners();
             startBannerAutoSlide();
         }
 
-        // Load ANIME_1.JSON to ANIME_15.JSON, MOVIE_1.JSON, HANTAI_1.JSON
-        async function loadAllSplitCardDatabases() {
+        async function loadMasterIndexesAndBanners() {
             let loadedCardsMap = {};
-            let fetchPromises = [];
 
-            cardPrefixes.forEach(prefix => {
-                for (let index = 1; index <= 15; index++) {
-                    const jsonFilename = `${prefix}_${index}.JSON`;
-                    fetchPromises.push(
-                        fetch(`./${jsonFilename}?v=${Date.now()}`)
-                            .then(res => res.ok ? res.json() : null)
-                            .then(data => {
-                                if (!data) return;
-                                let cards = data.cards || data;
-                                if (cards && typeof cards === 'object') {
-                                    Object.keys(cards).forEach(slug => {
-                                        let item = cards[slug];
-                                        let itemType = item.type || prefix.toLowerCase();
-                                        if (prefix === 'MOVIE') itemType = 'movie';
-                                        if (prefix === 'HANTAI') itemType = 'hentai';
-
-                                        if (!loadedCardsMap[slug]) {
-                                            loadedCardsMap[slug] = {
-                                                title: item.title || slug.replace(/_/g, ' '),
-                                                image: item.image || item.poster || item.img || "https://via.placeholder.com/300x420/1f2833/66fcf1?text=7anime",
-                                                genres: Array.isArray(item.genres) ? item.genres.join(", ") : (item.genres || "Action, Anime"),
-                                                type: itemType,
-                                                rating: item.rating || item.score || "8.5",
-                                                language: item.audio_language || item.language || item.audio || "Dual Audio [Hindi - Jap]",
-                                                slug: slug
-                                            };
-                                        }
-                                    });
-                                }
-                            }).catch(() => {})
-                    );
-                }
-            });
-
-            await Promise.all(fetchPromises);
-            let cardsArray = Object.values(loadedCardsMap);
-            if (cardsArray.length > 0) mergeCards(cardsArray);
-        }
-
-        // Load Video Quality Split Files (_1 to _15)
-        async function loadAllQualitySplitDatabases() {
-            let loadedCardsMap = {};
-            let fetchPromises = [];
-
-            videoCategories.forEach(cat => {
-                for (let index = 1; index <= 15; index++) {
-                    qualityTypes.forEach(q => {
-                        const jsonFilename = `${cat}_${index}_${q}.json`;
-                        fetchPromises.push(
-                            fetch(`./${jsonFilename}?v=${Date.now()}`)
-                                .then(res => res.ok ? res.json() : null)
-                                .then(data => {
-                                    if (!data) return;
-                                    let cards = data.cards || data;
-                                    if (cards && typeof cards === 'object') {
-                                        Object.keys(cards).forEach(slug => {
-                                            let item = cards[slug];
-                                            let itemType = item.type || cat.toLowerCase();
-                                            if (cat.toLowerCase().includes('movie')) itemType = 'movie';
-                                            else if (cat.toLowerCase().includes('hatai') || cat.toLowerCase().includes('pulse') || cat.toLowerCase().includes('18')) itemType = 'hentai';
-
-                                            if (!loadedCardsMap[slug]) {
-                                                loadedCardsMap[slug] = {
-                                                    title: item.title || slug.replace(/_/g, ' '),
-                                                    image: item.poster || item.image || item.img || "https://via.placeholder.com/300x420/1f2833/66fcf1?text=7anime",
-                                                    genres: Array.isArray(item.genres) ? item.genres.join(", ") : (item.genres || "Action, Anime"),
-                                                    type: itemType,
-                                                    rating: item.rating || item.score || "8.5",
-                                                    language: item.audio_language || item.language || "Dual Audio [Hindi - Jap]",
-                                                    slug: slug
-                                                };
-                                            }
-                                        });
-                                    }
-                                }).catch(() => {})
-                        );
-                    });
-                }
-            });
-
-            await Promise.all(fetchPromises);
-            let cardsArray = Object.values(loadedCardsMap);
-            if (cardsArray.length > 0) mergeCards(cardsArray);
-        }
-
-        async function loadBannerAndAdminCards() {
+            // 1. Load Banners & Admin Cards from site_data.json
             try {
                 const res = await fetch(`./site_data.json?v=${Date.now()}`);
-                if (!res.ok) throw new Error("site_data.json not found");
-                
-                const rawJson = await res.json();
-                const cardsList = rawJson.cards ? Object.values(rawJson.cards) : [];
-
-                if (rawJson.banners && Array.isArray(rawJson.banners) && rawJson.banners.length > 0) {
-                    bannerList = rawJson.banners;
+                if (res.ok) {
+                    const rawJson = await res.json();
+                    if (rawJson.banners && Array.isArray(rawJson.banners) && rawJson.banners.length > 0) {
+                        bannerList = rawJson.banners;
+                    }
+                    const cards = rawJson.cards || {};
+                    Object.values(cards).forEach(item => {
+                        if (item && item.slug) {
+                            loadedCardsMap[item.slug] = {
+                                title: item.title || item.slug.replace(/_/g, ' '),
+                                image: item.image || item.poster || "",
+                                genres: item.genres || "Action, Anime",
+                                type: item.type || "series",
+                                rating: item.rating || "8.5",
+                                language: item.audio_language || "Dual Audio [Hindi - Jap]",
+                                slug: item.slug
+                            };
+                        }
+                    });
                 }
+            } catch (e) {}
 
-                renderHeroBanner(bannerList[0]);
-                if (cardsList.length > 0) mergeCards(cardsList);
-            } catch (err) {
-                renderHeroBanner(bannerList[0]);
+            // 2. Load Master Index Files (`anime_index.json`, `movie_index.json`, `hantai_index.json`)
+            const indexCategories = [
+                { file: 'anime_index.json', defaultType: 'series' },
+                { file: 'movie_index.json', defaultType: 'movie' },
+                { file: 'hantai_index.json', defaultType: 'hentai' }
+            ];
+
+            let cardFilesToFetch = new Set();
+            let indexDataMap = {};
+
+            for (let cat of indexCategories) {
+                try {
+                    const res = await fetch(`./${cat.file}?v=${Date.now()}`);
+                    if (!res.ok) continue;
+                    const indexData = await res.json();
+                    indexDataMap[cat.defaultType] = indexData;
+
+                    for (let slug of Object.keys(indexData)) {
+                        let entry = indexData[slug];
+                        if (entry.card_file) {
+                            cardFilesToFetch.add(entry.card_file);
+                        }
+                    }
+                } catch (e) {}
             }
+
+            let cardFileContents = {};
+            let fetchPromises = Array.from(cardFilesToFetch).map(async (filename) => {
+                try {
+                    const res = await fetch(`./${filename}?v=${Date.now()}`);
+                    if (res.ok) {
+                        const json = await res.json();
+                        cardFileContents[filename] = json.cards || json;
+                    }
+                } catch (e) {}
+            });
+            await Promise.all(fetchPromises);
+
+            for (let defaultType of Object.keys(indexDataMap)) {
+                let indexData = indexDataMap[defaultType];
+                for (let slug of Object.keys(indexData)) {
+                    let entry = indexData[slug];
+                    if (loadedCardsMap[slug]) continue;
+
+                    let cardDetails = {
+                        title: slug.replace(/_/g, ' ').toUpperCase(),
+                        image: "",
+                        genres: "Action, Anime",
+                        rating: "8.5"
+                    };
+
+                    if (entry.card_file && cardFileContents[entry.card_file]) {
+                        let dict = cardFileContents[entry.card_file];
+                        if (dict[slug]) {
+                            let item = dict[slug];
+                            cardDetails.title = item.title || cardDetails.title;
+                            cardDetails.image = item.image || item.poster || "";
+                            cardDetails.genres = item.genres || cardDetails.genres;
+                            cardDetails.rating = item.rating || cardDetails.rating;
+                        }
+                    }
+
+                    loadedCardsMap[slug] = {
+                        title: cardDetails.title,
+                        image: cardDetails.image,
+                        genres: cardDetails.genres,
+                        type: defaultType,
+                        rating: cardDetails.rating,
+                        language: "Dual Audio [Hindi - Jap]",
+                        slug: slug
+                    };
+                }
+            }
+
+            renderHeroBanner(bannerList[0]);
+            allAnimeCards = Object.values(loadedCardsMap);
+            filterCategory(activeCategory);
         }
 
         function startBannerAutoSlide() {
@@ -366,8 +355,8 @@
             heroElem.style.backgroundImage = `url('${bgImg}')`;
             document.getElementById("bannerTitle").innerText = banner.title || "Solo Leveling";
             document.getElementById("bannerDesc").innerText = banner.description || "";
-            document.getElementById("bannerPlayBtn").href = `anime.html?anime=${banner.play_slug || 'SOLO_LEVELING'}`;
-            document.getElementById("bannerDownloadBtn").href = `anime.html?anime=${banner.play_slug || 'SOLO_LEVELING'}`;
+            document.getElementById("bannerPlayBtn").href = `anime.html?anime=${banner.play_slug || 'solo_leveling'}&cat=${banner.type || 'series'}`;
+            document.getElementById("bannerDownloadBtn").href = `anime.html?anime=${banner.play_slug || 'solo_leveling'}&cat=${banner.type || 'series'}`;
             updateBannerDots();
         }
 
@@ -392,21 +381,6 @@
             currentBannerIndex = index;
             renderHeroBanner(bannerList[currentBannerIndex]);
             startBannerAutoSlide();
-        }
-
-        function mergeCards(newCards) {
-            newCards.forEach(card => {
-                if (!card.type) card.type = 'series';
-                const existingIndex = allAnimeCards.findIndex(c => c.slug === card.slug);
-                if (existingIndex > -1) {
-                    allAnimeCards[existingIndex] = { ...allAnimeCards[existingIndex], ...card };
-                } else {
-                    allAnimeCards.push(card);
-                }
-            });
-
-            shuffleArray(allAnimeCards);
-            filterCategory(activeCategory);
         }
 
         function filterCategory(cat) {
@@ -469,14 +443,14 @@
             const matches = allAnimeCards.filter(card => 
                 card.title.toLowerCase().includes(query) || 
                 (card.genres && card.genres.toLowerCase().includes(query)) ||
-                (card.type && card.type.toLowerCase().includes(query))
+                (card.slug && card.slug.toLowerCase().includes(query))
             );
 
             if (matches.length === 0) {
                 dropdown.innerHTML = `<div class="p-3 text-center text-xs text-gray-400">No matching anime found</div>`;
             } else {
                 dropdown.innerHTML = matches.map(card => `
-                    <a href="anime.html?anime=${card.slug}" class="flex items-center gap-2.5 p-2.5 hover:bg-[#0b0c10] border-b border-gray-800/60 transition group">
+                    <a href="anime.html?anime=${card.slug}&cat=${card.type}" class="flex items-center gap-2.5 p-2.5 hover:bg-[#0b0c10] border-b border-gray-800/60 transition group">
                         <img src="${formatImageUrl(card.image)}" class="w-9 h-12 object-cover rounded shadow" onerror="this.src='https://via.placeholder.com/100x120/1f2833/ffffff?text=7A'">
                         <div class="flex flex-col flex-1 min-w-0">
                             <div class="flex items-center gap-1.5 mb-0.5">
@@ -514,7 +488,7 @@
 
             grid.innerHTML = cards.map(card => `
                 <div class="bg-[#1f2833] rounded-lg overflow-hidden shadow border border-gray-800/80 card-hover flex flex-col justify-between">
-                    <a href="anime.html?anime=${card.slug}">
+                    <a href="anime.html?anime=${card.slug}&cat=${card.type}">
                         <div class="relative aspect-[2/3] w-full overflow-hidden bg-gray-900">
                             <img src="${formatImageUrl(card.image)}" alt="${card.title}" class="w-full h-full object-cover" onerror="this.src='https://via.placeholder.com/300x420/1f2833/ffffff?text=7anime'">
                             
@@ -529,16 +503,16 @@
                     </a>
                     <div class="p-2 flex flex-col justify-between flex-1">
                         <div>
-                            <a href="anime.html?anime=${card.slug}" class="font-divider font-bold text-white text-xs hover:text-[#66fcf1] line-clamp-1">
+                            <a href="anime.html?anime=${card.slug}&cat=${card.type}" class="font-bold text-white text-xs hover:text-[#66fcf1] line-clamp-1">
                                 ${card.title}
                             </a>
                             <p class="text-[10px] text-gray-400 mt-0.5 truncate">${card.language || 'Dual Audio [Hindi]'}</p>
                         </div>
                         <div class="flex items-center justify-between gap-1.5 mt-2 pt-1.5 border-t border-gray-800">
-                            <a href="anime.html?anime=${card.slug}" class="flex-1 bg-[#66fcf1] hover:bg-[#45a29e] text-black text-[11px] font-bold py-1 rounded text-center transition">
+                            <a href="anime.html?anime=${card.slug}&cat=${card.type}" class="flex-1 bg-[#66fcf1] hover:bg-[#45a29e] text-black text-[11px] font-bold py-1 rounded text-center transition">
                                 Download
                             </a>
-                            <a href="anime.html?anime=${card.slug}" class="bg-gray-800 hover:bg-gray-700 text-white text-[11px] p-1 rounded transition border border-gray-700" title="Details">
+                            <a href="anime.html?anime=${card.slug}&cat=${card.type}" class="bg-gray-800 hover:bg-gray-700 text-white text-[11px] p-1 rounded transition border border-gray-700" title="Details">
                                 <i class="fa-solid fa-arrow-right"></i>
                             </a>
                         </div>
