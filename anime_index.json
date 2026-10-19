@@ -1,12 +1,19 @@
 {
   "solo_leveling": {
-    "channel": "sevenanime_ch1",
+    "channel": "@sevenanime_ch1",
     "card_file": "ANIME_1.JSON",
     "card_line": 3,
-    "video_files": {},
+    "video_files": {
+      "480p": {
+        "file": "anime_1_480p.json",
+        "line": 3
+      }
+    },
     "seasons": [
       "Season 1"
     ],
-    "qualities": []
+    "qualities": [
+      "480p"
+    ]
   }
 }
