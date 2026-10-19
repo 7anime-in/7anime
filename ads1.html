@@ -43,7 +43,7 @@
 
         <!-- STEP 1: VERIFY BUTTON -->
         <div id="verifyBox">
-            <button onclick="startVerification()" class="w-full bg-[#66fcf1] hover:bg-[#45a29e] text-black font-extrabold text-xs py-3.5 rounded-xl transition shadow-lg flex items-center justify-center gap-2">
+            <button onclick="startVerification()" class="w-full bg-[#66fcf1] hover:bg-[#45a29e] text-black font-extrabold text-xs py-3.5 rounded-xl transition shadow-lg flex items-center justify-center gap-2 cursor-pointer">
                 <i class="fa-solid fa-check-to-slot"></i> Click Here to Verify
             </button>
         </div>
@@ -79,26 +79,79 @@
         </div>
     </div>
 
-    <!-- SCRIPT -->
+    <!-- SCRIPT (Background Pre-fetcher) -->
     <script>
         "use strict";
 
         const urlParams = new URLSearchParams(window.location.search);
         const animeSlug = urlParams.get('anime') || 'solo_leveling';
         const seasonParam = urlParams.get('season') || 'Season 1';
-        const qualityParam = urlParams.get('quality') || '720p';
+        const qualityParam = (urlParams.get('quality') || '720p').toLowerCase();
         const dbParam = urlParams.get('db') || '';
         const lineParam = urlParams.get('line') || '';
 
-        // FIXED: Passing all parameters including db and line dynamically to download.html[span_2](start_span)[span_2](end_span)
         let targetDownloadUrl = `download.html?anime=${encodeURIComponent(animeSlug)}&season=${encodeURIComponent(seasonParam)}&quality=${encodeURIComponent(qualityParam)}`;
         if (dbParam) targetDownloadUrl += `&db=${encodeURIComponent(dbParam)}`;
         if (lineParam) targetDownloadUrl += `&line=${encodeURIComponent(lineParam)}`;
 
+        // BACKGROUND PRE-FETCH: 15 second ke timer ke dauran saara data silently fetch karke cache me daal do
+        async function backgroundPreloadData() {
+            try {
+                const indexFiles = ['anime_index.json', 'movie_index.json', 'hantai_index.json'];
+                let entry = null;
+                let cardFile = null;
+                let targetDb = dbParam;
+
+                for (let idxFile of indexFiles) {
+                    try {
+                        const res = await fetch(`./${idxFile}?v=${Date.now()}`);
+                        if (res.ok) {
+                            const json = await res.json();
+                            if (json[animeSlug]) {
+                                entry = json[animeSlug];
+                                break;
+                            }
+                        }
+                    } catch (e) {}
+                }
+
+                if (entry) {
+                    if (entry.card_file) cardFile = entry.card_file;
+                    if (!targetDb && entry.video_files) {
+                        let vInfo = entry.video_files[qualityParam] || entry.video_files[Object.keys(entry.video_files)[0]];
+                        targetDb = typeof vInfo === 'string' ? vInfo : (vInfo ? vInfo.file : null);
+                    }
+                }
+                if (!targetDb) targetDb = `anime_1_${qualityParam}.json`;
+
+                // Parallel fetch card and db files
+                let pList = [];
+                if (cardFile) pList.push(fetch(`./${cardFile}?v=${Date.now()}`).then(r => r.ok ? r.json() : null).catch(() => null));
+                else pList.push(Promise.resolve(null));
+
+                pList.push(fetch(`./${targetDb}?v=${Date.now()}`).then(r => r.ok ? r.json() : null).catch(() => null));
+
+                const [cardRes, dbRes] = await Promise.all(pList);
+
+                // Save preloaded payload into localStorage so download.html loads in 0ms!
+                const cachePayload = {
+                    card: cardRes?.cards?.[animeSlug] || cardRes?.[animeSlug] || null,
+                    downloads: dbRes?.cards?.[animeSlug]?.downloads || dbRes?.[animeSlug]?.downloads || null,
+                    timestamp: Date.now()
+                };
+
+                localStorage.setItem(`cache_7anime_${animeSlug}_${qualityParam}`, JSON.stringify(cachePayload));
+            } catch (err) {
+                console.log("Background prefetch background task error:", err);
+            }
+        }
+
         function startVerification() {
-            // Hide verify button, show timer box
             document.getElementById("verifyBox").classList.add("hidden");
             document.getElementById("timerBox").classList.remove("hidden");
+
+            // Turant background prefetch start kar do taaki 15s me data ready rahe
+            backgroundPreloadData();
 
             let timeLeft = 15;
             const countdownEl = document.getElementById("countdown");
@@ -120,7 +173,6 @@
                     document.getElementById("timerBox").classList.add("hidden");
                     scrollPrompt.classList.remove("hidden");
 
-                    // Unlock download button
                     downloadSection.classList.remove("opacity-40", "pointer-events-none");
                     getDownloadBtn.classList.remove("opacity-50", "cursor-not-allowed");
                     getDownloadBtn.classList.add("hover:bg-emerald-500", "cursor-pointer");
@@ -128,7 +180,6 @@
                     dlStatusText.innerHTML = "✨ Link Ready! Click below to download:";
                     dlStatusText.className = "text-xs text-emerald-400 font-bold mb-3";
 
-                    // Smooth scroll down slightly to guide user
                     window.scrollTo({
                         top: document.body.scrollHeight,
                         behavior: 'smooth'
