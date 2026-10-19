@@ -1,13 +1,20 @@
 {
   "cards": {
-    "SOLO_LEVELING": {
-      "title": "SOLO LEVELING",
-      "image": "https://drive.google.com/file/d/1J1BGy-wa3xewU7Butc-SdEv6gEU2tzEw/view?usp=drivesdk",
-      "genres": "Action, Fantasy",
-      "rating": "9.0",
-      "type": "series",
-      "description": "Solo Leveling\n\n╭━━━━━━━━━━━━━━━━━━━━━━━━━\n┣‣Season :- 01,02,03\n┣‣Episodes :- 12\n┣‣Quality :- 480p, 720p, 1080p, 4K [Dual]\n┣‣Language :- Hindi Dub [#OFFICIAL]\n┣‣Ganr :- Action, Adventure, Fantasy, Magic, Animation, Demons, Dark\n╰━━━━━━━━━━━━━━━━━━━━━━━━━",
-      "slug": "SOLO_LEVELING"
+    "solo_leveling": {
+      "title": "solo leveling",
+      "slug": "solo_leveling",
+      "poster": "https://via.placeholder.com/200x300?text=7anime",
+      "synopsis": "Added via screenshot command.",
+      "genres": [
+        "Action",
+        "Animation"
+      ],
+      "rating": "8.5",
+      "screenshots": [
+        "https://drive.google.com/file/d/1lfItGPKN4B6XDL65UZsDzETlIk8Oqm01/view?usp=drivesdk",
+        "https://drive.google.com/file/d/1_fmFIRRFSWp5mVc0G6Gh6_6JtTDnDREJ/view?usp=drivesdk",
+        "https://drive.google.com/file/d/1kHYpNwFfMVCXndsSjQVQxAsYVkYX6_qk/view?usp=drivesdk"
+      ]
     }
   }
 }
