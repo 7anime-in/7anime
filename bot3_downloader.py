@@ -5,6 +5,18 @@ import urllib.parse
 from typing import Optional
 from contextlib import asynccontextmanager
 
+# --- PYTHON 3.14 EVENT LOOP FIX FOR PYROGRAM ---
+try:
+    asyncio.get_event_loop_policy().get_event_loop()
+except RuntimeError:
+    asyncio.set_event_loop_policy(asyncio.DefaultEventLoopPolicy())
+    try:
+        asyncio.get_event_loop_policy().get_event_loop()
+    except RuntimeError:
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+# ---------------------------------------------
+
 from fastapi import FastAPI, Request, HTTPException, Header, Query
 from fastapi.responses import StreamingResponse, Response
 from fastapi.middleware.cors import CORSMiddleware
