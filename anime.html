@@ -106,7 +106,7 @@
         <p>© 2026 7anime. Direct Telegram & Server Downloads.</p>
     </footer>
 
-    <!-- ==================== JS LOGIC ==================== -->
+    <!-- ==================== JS LOGIC (MASTER INDEX & POINTERS) ==================== -->
     <script>
         "use strict";
 
@@ -116,7 +116,6 @@
         const urlParams = new URLSearchParams(window.location.search);
         const rawSlug = urlParams.get('anime') || 'solo_leveling';
         const categoryParam = (urlParams.get('cat') || 'series').toLowerCase();
-        const lineParam = urlParams.get('line');
 
         function formatImageUrl(url) {
             if (!url) return "https://via.placeholder.com/200x300?text=7anime";
@@ -162,7 +161,6 @@
                 let qualities = entry.qualities || Object.keys(entry.video_files || {});
 
                 for (let q of qualities) {
-                    detectedQualities.add(q.toUpperCase());
                     let vInfo = entry.video_files[q];
                     let vFilename = typeof vInfo === 'string' ? vInfo : (vInfo ? vInfo.file : 'N/A');
                     let vLineNum = (vInfo && typeof vInfo === 'object') ? (vInfo.line || 1) : 1;
@@ -205,7 +203,6 @@
                     }
                 }
 
-                // Fallback to master index entry seasons if empty
                 if (detectedSeasons.size === 0 && entry.seasons) {
                     entry.seasons.forEach(s => detectedSeasons.add(s));
                 }
@@ -288,15 +285,12 @@
             if (info.synopsis || info.description) document.getElementById("animeSynopsis").textContent = info.synopsis || info.description;
             if (info.status) document.getElementById("metaStatus").textContent = info.status;
             
-            // Dynamic Total Episodes
             document.getElementById("metaTotalEp").textContent = info.dynamicTotalEp || info.total_episodes || info.episodes || "12";
 
-            // Dynamic Seasons
             if (info.dynamicSeasons && info.dynamicSeasons.length > 0) {
                 document.getElementById("metaSeasons").textContent = info.dynamicSeasons.join(", ");
             }
 
-            // Dynamic Qualities
             if (info.dynamicQualities && info.dynamicQualities.length > 0) {
                 document.getElementById("metaQuality").textContent = info.dynamicQualities.join(", ");
             }
@@ -311,7 +305,6 @@
                 document.getElementById("infoLangType").textContent = info.audio_language || info.language || info.audio;
             }
 
-            // Robust Genre Parsing (Checks genres, genre, ganr, or extracts from synopsis)[span_3](start_span)[span_3](end_span)
             let genresRaw = info.genres || info.genre || info.ganr;
             let genresArray = [];
 
