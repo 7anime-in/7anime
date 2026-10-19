@@ -106,7 +106,7 @@
         <p>© 2026 7anime. Direct Telegram & Server Downloads.</p>
     </footer>
 
-    <!-- ==================== JS LOGIC (MASTER INDEX & POINTERS) ==================== -->
+    <!-- ==================== JS LOGIC ==================== -->
     <script>
         "use strict";
 
@@ -153,7 +153,7 @@
                     } catch (e) {}
                 }
 
-                let availableCombos = [];
+                let uniqueCombosMap = new Map();
                 let detectedQualities = new Set();
                 let detectedSeasons = new Set();
                 let maxEpisodes = 0;
@@ -190,12 +190,15 @@
                                         let detectedQuality = qMatch ? qMatch[1].toLowerCase() : q;
                                         detectedQualities.add(detectedQuality.toUpperCase());
 
-                                        availableCombos.push({
-                                            season: seasonStr,
-                                            quality: detectedQuality,
-                                            dbFile: vFilename,
-                                            lineNum: vLineNum
-                                        });
+                                        let comboKey = `${seasonStr}|${detectedQuality}`;
+                                        if (!uniqueCombosMap.has(comboKey)) {
+                                            uniqueCombosMap.set(comboKey, {
+                                                season: seasonStr,
+                                                quality: detectedQuality,
+                                                dbFile: vFilename,
+                                                lineNum: vLineNum
+                                            });
+                                        }
                                     });
                                 }
                             }
@@ -212,7 +215,7 @@
 
                 return {
                     card: cardDetails || { title: rawSlug.replace(/_/g, ' ').toUpperCase() },
-                    combos: availableCombos,
+                    combos: Array.from(uniqueCombosMap.values()),
                     qualities: Array.from(detectedQualities),
                     seasons: Array.from(detectedSeasons),
                     totalEpisodes: maxEpisodes > 0 ? maxEpisodes : (cardDetails?.total_episodes || cardDetails?.episodes || "12")
