@@ -25,13 +25,18 @@
       "480p": {
         "file": "anime_1_480p.json",
         "line": 45
+      },
+      "720p": {
+        "file": "anime_1_720p.json",
+        "line": 3
       }
     },
     "seasons": [
       "Season 1"
     ],
     "qualities": [
-      "480p"
+      "480p",
+      "720p"
     ]
   }
 }
