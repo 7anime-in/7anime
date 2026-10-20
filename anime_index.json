@@ -43,5 +43,22 @@
       "720p",
       "1080p"
     ]
+  },
+  "ranma1_2": {
+    "channel": "@ranma1_2_7anime",
+    "card_file": "",
+    "card_line": 1,
+    "video_files": {
+      "480p": {
+        "file": "anime_1_480p.json",
+        "line": 73
+      }
+    },
+    "seasons": [
+      "Season 1"
+    ],
+    "qualities": [
+      "480p"
+    ]
   }
 }
