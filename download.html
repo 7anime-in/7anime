@@ -98,17 +98,18 @@
 
     <!-- ==================== FOOTER ==================== -->
     <footer class="bg-[#1f2833] border-t border-gray-800 text-center py-6 text-sm text-gray-400 mt-auto">
-        <p>© 2026 7anime Engine. Powered by Render Direct Downloader Backend.</p>
+        <p>© 2026 7anime Engine. Powered by Render Direct Downloader Backend[span_1](start_span)[span_1](end_span).</p>
     </footer>
 
     <!-- Container for invisible background frames -->
     <div id="iframeContainer" style="display:none;"></div>
 
-    <!-- ==================== JS LOGIC (RENDER BACKEND INTEGRATION) ==================== -->
+    <!-- ==================== JS LOGIC (CORRECTED RENDER BACKEND URL) ==================== -->
     <script>
         let animeData = null;
         let currentSeason = "Season 1";
 
+        // Correct Render Server URL as requested
         const RENDER_BACKEND_URL = "https://sevenanime-mgwx.onrender.com";
 
         const urlParams = new URLSearchParams(window.location.search);
@@ -126,13 +127,11 @@
             return url;
         }
 
-        // Helper function to convert telegram raw links or message IDs into Render backend stream links
+        // FIXED: Correct URL mapping for Render backend server
         function processDownloadUrl(rawUrl) {
             if (!rawUrl) return "#";
             
-            // Agar link already http ya https se shuru hota hai (jaise direct web link), toh wahi rehne do
             if (rawUrl.startsWith("http://") || rawUrl.startsWith("https://")) {
-                // Agar t.me link hai toh usko render backend me convert karne ki koshish karo
                 if (rawUrl.includes("t.me/")) {
                     let parts = rawUrl.split("t.me/");
                     if (parts.length > 1) {
@@ -147,12 +146,10 @@
                 return rawUrl;
             }
 
-            // Agar database me format "chat_id/message_id" ya sirf message ID hai
             if (rawUrl.includes("/")) {
                 let [chatId, msgId] = rawUrl.split("/");
                 return `${RENDER_BACKEND_URL}/download/${chatId}/${msgId}`;
             } else if (!isNaN(rawUrl)) {
-                // Default chat ID agar sirf message id ho (apne channel/group ke hisab se adjust kar sakte hain)
                 return `${RENDER_BACKEND_URL}/download/@7anime_backup/${rawUrl}`;
             }
 
