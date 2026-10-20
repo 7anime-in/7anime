@@ -98,18 +98,18 @@
 
     <!-- ==================== FOOTER ==================== -->
     <footer class="bg-[#1f2833] border-t border-gray-800 text-center py-6 text-sm text-gray-400 mt-auto">
-        <p>© 2026 7anime Engine. Powered by Render Direct Downloader Backend[span_1](start_span)[span_1](end_span).</p>
+        <p>© 2026 7anime Engine. Powered by Render Direct Downloader Backend.</p>
     </footer>
 
     <!-- Container for invisible background frames -->
     <div id="iframeContainer" style="display:none;"></div>
 
-    <!-- ==================== JS LOGIC (CORRECTED RENDER BACKEND URL) ==================== -->
+    <!-- ==================== JS LOGIC (SMART DOMAIN REPLACER & RENDER INTEGRATION) ==================== -->
     <script>
         let animeData = null;
         let currentSeason = "Season 1";
 
-        // Correct Render Server URL as requested
+        // Active Render Server URL
         const RENDER_BACKEND_URL = "https://sevenanime-mgwx.onrender.com";
 
         const urlParams = new URLSearchParams(window.location.search);
@@ -127,10 +127,16 @@
             return url;
         }
 
-        // FIXED: Correct URL mapping for Render backend server
+        // SMART URL PROCESSOR: Database ke purane domain ko naye active Render domain se automatically map karega
         function processDownloadUrl(rawUrl) {
             if (!rawUrl) return "#";
             
+            // Agar database link me purana domain ya koi bhi render link hai, toh use active RENDER_BACKEND_URL se replace kar do
+            if (rawUrl.includes("onrender.com")) {
+                let pathOnly = rawUrl.replace(/^https?:\/\/[^\/]+/, ""); // Extract path like /download/sevenanime_ch1/1002
+                return `${RENDER_BACKEND_URL}${pathOnly}`;
+            }
+
             if (rawUrl.startsWith("http://") || rawUrl.startsWith("https://")) {
                 if (rawUrl.includes("t.me/")) {
                     let parts = rawUrl.split("t.me/");
