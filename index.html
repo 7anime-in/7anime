@@ -43,9 +43,6 @@
         #heroSection {
             transition: background-image 0.6s ease-in-out;
         }
-        iframe {
-            max-width: 100% !important;
-        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col selection:bg-[#66fcf1] selection:text-black">
@@ -189,11 +186,15 @@
         let bannerList = [
             {
                 title: "Solo Leveling",
-                image: "https://m.media-amazon.com/images/M/MV5BODlhM2RmM2ItM2FkYi00ZGY2LTg2NzAtNjg4NTgwOGVhMDFkXkEyXkFqcGdeQXVyMTI1NDEyNTM5._V1_.jpg",
+                image: "https://lh3.googleusercontent.com/d/1J1BGy-wa3xewU7Butc-SdEv6gEU2tzEw",
                 description: "In a world where hunters battle monsters, Sung Jinwoo awakens as the strongest shadow monarch.",
-                play_slug: "solo_leveling",
+                slug: "solo_leveling",
+                type: "series",
+                index_file: "anime_index.json",
+                card_file: "ANIME_1.JSON",
                 card_line: 3,
-                type: "series"
+                db_file: "anime_1_480p.json",
+                db_line: 3
             }
         ];
 
@@ -239,33 +240,6 @@
         async function loadMasterIndexesAndBanners() {
             let loadedCardsMap = {};
 
-            // 1. Load Admin Banners & Cards from site_data.json
-            try {
-                const res = await fetch(`./site_data.json?v=${Date.now()}`);
-                if (res.ok) {
-                    const rawJson = await res.json();
-                    if (rawJson.banners && Array.isArray(rawJson.banners) && rawJson.banners.length > 0) {
-                        bannerList = rawJson.banners;
-                    }
-                    const cards = rawJson.cards || {};
-                    Object.values(cards).forEach(item => {
-                        if (item && item.slug) {
-                            loadedCardsMap[item.slug] = {
-                                title: item.title || item.slug.replace(/_/g, ' '),
-                                image: item.image || item.poster || "",
-                                genres: item.genres || "Action, Anime",
-                                type: item.type || "series",
-                                rating: item.rating || "8.5",
-                                language: item.audio_language || "Dual Audio [Hindi - Jap]",
-                                slug: item.slug,
-                                card_line: item.card_line || 1
-                            };
-                        }
-                    });
-                }
-            } catch (e) {}
-
-            // 2. Load Master Index Files (`anime_index.json`, `movie_index.json`, `hantai_index.json`)
             const indexCategories = [
                 { file: 'anime_index.json', defaultType: 'series' },
                 { file: 'movie_index.json', defaultType: 'movie' },
@@ -280,7 +254,7 @@
                     const res = await fetch(`./${cat.file}?v=${Date.now()}`);
                     if (!res.ok) continue;
                     const indexData = await res.json();
-                    indexDataMap[cat.defaultType] = indexData;
+                    indexDataMap[cat.file] = { data: indexData, defaultType: cat.defaultType };
 
                     for (let slug of Object.keys(indexData)) {
                         let entry = indexData[slug];
@@ -303,8 +277,11 @@
             });
             await Promise.all(fetchPromises);
 
-            for (let defaultType of Object.keys(indexDataMap)) {
-                let indexData = indexDataMap[defaultType];
+            for (let indexFileName of Object.keys(indexDataMap)) {
+                let indexObj = indexDataMap[indexFileName];
+                let indexData = indexObj.data;
+                let defaultType = indexObj.defaultType;
+
                 for (let slug of Object.keys(indexData)) {
                     let entry = indexData[slug];
                     if (loadedCardsMap[slug]) continue;
@@ -327,6 +304,17 @@
                         }
                     }
 
+                    let firstVideoFile = "";
+                    let firstLineNum = 1;
+                    if (entry.video_files) {
+                        let firstQKey = Object.keys(entry.video_files)[0];
+                        if (firstQKey) {
+                            let vInfo = entry.video_files[firstQKey];
+                            firstVideoFile = typeof vInfo === 'string' ? vInfo : (vInfo ? vInfo.file : "");
+                            firstLineNum = (vInfo && typeof vInfo === 'object') ? (vInfo.line || 1) : 1;
+                        }
+                    }
+
                     loadedCardsMap[slug] = {
                         title: cardDetails.title,
                         image: cardDetails.image,
@@ -335,13 +323,21 @@
                         rating: cardDetails.rating,
                         language: "Dual Audio [Hindi - Jap]",
                         slug: slug,
-                        card_line: entry.card_line || 1
+                        index_file: indexFileName,
+                        card_file: entry.card_file || "ANIME_1.JSON",
+                        card_line: entry.card_line || 1,
+                        db_file: firstVideoFile,
+                        db_line: firstLineNum
                     };
                 }
             }
 
-            renderHeroBanner(bannerList[0]);
             allAnimeCards = Object.values(loadedCardsMap);
+            if (allAnimeCards.length > 0) {
+                bannerList = [allAnimeCards[0]];
+            }
+
+            renderHeroBanner(bannerList[0]);
             filterCategory(activeCategory);
         }
 
@@ -356,14 +352,21 @@
             }, 4000);
         }
 
+        function getDetailUrl(card) {
+            return `anime.html?anime=${card.slug}&index=${card.index_file}&card_file=${card.card_file}&card_line=${card.card_line}&db=${card.db_file}&db_line=${card.db_line}`;
+        }
+
         function renderHeroBanner(banner) {
+            if (!banner) return;
             const bgImg = formatImageUrl(banner.image);
             const heroElem = document.getElementById("heroSection");
             heroElem.style.backgroundImage = `url('${bgImg}')`;
             document.getElementById("bannerTitle").innerText = banner.title || "Solo Leveling";
-            document.getElementById("bannerDesc").innerText = banner.description || "";
-            document.getElementById("bannerPlayBtn").href = `anime.html?anime=${banner.play_slug || 'solo_leveling'}&cat=${banner.type || 'series'}&line=${banner.card_line || 3}`;
-            document.getElementById("bannerDownloadBtn").href = `anime.html?anime=${banner.play_slug || 'solo_leveling'}&cat=${banner.type || 'series'}&line=${banner.card_line || 3}`;
+            document.getElementById("bannerDesc").innerText = banner.description || "Explore high-speed anime downloads.";
+            
+            const targetUrl = getDetailUrl(banner);
+            document.getElementById("bannerPlayBtn").href = targetUrl;
+            document.getElementById("bannerDownloadBtn").href = targetUrl;
             updateBannerDots();
         }
 
@@ -456,19 +459,22 @@
             if (matches.length === 0) {
                 dropdown.innerHTML = `<div class="p-3 text-center text-xs text-gray-400">No matching anime found</div>`;
             } else {
-                dropdown.innerHTML = matches.map(card => `
-                    <a href="anime.html?anime=${card.slug}&cat=${card.type}&line=${card.card_line || 1}" class="flex items-center gap-2.5 p-2.5 hover:bg-[#0b0c10] border-b border-gray-800/60 transition group">
-                        <img src="${formatImageUrl(card.image)}" class="w-9 h-12 object-cover rounded shadow" onerror="this.src='https://via.placeholder.com/100x120/1f2833/ffffff?text=7A'">
-                        <div class="flex flex-col flex-1 min-w-0">
-                            <div class="flex items-center gap-1.5 mb-0.5">
-                                ${getTypeBadge(card.type)}
-                                <span class="text-[10px] text-gray-400 truncate">${card.genres || 'Anime'}</span>
+                dropdown.innerHTML = matches.map(card => {
+                    const detailUrl = getDetailUrl(card);
+                    return `
+                        <a href="${detailUrl}" class="flex items-center gap-2.5 p-2.5 hover:bg-[#0b0c10] border-b border-gray-800/60 transition group">
+                            <img src="${formatImageUrl(card.image)}" class="w-9 h-12 object-cover rounded shadow" onerror="this.src='https://via.placeholder.com/100x120/1f2833/ffffff?text=7A'">
+                            <div class="flex flex-col flex-1 min-w-0">
+                                <div class="flex items-center gap-1.5 mb-0.5">
+                                    ${getTypeBadge(card.type)}
+                                    <span class="text-[10px] text-gray-400 truncate">${card.genres || 'Anime'}</span>
+                                </div>
+                                <span class="text-xs font-semibold text-white group-hover:text-[#66fcf1] truncate">${card.title}</span>
+                                <span class="text-[10px] text-gray-400 truncate">${card.language || 'Dual Audio'}</span>
                             </div>
-                            <span class="text-xs font-semibold text-white group-hover:text-[#66fcf1] truncate">${card.title}</span>
-                            <span class="text-[10px] text-gray-400 truncate">${card.language || 'Dual Audio'}</span>
-                        </div>
-                    </a>
-                `).join("");
+                        </a>
+                    `;
+                }).join("");
             }
 
             dropdown.classList.remove("hidden");
@@ -493,39 +499,42 @@
                 return;
             }
 
-            grid.innerHTML = cards.map(card => `
-                <div class="bg-[#1f2833] rounded-lg overflow-hidden shadow border border-gray-800/80 card-hover flex flex-col justify-between">
-                    <a href="anime.html?anime=${card.slug}&cat=${card.type}&line=${card.card_line || 1}">
-                        <div class="relative aspect-[2/3] w-full overflow-hidden bg-gray-900">
-                            <img src="${formatImageUrl(card.image)}" alt="${card.title}" class="w-full h-full object-cover" onerror="this.src='https://via.placeholder.com/300x420/1f2833/ffffff?text=7anime'">
-                            
-                            <div class="absolute top-1.5 left-1.5">
-                                ${getTypeBadge(card.type)}
-                            </div>
+            grid.innerHTML = cards.map(card => {
+                const detailUrl = getDetailUrl(card);
+                return `
+                    <div class="bg-[#1f2833] rounded-lg overflow-hidden shadow border border-gray-800/80 card-hover flex flex-col justify-between">
+                        <a href="${detailUrl}">
+                            <div class="relative aspect-[2/3] w-full overflow-hidden bg-gray-900">
+                                <img src="${formatImageUrl(card.image)}" alt="${card.title}" class="w-full h-full object-cover" onerror="this.src='https://via.placeholder.com/300x420/1f2833/ffffff?text=7anime'">
+                                
+                                <div class="absolute top-1.5 left-1.5">
+                                    ${getTypeBadge(card.type)}
+                                </div>
 
-                            <span class="absolute top-1.5 right-1.5 bg-black/80 text-[#66fcf1] font-bold text-[10px] px-1.5 py-0.5 rounded flex items-center gap-1 backdrop-blur-sm">
-                                <i class="fa-solid fa-star text-yellow-400 text-[9px]"></i> ${card.rating || '8.0'}
-                            </span>
-                        </div>
-                    </a>
-                    <div class="p-2 flex flex-col justify-between flex-1">
-                        <div>
-                            <a href="anime.html?anime=${card.slug}&cat=${card.type}&line=${card.card_line || 1}" class="font-divider font-bold text-white text-xs hover:text-[#66fcf1] line-clamp-1">
-                                ${card.title}
-                            </a>
-                            <p class="text-[10px] text-gray-400 mt-0.5 truncate">${card.language || 'Dual Audio [Hindi]'}</p>
-                        </div>
-                        <div class="flex items-center justify-between gap-1.5 mt-2 pt-1.5 border-t border-gray-800">
-                            <a href="anime.html?anime=${card.slug}&cat=${card.type}&line=${card.card_line || 1}" class="flex-1 bg-[#66fcf1] hover:bg-[#45a29e] text-black text-[11px] font-bold py-1 rounded text-center transition">
-                                Download
-                            </a>
-                            <a href="anime.html?anime=${card.slug}&cat=${card.type}&line=${card.card_line || 1}" class="bg-gray-800 hover:bg-gray-700 text-white text-[11px] p-1 rounded transition border border-gray-700" title="Details">
-                                <i class="fa-solid fa-arrow-right"></i>
-                            </a>
+                                <span class="absolute top-1.5 right-1.5 bg-black/80 text-[#66fcf1] font-bold text-[10px] px-1.5 py-0.5 rounded flex items-center gap-1 backdrop-blur-sm">
+                                    <i class="fa-solid fa-star text-yellow-400 text-[9px]"></i> ${card.rating || '8.0'}
+                                </span>
+                            </div>
+                        </a>
+                        <div class="p-2 flex flex-col justify-between flex-1">
+                            <div>
+                                <a href="${detailUrl}" class="font-bold text-white text-xs hover:text-[#66fcf1] line-clamp-1">
+                                    ${card.title}
+                                </a>
+                                <p class="text-[10px] text-gray-400 mt-0.5 truncate">${card.language || 'Dual Audio [Hindi]'}</p>
+                            </div>
+                            <div class="flex items-center justify-between gap-1.5 mt-2 pt-1.5 border-t border-gray-800">
+                                <a href="${detailUrl}" class="flex-1 bg-[#66fcf1] hover:bg-[#45a29e] text-black text-[11px] font-bold py-1 rounded text-center transition">
+                                    Download
+                                </a>
+                                <a href="${detailUrl}" class="bg-gray-800 hover:bg-gray-700 text-white text-[11px] p-1 rounded transition border border-gray-700" title="Details">
+                                    <i class="fa-solid fa-arrow-right"></i>
+                                </a>
+                            </div>
                         </div>
                     </div>
-                </div>
-            `).join("");
+                `;
+            }).join("");
         }
 
         window.addEventListener("DOMContentLoaded", initPage);
