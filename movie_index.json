@@ -11,6 +11,10 @@
       "720p": {
         "file": "movie_1_720p.json",
         "line": 3
+      },
+      "1080p": {
+        "file": "movie_1_1080p.json",
+        "line": 3
       }
     },
     "seasons": [
@@ -19,7 +23,8 @@
     ],
     "qualities": [
       "480p",
-      "720p"
+      "720p",
+      "1080p"
     ]
   }
 }
