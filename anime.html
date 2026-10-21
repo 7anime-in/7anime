@@ -106,8 +106,8 @@
         <p>© 2026 7anime. Direct Telegram & Server Downloads.</p>
     </footer>
 
-    <!-- ==================== JS LOGIC (FULLY AUTOMATIC MULTI-ANIME POINTER RESOLUTION) ==================== -->
-    <script>
+    <!-- ==================== JS LOGIC ==================== -->
+    <script[span_2](start_span)[span_2](end_span)>
         "use strict";
 
         const SMART_LINK_AD_URL = "https://seenimplieddump.com/r4encwrvs?key=991b24b9ac839ae4944305239012fd68";
@@ -115,6 +115,11 @@
 
         const urlParams = new URLSearchParams(window.location.search);
         const rawSlug = urlParams.get('anime') || 'solo_leveling';
+        const paramIndexFile = urlParams.get('index') || 'anime_index.json';
+        const paramCardFile = urlParams.get('card_file') || 'ANIME_1.JSON';
+        const paramCardLine = urlParams.get('card_line') || '1';
+        const paramDbFile = urlParams.get('db');
+        const paramDbLine = urlParams.get('db_line') || '1';
 
         function formatImageUrl(url) {
             if (!url) return "https://via.placeholder.com/200x300?text=7anime";
@@ -126,28 +131,41 @@
         }
 
         async function fetchAnimeViaMasterIndex() {
-            const indexFiles = ['anime_index.json', 'movie_index.json', 'hantai_index.json'];
             let entry = null;
 
-            for (let idxFile of indexFiles) {
+            if (paramIndexFile) {
                 try {
-                    const res = await fetch(`./${idxFile}?v=${Date.now()}`);
+                    const res = await fetch(`./${paramIndexFile}?v=${Date.now()}`);
                     if (res.ok) {
                         const json = await res.json();
-                        if (json[rawSlug]) {
-                            entry = json[rawSlug];
-                            break;
-                        }
+                        if (json[rawSlug]) entry = json[rawSlug];
                     }
                 } catch (e) {}
+            }
+
+            if (!entry) {
+                const indexFiles = ['anime_index.json', 'movie_index.json', 'hantai_index.json'];
+                for (let idxFile of indexFiles) {
+                    try {
+                        const res = await fetch(`./${idxFile}?v=${Date.now()}`);
+                        if (res.ok) {
+                            const json = await res.json();
+                            if (json[rawSlug]) {
+                                entry = json[rawSlug];
+                                break;
+                            }
+                        }
+                    } catch (e) {}
+                }
             }
 
             if (!entry) return null;
 
             let cardDetails = null;
-            if (entry.card_file) {
+            let targetCardFile = paramCardFile || entry.card_file;
+            if (targetCardFile) {
                 try {
-                    const cardRes = await fetch(`./${entry.card_file}?v=${Date.now()}`);
+                    const cardRes = await fetch(`./${targetCardFile}?v=${Date.now()}`);
                     if (cardRes.ok) {
                         const cardJson = await cardRes.json();
                         const cardsDict = cardJson.cards || cardJson;
@@ -163,60 +181,75 @@
             let detectedSeasons = new Set();
             let maxEpisodes = 0;
 
-            let qualities = entry.qualities || Object.keys(entry.video_files || {});
+            let filesToFetch = new Set();
+            if (paramDbFile) filesToFetch.add(paramDbFile);
+            if (entry.video_files) {
+                Object.values(entry.video_files).forEach(vInfo => {
+                    let f = typeof vInfo === 'string' ? vInfo : (vInfo ? vInfo.file : null);
+                    if (f) filesToFetch.add(f);
+                });
+            }
 
-            for (let q of qualities) {
-                let vInfo = entry.video_files[q];
-                let vFilename = typeof vInfo === 'string' ? vInfo : (vInfo ? vInfo.file : 'N/A');
-                let vLineNum = (vInfo && typeof vInfo === 'object') ? (vInfo.line || 1) : 1;
+            for (let vFilename of filesToFetch) {
+                try {
+                    const vRes = await fetch(`./${vFilename}?v=${Date.now()}`);
+                    if (vRes.ok) {
+                        const vJson = await vRes.json();
+                        const vDict = vJson.cards || vJson;
+                        if (vDict[rawSlug]) {
+                            let item = vDict[rawSlug];
+                            let downloads = item.downloads || {};
 
-                if (vFilename && vFilename !== 'N/A') {
-                    try {
-                        const vRes = await fetch(`./${vFilename}?v=${Date.now()}`);
-                        if (vRes.ok) {
-                            const vJson = await vRes.json();
-                            const vDict = vJson.cards || vJson;
-                            if (vDict[rawSlug]) {
-                                let item = vDict[rawSlug];
-                                let downloads = item.downloads || {};
+                            let epCount = Object.keys(downloads).length;
+                            if (epCount > maxEpisodes) maxEpisodes = epCount;
 
-                                let epCount = Object.keys(downloads).length;
-                                if (epCount > maxEpisodes) {
-                                    maxEpisodes = epCount;
-                                }
-
-                                Object.keys(downloads).forEach(dlKey => {
-                                    let sMatch = dlKey.match(/Season\s*(\d+)/i) || dlKey.match(/S(\d+)/i);
-                                    let seasonNum = sMatch ? sMatch[1] : "1";
-                                    let seasonStr = `Season ${seasonNum}`;
-                                    detectedSeasons.add(seasonStr);
-
-                                    let qMatch = dlKey.match(/(480p|720p|1080p|4k)/i);
-                                    let detectedQuality = qMatch ? qMatch[1].toLowerCase() : q;
-                                    detectedQualities.add(detectedQuality.toUpperCase());
-
-                                    let comboKey = `${seasonStr}|${detectedQuality}`;
-                                    if (!uniqueCombosMap.has(comboKey)) {
-                                        uniqueCombosMap.set(comboKey, {
-                                            season: seasonStr,
-                                            quality: detectedQuality,
-                                            dbFile: vFilename,
-                                            lineNum: vLineNum
-                                        });
+                            let matchedQ = "480p";
+                            if (entry.video_files) {
+                                for (let qKey of Object.keys(entry.video_files)) {
+                                    let info = entry.video_files[qKey];
+                                    let fName = typeof info === 'string' ? info : info.file;
+                                    if (fName === vFilename) {
+                                        matchedQ = qKey;
+                                        break;
                                     }
-                                });
+                                }
                             }
+
+                            Object.keys(downloads).forEach(dlKey => {
+                                let sMatch = dlKey.match(/Season\s*(\d+)/i) || dlKey.match(/S(\d+)/i);
+                                let seasonNum = sMatch ? sMatch[1] : "1";
+                                let seasonStr = `Season ${seasonNum}`;
+                                detectedSeasons.add(seasonStr);
+
+                                let qMatch = dlKey.match(/(480p|720p|1080p|4k)/i);
+                                let detectedQuality = qMatch ? qMatch[1].toLowerCase() : matchedQ;
+                                detectedQualities.add(detectedQuality.toUpperCase());
+
+                                let comboKey = `${seasonStr}|${detectedQuality}`;
+                                if (!uniqueCombosMap.has(comboKey)) {
+                                    let lineNum = paramDbLine;
+                                    if (entry.video_files && entry.video_files[detectedQuality]) {
+                                        let inf = entry.video_files[detectedQuality];
+                                        lineNum = (typeof inf === 'object') ? (inf.line || paramDbLine) : paramDbLine;
+                                    }
+
+                                    uniqueCombosMap.set(comboKey, {
+                                        season: seasonStr,
+                                        quality: detectedQuality,
+                                        dbFile: vFilename,
+                                        lineNum: lineNum
+                                    });
+                                }
+                            });
                         }
-                    } catch (e) {}
-                }
+                    }
+                } catch (e) {}
             }
 
             if (detectedSeasons.size === 0 && entry.seasons) {
                 entry.seasons.forEach(s => detectedSeasons.add(s));
             }
-            if (detectedSeasons.size === 0) {
-                detectedSeasons.add("Season 1");
-            }
+            if (detectedSeasons.size === 0) detectedSeasons.add("Season 1");
 
             return {
                 card: cardDetails || { title: rawSlug.replace(/_/g, ' ').toUpperCase() },
@@ -243,8 +276,7 @@
                     let combos = masterResult.combos;
                     if (combos.length === 0) {
                         combos = [
-                            { season: "Season 1", quality: "480p", dbFile: "anime_1_480p.json", lineNum: 1 },
-                            { season: "Season 1", quality: "720p", dbFile: "anime_1_720p.json", lineNum: 1 }
+                            { season: "Season 1", quality: "480p", dbFile: paramDbFile || "anime_1_480p.json", lineNum: paramDbLine }
                         ];
                     }
                     renderBatchQualityButtons(combos);
@@ -268,7 +300,7 @@
                     };
                     populateUI(animeData);
                     renderBatchQualityButtons([
-                        { season: "Season 1", quality: "480p", dbFile: "anime_1_480p.json", lineNum: 1 }
+                        { season: "Season 1", quality: "480p", dbFile: paramDbFile || "anime_1_480p.json", lineNum: paramDbLine }
                     ]);
                 }
 
@@ -365,6 +397,9 @@
                 if (quality.includes("1080")) btnColor = "bg-purple-600 hover:bg-purple-500 text-white";
                 if (quality.includes("4k")) btnColor = "bg-amber-600 hover:bg-amber-500 text-white";
 
+                // EXACT LINK STRUCTURE WITH ALL DIRECT POINTERS FOR FAST LOADING & FORWARDING
+                const targetAdsUrl = `ads1.html?anime=${rawSlug}&season=${encodeURIComponent(seasonName)}&quality=${encodeURIComponent(quality)}&index=${paramIndexFile}&card_file=${paramCardFile}&card_line=${paramCardLine}&db=${encodeURIComponent(dbFile)}&db_line=${lineNum}`;
+
                 return `
                     <div class="flex items-center justify-between bg-gray-900 p-3.5 rounded-xl border border-gray-800 shadow">
                         <div class="flex items-center gap-2">
@@ -372,8 +407,8 @@
                             <span class="text-xs font-extrabold text-white uppercase">${seasonName} (${quality.toUpperCase()})</span>
                         </div>
                         <a 
-                            href="ads1.html?anime=${rawSlug}&season=${encodeURIComponent(seasonName)}&quality=${encodeURIComponent(quality)}&db=${encodeURIComponent(dbFile)}&line=${lineNum}" 
-                            onclick="handleAdRedirect(event, '${rawSlug}', '${encodeURIComponent(seasonName)}', '${encodeURIComponent(quality)}', '${encodeURIComponent(dbFile)}', '${lineNum}')"
+                            href="${targetAdsUrl}" 
+                            onclick="handleAdRedirect(event, '${targetAdsUrl}')"
                             class="${btnColor} font-extrabold text-xs px-5 py-2.5 rounded-lg transition shadow flex items-center gap-2"
                         >
                             <i class="fa-solid fa-download"></i> Fast Download
@@ -383,12 +418,12 @@
             }).join("");
         }
 
-        function handleAdRedirect(event, slug, season, quality, dbFile, lineNum) {
+        function handleAdRedirect(event, redirectUrl) {
             event.preventDefault();
             if (SMART_LINK_AD_URL) {
                 window.open(SMART_LINK_AD_URL, '_blank');
             }
-            window.location.href = `ads1.html?anime=${slug}&season=${season}&quality=${quality}&db=${dbFile}&line=${lineNum}`;
+            window.location.href = redirectUrl;
         }
 
         window.addEventListener("DOMContentLoaded", initPage);
