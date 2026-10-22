@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>7anime - Episode & Season Downloader</title>
+    <title>7anime - Download Center</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
@@ -51,30 +51,26 @@
             <div class="flex-1 text-center md:text-left flex flex-col justify-between h-full py-1">
                 <div>
                     <div class="flex items-center justify-center md:justify-start gap-2 mb-2">
-                        <span class="bg-[#66fcf1]/20 text-[#66fcf1] text-xs font-bold px-3 py-1 rounded-full border border-[#66fcf1]/30">High Speed Server</span>
+                        <span id="serverBadge" class="bg-[#66fcf1]/20 text-[#66fcf1] text-xs font-bold px-3 py-1 rounded-full border border-[#66fcf1]/30">High Speed Server</span>
                         <span id="totalEpBadge" class="bg-gray-800 text-gray-300 text-xs font-bold px-3 py-1 rounded-full border border-gray-700">Loading...</span>
                     </div>
                     <h1 id="animeTitle" class="text-2xl md:text-4xl font-black text-white">Loading Anime...</h1>
-                    <p class="text-sm text-gray-400 mt-2">Select individual episodes below or download the entire season pack in 1-Click.</p>
+                    <p id="headerSubText" class="text-sm text-gray-400 mt-2">Select individual episodes below or download securely.</p>
                 </div>
 
                 <div class="flex flex-wrap items-center justify-center md:justify-start gap-3 mt-6">
                     <a id="watchNowBtn" href="#" class="bg-[#66fcf1] hover:bg-[#45a29e] text-black font-extrabold px-6 py-2.5 rounded-lg flex items-center gap-2 transition text-sm shadow-md">
                         <i class="fa-solid fa-play"></i> Switch To Player
                     </a>
-                    <!-- 1-CLICK SEASON PACK DOWNLOAD BUTTON -->
-                    <button id="downloadPackBtn" onclick="downloadCurrentSeasonPack()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold px-5 py-2.5 rounded-lg flex items-center gap-2 transition text-sm shadow-lg border border-emerald-500/40 cursor-pointer">
-                        <i class="fa-solid fa-box-archive text-[#66fcf1]"></i> <span id="downloadPackBtnText">Download Full Season Pack</span>
-                    </button>
                 </div>
             </div>
         </div>
 
-        <!-- ==================== SEASON & EPISODE DOWNLOAD LIST ==================== -->
+        <!-- ==================== DOWNLOAD SECTION (Smart Conditional View) ==================== -->
         <div class="bg-[#1f2833] p-4 md:p-6 rounded-2xl border border-gray-800 flex flex-col gap-5">
             
-            <!-- Season Selector Buttons -->
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-700/60 pb-4">
+            <!-- Season Selector Header (Visible only for Series) -->
+            <div id="seasonHeaderBox" class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-700/60 pb-4">
                 <h2 class="text-xl font-bold text-white flex items-center gap-2">
                     <i class="fa-solid fa-cloud-arrow-down text-[#66fcf1]"></i> Available Downloads
                 </h2>
@@ -85,7 +81,7 @@
                 </div>
             </div>
 
-            <!-- Download List Container -->
+            <!-- Download List Container (Dynamic: Series Episodes OR Single ZIP/Movie Card) -->
             <div id="episodesDownloadList" class="flex flex-col gap-2 max-h-[600px] overflow-y-auto pr-1">
                 <div class="animate-pulse bg-gray-800 h-14 rounded-lg"></div>
                 <div class="animate-pulse bg-gray-800 h-14 rounded-lg"></div>
@@ -101,22 +97,22 @@
         <p>© 2026 7anime Engine. Powered by Render Direct Downloader Backend.</p>
     </footer>
 
-    <!-- Container for invisible background frames -->
-    <div id="iframeContainer" style="display:none;"></div>
-
-    <!-- ==================== JS LOGIC (SMART DOMAIN REPLACER & RENDER INTEGRATION) ==================== -->
+    <!-- ==================== JS LOGIC ==================== -->
     <script>
         let animeData = null;
         let currentSeason = "Season 1";
 
-        // Active Render Server URL
         const RENDER_BACKEND_URL = "https://sevenanime-mgwx.onrender.com";
 
         const urlParams = new URLSearchParams(window.location.search);
         const animeSlug = urlParams.get('anime') || 'solo_leveling';
         const requestedSeason = urlParams.get('season') || 'Season 1';
-        const requestedQuality = (urlParams.get('quality') || '480p').toLowerCase();
+        const requestedQuality = (urlParams.get('quality') || '720p').toLowerCase();
+        const typeParam = urlParams.get('type') || 'video';
+        const titleParam = urlParams.get('title') || '';
         const dbFile = urlParams.get('db');
+        const cardFileParam = urlParams.get('card_file');
+        const indexFileParam = urlParams.get('index') || 'anime_index.json';
 
         function formatImageUrl(url) {
             if (!url) return "https://via.placeholder.com/300x420?text=7anime";
@@ -127,16 +123,12 @@
             return url;
         }
 
-        // SMART URL PROCESSOR: Database ke purane domain ko naye active Render domain se automatically map karega
         function processDownloadUrl(rawUrl) {
             if (!rawUrl) return "#";
-            
-            // Agar database link me purana domain ya koi bhi render link hai, toh use active RENDER_BACKEND_URL se replace kar do
             if (rawUrl.includes("onrender.com")) {
-                let pathOnly = rawUrl.replace(/^https?:\/\/[^\/]+/, ""); // Extract path like /download/sevenanime_ch1/1002
+                let pathOnly = rawUrl.replace(/^https?:\/\/[^\/]+/, "");
                 return `${RENDER_BACKEND_URL}${pathOnly}`;
             }
-
             if (rawUrl.startsWith("http://") || rawUrl.startsWith("https://")) {
                 if (rawUrl.includes("t.me/")) {
                     let parts = rawUrl.split("t.me/");
@@ -151,14 +143,12 @@
                 }
                 return rawUrl;
             }
-
             if (rawUrl.includes("/")) {
                 let [chatId, msgId] = rawUrl.split("/");
                 return `${RENDER_BACKEND_URL}/download/${chatId}/${msgId}`;
             } else if (!isNaN(rawUrl)) {
                 return `${RENDER_BACKEND_URL}/download/@7anime_backup/${rawUrl}`;
             }
-
             return rawUrl;
         }
 
@@ -167,7 +157,7 @@
                 let foundCardItem = null;
                 let downloads = null;
 
-                const cacheKey = `cache_7anime_${animeSlug}_${requestedQuality}`;
+                const cacheKey = `cache_7anime_${animeSlug}_${requestedQuality}_${typeParam}`;
                 const cachedRaw = localStorage.getItem(cacheKey);
 
                 if (cachedRaw) {
@@ -180,12 +170,11 @@
 
                 if (!downloads) {
                     let targetDbFile = dbFile || `anime_1_${requestedQuality}.json`;
-                    const indexFiles = ['anime_index.json', 'movie_index.json', 'hantai_index.json'];
-                    let cardFileToFetch = null;
+                    let cardFileToFetch = cardFileParam;
 
-                    for (let idxFile of indexFiles) {
+                    if (!cardFileToFetch) {
                         try {
-                            const res = await fetch(`./${idxFile}?v=${Date.now()}`);
+                            const res = await fetch(`./${indexFileParam}?v=${Date.now()}`);
                             if (res.ok) {
                                 const json = await res.json();
                                 if (json[animeSlug]) {
@@ -194,7 +183,6 @@
                                         let vInfo = json[animeSlug].video_files[requestedQuality] || json[animeSlug].video_files[Object.keys(json[animeSlug].video_files)[0]];
                                         targetDbFile = typeof vInfo === 'string' ? vInfo : (vInfo ? vInfo.file : targetDbFile);
                                     }
-                                    break;
                                 }
                             }
                         } catch (e) {}
@@ -212,45 +200,14 @@
                         foundCardItem = cardRes.cards?.[animeSlug] || cardRes?.[animeSlug] || null;
                     }
                     if (dbRes) {
-                        downloads = dbRes.cards?.[animeSlug]?.downloads || dbRes?.[animeSlug]?.downloads || {};
+                        downloads = dbRes.cards?.[animeSlug]?.downloads || dbRes.cards?.[animeSlug] || dbRes?.[animeSlug]?.downloads || {};
                     }
                 }
-
-                let seasonsMap = {};
-                if (downloads) {
-                    Object.keys(downloads).forEach(dlKey => {
-                        let sMatch = dlKey.match(/Season\s*(\d+)/i) || dlKey.match(/S(\d+)/i);
-                        let seasonName = sMatch ? `Season ${sMatch[1]}` : "Season 1";
-                        
-                        let epMatch = dlKey.match(/Ep\s*(\d+)/i) || dlKey.match(/Episode\s*(\d+)/i) || dlKey.match(/-\s*(\d+)$/);
-                        let epNum = epMatch ? parseInt(epMatch[1]) : 1;
-
-                        let qMatch = dlKey.match(/(480p|720p|1080p|4k)/i);
-                        let epQuality = qMatch ? qMatch[1].toLowerCase() : requestedQuality;
-
-                        if (!seasonsMap[seasonName]) {
-                            seasonsMap[seasonName] = [];
-                        }
-
-                        if (!seasonsMap[seasonName].some(e => e.ep === epNum && e.quality === epQuality)) {
-                            seasonsMap[seasonName].push({
-                                ep: epNum,
-                                quality: epQuality,
-                                download_url: processDownloadUrl(downloads[dlKey]),
-                                type: "official"
-                            });
-                        }
-                    });
-                }
-
-                Object.keys(seasonsMap).forEach(s => {
-                    seasonsMap[s].sort((a, b) => a.ep - b.ep);
-                });
 
                 animeData = {
                     title: foundCardItem?.title || animeSlug.replace(/_/g, ' ').toUpperCase(),
                     poster: foundCardItem?.poster || foundCardItem?.image || "",
-                    seasons: seasonsMap
+                    downloads: downloads || {}
                 };
 
                 document.getElementById("animeTitle").innerText = animeData.title;
@@ -258,38 +215,107 @@
                 document.getElementById("navWatchLink").href = `anime.html?anime=${animeSlug}`;
 
                 let posterUrl = formatImageUrl(animeData.poster);
-                if(posterUrl) {
-                    document.getElementById("animePoster").src = posterUrl;
-                } else {
-                    document.getElementById("animePoster").src = `https://via.placeholder.com/300x420/1f2833/66fcf1?text=${encodeURIComponent(animeData.title)}`;
-                }
+                document.getElementById("animePoster").src = posterUrl || `https://via.placeholder.com/300x420/1f2833/66fcf1?text=${encodeURIComponent(animeData.title)}`;
 
-                renderSeasonTabs();
-
-                const seasons = Object.keys(animeData.seasons);
-                if(seasons.length > 0) {
-                    currentSeason = seasons.includes(requestedSeason) ? requestedSeason : seasons[0];
-                    renderEpisodeDownloadList(currentSeason);
+                // Check whether it's a ZIP / Single Archive or a Regular Series Episodes list
+                if (typeParam === 'zip' || Object.keys(animeData.downloads).length <= 2 && titleParam) {
+                    renderSingleFileLayout();
                 } else {
-                    document.getElementById("episodesDownloadList").innerHTML = `<p class="text-center py-8 text-gray-500">No download links found for this anime.</p>`;
-                    document.getElementById("totalEpBadge").innerText = `0 Episodes`;
+                    renderSeriesLayout();
                 }
 
             } catch(err) {
                 console.error("Error loading downloader data:", err);
                 document.getElementById("animeTitle").innerText = "Anime Not Found";
-                document.getElementById("episodesDownloadList").innerHTML = `<p class="text-center py-8 text-gray-500">Failed to load episode database.</p>`;
+                document.getElementById("episodesDownloadList").innerHTML = `<p class="text-center py-8 text-gray-500">Failed to load download database.</p>`;
+            }
+        }
+
+        // Layout for ZIP / Movie / Single Batch Archive (Clean & Premium Single-Card View)
+        function renderSingleFileLayout() {
+            document.getElementById("seasonHeaderBox").style.display = "none";
+            document.getElementById("serverBadge").innerText = "ZIP / Batch Archive Server";
+            document.getElementById("totalEpBadge").innerText = "Direct Fast Download";
+            document.getElementById("headerSubText").innerText = "Click the button below to start your high-speed archive download.";
+
+            const listContainer = document.getElementById("episodesDownloadList");
+            const downloads = animeData.downloads;
+            
+            let targetKey = titleParam || Object.keys(downloads)[0];
+            let rawLink = targetKey ? downloads[targetKey] : Object.values(downloads)[0];
+            let finalUrl = processDownloadUrl(rawLink);
+
+            listContainer.innerHTML = `
+                <div class="bg-gradient-to-r from-gray-900 to-[#1f2833] border border-amber-500/40 p-6 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-6 shadow-2xl">
+                    <div class="flex items-center gap-4 text-center md:text-left">
+                        <div class="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 text-3xl flex-shrink-0">
+                            <i class="fa-solid fa-file-zipper"></i>
+                        </div>
+                        <div>
+                            <span class="text-[10px] bg-amber-500/20 text-amber-300 font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider border border-amber-500/30">Batch Archive</span>
+                            <h3 class="font-black text-white text-lg md:text-xl mt-1">${targetKey || animeData.title}</h3>
+                            <p class="text-xs text-gray-400 mt-0.5">High-Speed Secure Server • Dual Audio / Sub</p>
+                        </div>
+                    </div>
+
+                    <a 
+                        href="${finalUrl}" 
+                        target="_blank" 
+                        class="w-full md:w-auto bg-amber-500 hover:bg-amber-400 text-black font-black text-sm px-8 py-3.5 rounded-xl transition shadow-lg flex items-center justify-center gap-2"
+                    >
+                        <i class="fa-solid fa-cloud-arrow-down text-base"></i> Download Zip File
+                    </a>
+                </div>
+            `;
+        }
+
+        // Layout for Series / Multiple Episodes (Tabbed Season & Episode List View)
+        function renderSeriesLayout() {
+            let seasonsMap = {};
+            let downloads = animeData.downloads;
+
+            Object.keys(downloads).forEach(dlKey => {
+                let sMatch = dlKey.match(/Season\s*(\d+)/i) || dlKey.match(/S(\d+)/i);
+                let seasonName = sMatch ? `Season ${sMatch[1]}` : "Season 1";
+                
+                let epMatch = dlKey.match(/Ep\s*(\d+)/i) || dlKey.match(/Episode\s*(\d+)/i) || dlKey.match(/-\s*(\d+)$/);
+                let epNum = epMatch ? parseInt(epMatch[1]) : 1;
+
+                let qMatch = dlKey.match(/(480p|720p|1080p|4k)/i);
+                let epQuality = qMatch ? qMatch[1].toLowerCase() : requestedQuality;
+
+                if (!seasonsMap[seasonName]) seasonsMap[seasonName] = [];
+
+                if (!seasonsMap[seasonName].some(e => e.ep === epNum && e.quality === epQuality)) {
+                    seasonsMap[seasonName].push({
+                        ep: epNum,
+                        quality: epQuality,
+                        download_url: processDownloadUrl(downloads[dlKey]),
+                        type: "official"
+                    });
+                }
+            });
+
+            Object.keys(seasonsMap).forEach(s => {
+                seasonsMap[s].sort((a, b) => a.ep - b.ep);
+            });
+
+            animeData.seasons = seasonsMap;
+            renderSeasonTabs();
+
+            const seasons = Object.keys(animeData.seasons);
+            if (seasons.length > 0) {
+                currentSeason = seasons.includes(requestedSeason) ? requestedSeason : seasons[0];
+                renderEpisodeDownloadList(currentSeason);
+            } else {
+                document.getElementById("episodesDownloadList").innerHTML = `<p class="text-center py-8 text-gray-500">No episode download links found.</p>`;
+                document.getElementById("totalEpBadge").innerText = `0 Episodes`;
             }
         }
 
         function renderSeasonTabs() {
             const tabsContainer = document.getElementById("seasonTabsContainer");
             const seasons = Object.keys(animeData?.seasons || {});
-
-            if(seasons.length === 0) {
-                tabsContainer.innerHTML = `<span class="text-xs text-gray-400 font-semibold">Season 1</span>`;
-                return;
-            }
 
             tabsContainer.innerHTML = seasons.map(s => `
                 <button 
@@ -313,8 +339,7 @@
         function updateTabStyles() {
             const seasons = Object.keys(animeData?.seasons || {});
             seasons.forEach(s => {
-                const tabId = `tab-s-${s.replace(/\s+/g, '-')}`;
-                const tab = document.getElementById(tabId);
+                const tab = document.getElementById(`tab-s-${s.replace(/\s+/g, '-')}`);
                 if(tab) {
                     if(s === currentSeason) {
                         tab.className = "px-4 py-1.5 text-xs font-black rounded-lg bg-[#66fcf1] text-black border border-[#66fcf1] shadow-lg shadow-[#66fcf1]/20 scale-105 transition-all duration-200 cursor-pointer flex items-center gap-1.5";
@@ -323,8 +348,6 @@
                     }
                 }
             });
-
-            document.getElementById("downloadPackBtnText").innerText = `Download ${currentSeason} Pack`;
         }
 
         function renderEpisodeDownloadList(seasonName) {
@@ -376,44 +399,6 @@
                     </div>
                 `;
             }).join("");
-        }
-
-        async function downloadCurrentSeasonPack() {
-            const episodes = animeData?.seasons?.[currentSeason] || [];
-            if (!episodes || episodes.length === 0) {
-                alert("Is season ke koi episodes nahi mile!");
-                return;
-            }
-
-            const confirmDownload = confirm(`${currentSeason} ke Total ${episodes.length} Episodes ka download start karein?\n\n(Har episode 4 second ke gap me load ho kar download hoga)`);
-            if (!confirmDownload) return;
-
-            const packBtn = document.getElementById("downloadPackBtn");
-            const packBtnText = document.getElementById("downloadPackBtnText");
-            const iframeContainer = document.getElementById("iframeContainer");
-
-            if (packBtn) packBtn.disabled = true;
-
-            for (let i = 0; i < episodes.length; i++) {
-                const ep = episodes[i];
-
-                if (packBtnText) {
-                    packBtnText.innerText = `Loading Ep ${ep.ep} (${i + 1}/${episodes.length})...`;
-                }
-
-                const iframe = document.createElement("iframe");
-                iframe.src = ep.download_url;
-                iframeContainer.appendChild(iframe);
-
-                await new Promise(resolve => setTimeout(resolve, 4000));
-            }
-
-            if (packBtnText) {
-                packBtnText.innerText = `Download ${currentSeason} Pack`;
-            }
-            if (packBtn) packBtn.disabled = false;
-
-            alert(`${currentSeason} ke sabhi (${episodes.length}) episodes ka download queue poora ho gaya hai!`);
         }
 
         window.addEventListener("DOMContentLoaded", initDownloader);
