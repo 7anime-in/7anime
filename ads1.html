@@ -79,70 +79,59 @@
         </div>
     </div>
 
-    <!-- SCRIPT (Background Pre-fetcher) -->
+    <!-- SCRIPT (O(1) Direct Pointer Background Pre-fetcher) -->
     <script>
         "use strict";
 
         const urlParams = new URLSearchParams(window.location.search);
         const animeSlug = urlParams.get('anime') || 'solo_leveling';
+        const typeParam = urlParams.get('type') || 'video';
         const seasonParam = urlParams.get('season') || 'Season 1';
-        const qualityParam = (urlParams.get('quality') || '720p').toLowerCase();
-        const dbParam = urlParams.get('db') || '';
-        const lineParam = urlParams.get('line') || '';
+        const qualityParam = urlParams.get('quality') || '720p';
+        const titleParam = urlParams.get('title') || '';
+        const indexFile = urlParams.get('index') || 'anime_index.json';
+        const cardFile = urlParams.get('card_file') || 'ANIME_1.JSON';
+        const cardLine = urlParams.get('card_line') || '1';
+        const dbFile = urlParams.get('db') || '';
+        const dbLine = urlParams.get('db_line') || '1';
 
-        let targetDownloadUrl = `download.html?anime=${encodeURIComponent(animeSlug)}&season=${encodeURIComponent(seasonParam)}&quality=${encodeURIComponent(qualityParam)}`;
-        if (dbParam) targetDownloadUrl += `&db=${encodeURIComponent(dbParam)}`;
-        if (lineParam) targetDownloadUrl += `&line=${encodeURIComponent(lineParam)}`;
+        // Pass all direct pointers forward to download.html
+        let targetDownloadUrl = `download.html?anime=${encodeURIComponent(animeSlug)}&type=${encodeURIComponent(typeParam)}&season=${encodeURIComponent(seasonParam)}&quality=${encodeURIComponent(qualityParam)}&title=${encodeURIComponent(titleParam)}&index=${encodeURIComponent(indexFile)}&card_file=${encodeURIComponent(cardFile)}&card_line=${encodeURIComponent(cardLine)}&db=${encodeURIComponent(dbFile)}&db_line=${encodeURIComponent(dbLine)}`;
 
-        // BACKGROUND PRE-FETCH: 15 second ke timer ke dauran saara data silently fetch karke cache me daal do
+        // BACKGROUND PRE-FETCH USING DIRECT POINTERS (0 Scan Time)
         async function backgroundPreloadData() {
             try {
-                const indexFiles = ['anime_index.json', 'movie_index.json', 'hantai_index.json'];
-                let entry = null;
-                let cardFile = null;
-                let targetDb = dbParam;
-
-                for (let idxFile of indexFiles) {
-                    try {
-                        const res = await fetch(`./${idxFile}?v=${Date.now()}`);
-                        if (res.ok) {
-                            const json = await res.json();
-                            if (json[animeSlug]) {
-                                entry = json[animeSlug];
-                                break;
-                            }
-                        }
-                    } catch (e) {}
-                }
-
-                if (entry) {
-                    if (entry.card_file) cardFile = entry.card_file;
-                    if (!targetDb && entry.video_files) {
-                        let vInfo = entry.video_files[qualityParam] || entry.video_files[Object.keys(entry.video_files)[0]];
-                        targetDb = typeof vInfo === 'string' ? vInfo : (vInfo ? vInfo.file : null);
-                    }
-                }
-                if (!targetDb) targetDb = `anime_1_${qualityParam}.json`;
-
-                // Parallel fetch card and db files
                 let pList = [];
-                if (cardFile) pList.push(fetch(`./${cardFile}?v=${Date.now()}`).then(r => r.ok ? r.json() : null).catch(() => null));
-                else pList.push(Promise.resolve(null));
 
-                pList.push(fetch(`./${targetDb}?v=${Date.now()}`).then(r => r.ok ? r.json() : null).catch(() => null));
+                // Direct fetch card file using O(1) pointer
+                if (cardFile) {
+                    pList.push(fetch(`./${cardFile}?v=${Date.now()}`).then(r => r.ok ? r.json() : null).catch(() => null));
+                } else {
+                    pList.push(Promise.resolve(null));
+                }
+
+                // Direct fetch database file using O(1) pointer
+                if (dbFile) {
+                    pList.push(fetch(`./${dbFile}?v=${Date.now()}`).then(r => r.ok ? r.json() : null).catch(() => null));
+                } else {
+                    pList.push(Promise.resolve(null));
+                }
 
                 const [cardRes, dbRes] = await Promise.all(pList);
 
-                // Save preloaded payload into localStorage so download.html loads in 0ms!
                 const cachePayload = {
                     card: cardRes?.cards?.[animeSlug] || cardRes?.[animeSlug] || null,
                     downloads: dbRes?.cards?.[animeSlug]?.downloads || dbRes?.[animeSlug]?.downloads || null,
+                    type: typeParam,
+                    season: seasonParam,
+                    quality: qualityParam,
+                    title: titleParam,
                     timestamp: Date.now()
                 };
 
-                localStorage.setItem(`cache_7anime_${animeSlug}_${qualityParam}`, JSON.stringify(cachePayload));
+                localStorage.setItem(`cache_7anime_${animeSlug}_${qualityParam}_${typeParam}`, JSON.stringify(cachePayload));
             } catch (err) {
-                console.log("Background prefetch background task error:", err);
+                console.log("Background prefetch error:", err);
             }
         }
 
@@ -150,7 +139,7 @@
             document.getElementById("verifyBox").classList.add("hidden");
             document.getElementById("timerBox").classList.remove("hidden");
 
-            // Turant background prefetch start kar do taaki 15s me data ready rahe
+            // Start silent prefetch during timer
             backgroundPreloadData();
 
             let timeLeft = 15;
