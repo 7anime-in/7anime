@@ -1,15 +1,22 @@
 {
   "ranma1_2": {
     "type": "series",
-    "channel": "sevenanime_ch1",
+    "channel": "@ranma_7anime",
     "card_file": "ANIME_1.JSON",
     "card_line": 3,
     "video_files": {},
-    "zip_files": {},
+    "zip_files": {
+      "1080p": {
+        "file": "zip_anime_1_1080p.json",
+        "line": 3
+      }
+    },
     "seasons": [
       "Season 1"
     ],
-    "qualities": []
+    "qualities": [
+      "1080p"
+    ]
   },
   "tomb_raider_king_hindi_dubbed": {
     "type": "series",
