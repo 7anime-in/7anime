@@ -116,7 +116,7 @@
         <p>© 2026 7anime. Direct Telegram & Server Downloads.</p>
     </footer>
 
-    <!-- ==================== JS LOGIC ==================== -->
+    <!-- ==================== JS LOGIC (O(1) DIRECT POINTER ROUTING) ==================== -->
     <script>
         "use strict";
 
@@ -187,7 +187,7 @@
                 } catch (err) {}
             }
 
-            // 3. Process Video Files from Master Index
+            // 3. Process Video Files with Direct Line Numbers
             let uniqueCombosMap = new Map();
             let detectedQualities = new Set();
             let detectedSeasons = new Set();
@@ -257,7 +257,7 @@
                 }
             }
 
-            // 4. Process Multi-Season Zip Files Dynamically from Master Index & DB
+            // 4. Process Multi-Season Zip Files with Direct Line Numbers
             let zipCombosList = [];
             if (entry && entry.zip_files) {
                 for (let zKey of Object.keys(entry.zip_files)) {
@@ -455,7 +455,8 @@
                 if (quality.includes("1080")) btnColor = "bg-purple-600 hover:bg-purple-500 text-white";
                 if (quality.includes("4K")) btnColor = "bg-amber-600 hover:bg-amber-500 text-white";
 
-                const targetAdsUrl = `ads1.html?anime=${rawSlug}&season=${encodeURIComponent(seasonName)}&quality=${encodeURIComponent(quality)}&index=${paramIndexFile}&card_file=${paramCardFile}&card_line=${paramCardLine}&db=${encodeURIComponent(dbFile)}&db_line=${lineNum}`;
+                // COMPLETE DIRECT POINTER PARAMS IN URL
+                const targetAdsUrl = `ads1.html?anime=${rawSlug}&type=video&season=${encodeURIComponent(seasonName)}&quality=${encodeURIComponent(quality)}&index=${encodeURIComponent(paramIndexFile)}&card_file=${encodeURIComponent(paramCardFile)}&card_line=${paramCardLine}&db=${encodeURIComponent(dbFile)}&db_line=${lineNum}`;
 
                 return `
                     <div class="bg-gray-900 p-3.5 rounded-xl border border-gray-800 shadow space-y-2">
@@ -493,7 +494,8 @@
 
             section.classList.remove("hidden");
             container.innerHTML = zipList.map(zip => {
-                const targetAdsUrl = `ads1.html?anime=${rawSlug}&type=zip&season=${encodeURIComponent(zip.season)}&quality=${encodeURIComponent(zip.quality)}&title=${encodeURIComponent(zip.zipKey)}&index=${paramIndexFile}&card_file=${paramCardFile}&card_line=${paramCardLine}&db=${encodeURIComponent(zip.dbFile)}&db_line=${zip.lineNum}`;
+                // COMPLETE DIRECT POINTER PARAMS IN URL
+                const targetAdsUrl = `ads1.html?anime=${rawSlug}&type=zip&season=${encodeURIComponent(zip.season)}&quality=${encodeURIComponent(zip.quality)}&title=${encodeURIComponent(zip.zipKey)}&index=${encodeURIComponent(paramIndexFile)}&card_file=${encodeURIComponent(paramCardFile)}&card_line=${paramCardLine}&db=${encodeURIComponent(zip.dbFile)}&db_line=${zip.lineNum}`;
 
                 return `
                     <div class="bg-gray-900 p-3.5 rounded-xl border border-amber-800/50 shadow space-y-2">
