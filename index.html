@@ -212,14 +212,16 @@
                 slug: "solo_leveling",
                 type: "series",
                 index_file: "anime_index.json",
-                card_file: "ANIME_1.JSON"
+                card_file: "ANIME_1.JSON",
+                card_line: 3,
+                db_file: "anime_1_1080p.json",
+                db_line: 3
             }
         ];
 
         let currentBannerIndex = 0;
         let sliderTimer = null;
 
-        // Page load hone par 1 second baad Telegram popup show karne ke liye
         window.addEventListener("DOMContentLoaded", () => {
             setTimeout(() => {
                 document.getElementById("telegramPopup").classList.remove("hidden");
@@ -337,6 +339,26 @@
                         }
                     }
 
+                    // Extract exact video/zip database file & line pointer from Master Index
+                    let firstVideoFile = "";
+                    let firstLineNum = 1;
+                    let zipFileRef = "";
+                    let zipLineNum = 1;
+
+                    if (entry.video_files && Object.keys(entry.video_files).length > 0) {
+                        let firstQKey = Object.keys(entry.video_files)[0];
+                        let vInfo = entry.video_files[firstQKey];
+                        firstVideoFile = typeof vInfo === 'string' ? vInfo : (vInfo ? vInfo.file : "");
+                        firstLineNum = (vInfo && typeof vInfo === 'object') ? (vInfo.line || 1) : 1;
+                    }
+
+                    if (entry.zip_files && Object.keys(entry.zip_files).length > 0) {
+                        let firstZKey = Object.keys(entry.zip_files)[0];
+                        let zInfo = entry.zip_files[firstZKey];
+                        zipFileRef = typeof zInfo === 'string' ? zInfo : (zInfo ? zInfo.file : "");
+                        zipLineNum = (zInfo && typeof zInfo === 'object') ? (zInfo.line || 1) : 1;
+                    }
+
                     loadedCardsMap[slug] = {
                         title: cardDetails.title,
                         image: cardDetails.image,
@@ -346,7 +368,10 @@
                         language: "Dual Audio [Hindi - Jap]",
                         slug: slug,
                         index_file: indexFileName,
-                        card_file: entry.card_file || "ANIME_1.JSON"
+                        card_file: entry.card_file || "ANIME_1.JSON",
+                        card_line: entry.card_line || 1,
+                        db_file: firstVideoFile || zipFileRef,
+                        db_line: firstLineNum || zipLineNum
                     };
                 }
             }
@@ -371,9 +396,9 @@
             }, 4000);
         }
 
-        // 🔥 SHORTER URL FUNCTION: Ab link sirf anime, index, aur card_file pass karega[span_3](start_span)[span_3](end_span)
+        // 🔥 O(1) Direct Pointer Routing URL mapping
         function getDetailUrl(card) {
-            return `anime.html?anime=${card.slug}&index=${card.index_file}&card_file=${card.card_file}`;
+            return `anime.html?anime=${card.slug}&index=${card.index_file}&card_file=${card.card_file}&card_line=${card.card_line}&db=${card.db_file}&db_line=${card.db_line}`;
         }
 
         function renderHeroBanner(banner) {
