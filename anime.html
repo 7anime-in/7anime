@@ -84,7 +84,7 @@
             </div>
         </div>
 
-        <!-- ==================== ZIP FILE DOWNLOAD SECTION (NEW) ==================== -->
+        <!-- ==================== ZIP FILE DOWNLOAD SECTION ==================== -->
         <div id="zipDownloadSection" class="bg-[#1f2833] p-4 md:p-6 rounded-xl border border-gray-800 shadow-xl space-y-4 hidden">
             <h3 class="text-xs font-bold text-amber-400 uppercase tracking-wider border-b border-gray-800 pb-2 text-center">
                 <i class="fa-solid fa-file-zipper mr-1"></i> Full Season Zip Downloads (Direct Batch)
@@ -116,7 +116,7 @@
         <p>© 2026 7anime. Direct Telegram & Server Downloads.</p>
     </footer>
 
-    <!-- ==================== JS LOGIC (WITH ZIP FILE SUPPORT & DIRECT POINTER ROUTING) ==================== -->
+    <!-- ==================== JS LOGIC (STRICT SEASON-FIRST SORTING) ==================== -->
     <script>
         "use strict";
 
@@ -136,6 +136,20 @@
                 return `https://lh3.googleusercontent.com/d/${driveMatch[1]}`;
             }
             return url;
+        }
+
+        function extractSeasonNumber(seasonStr) {
+            let match = (seasonStr || "").match(/\d+/);
+            return match ? parseInt(match[0], 10) : 1;
+        }
+
+        function extractQualityOrder(qualityStr) {
+            let q = (qualityStr || "").toLowerCase();
+            if (q.includes("480")) return 1;
+            if (q.includes("720")) return 2;
+            if (q.includes("1080")) return 3;
+            if (q.includes("4k") || q.includes("2160")) return 4;
+            return 5;
         }
 
         async function fetchAnimeViaMasterIndex() {
@@ -215,7 +229,9 @@
                                         if (!uniqueCombosMap.has(comboKey)) {
                                             uniqueCombosMap.set(comboKey, {
                                                 season: seasonStr,
+                                                seasonNum: parseInt(seasonNum, 10),
                                                 quality: qualityName,
+                                                qualityOrder: extractQualityOrder(qualityName),
                                                 dbFile: vFilename,
                                                 lineNum: lineNum
                                             });
@@ -227,7 +243,9 @@
                                     if (!uniqueCombosMap.has(comboKey)) {
                                         uniqueCombosMap.set(comboKey, {
                                             season: "Season 1",
+                                            seasonNum: 1,
                                             quality: qualityName,
+                                            qualityOrder: extractQualityOrder(qualityName),
                                             dbFile: vFilename,
                                             lineNum: lineNum
                                         });
@@ -239,7 +257,7 @@
                 }
             }
 
-            // 4. Process Zip Files from Master Index (Direct Pointer Routing)
+            // 4. Process Zip Files from Master Index
             let zipCombosList = [];
             if (entry && entry.zip_files) {
                 for (let zKey of Object.keys(entry.zip_files)) {
@@ -275,11 +293,21 @@
             if (uniqueCombosMap.size === 0) {
                 uniqueCombosMap.set("Season 1|480p", {
                     season: "Season 1",
+                    seasonNum: 1,
                     quality: "480p",
+                    qualityOrder: 1,
                     dbFile: "anime_1_480p.json",
                     lineNum: 1
                 });
             }
+
+            // 🔥 STRICT SEASON-FIRST SORTING: Season 1 (480p, 720p, 1080p) -> Season 2 (480p, 720p, 1080p)...
+            let sortedCombos = Array.from(uniqueCombosMap.values()).sort((a, b) => {
+                if (a.seasonNum !== b.seasonNum) {
+                    return a.seasonNum - b.seasonNum; // Pehle Season 1, phir Season 2...
+                }
+                return a.qualityOrder - b.qualityOrder; // Season ke andar 480p, 720p, 1080p...
+            });
 
             return {
                 card: cardDetails || { 
@@ -287,10 +315,10 @@
                     poster: "https://via.placeholder.com/200x300?text=7anime",
                     synopsis: "No synopsis available."
                 },
-                combos: Array.from(uniqueCombosMap.values()),
+                combos: sortedCombos,
                 zipCombos: zipCombosList,
                 qualities: Array.from(detectedQualities),
-                seasons: Array.from(detectedSeasons),
+                seasons: Array.from(detectedSeasons).sort((a, b) => extractSeasonNumber(a) - extractSeasonNumber(b)),
                 totalEpisodes: maxEpisodes > 0 ? maxEpisodes : (cardDetails?.total_episodes || cardDetails?.episodes || "12")
             };
         }
