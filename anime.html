@@ -87,7 +87,7 @@
         <!-- ==================== ZIP FILE DOWNLOAD SECTION ==================== -->
         <div id="zipDownloadSection" class="bg-[#1f2833] p-4 md:p-6 rounded-xl border border-gray-800 shadow-xl space-y-4 hidden">
             <h3 class="text-xs font-bold text-amber-400 uppercase tracking-wider border-b border-gray-800 pb-2 text-center">
-                <i class="fa-solid fa-file-zipper mr-1"></i> Full Season Zip Downloads (Direct Batch)
+                <i class="fa-solid fa-file-zipper mr-1"></i> ZIP / BATCH DOWNLOADS
             </h3>
             <div id="zipDownloadContainer" class="space-y-3">
             </div>
@@ -116,7 +116,7 @@
         <p>© 2026 7anime. Direct Telegram & Server Downloads.</p>
     </footer>
 
-    <!-- ==================== JS LOGIC (INDIVIDUAL BUTTON INFO LINE) ==================== -->
+    <!-- ==================== JS LOGIC ==================== -->
     <script>
         "use strict";
 
@@ -257,8 +257,8 @@
                 }
             }
 
-            // 4. Process Zip Files from Master Index
-             let zipCombosList = [];
+            // 4. Process Multi-Season Zip Files Dynamically from Master Index & DB
+            let zipCombosList = [];
             if (entry && entry.zip_files) {
                 for (let zKey of Object.keys(entry.zip_files)) {
                     let zInfo = entry.zip_files[zKey];
@@ -276,11 +276,38 @@
                                 let zItem = zDict[rawSlug];
                                 if (!cardDetails) cardDetails = zItem;
 
-                                zipCombosList.push({
-                                    title: zKey.toUpperCase(),
-                                    dbFile: zFilename,
-                                    lineNum: zLineNum
-                                });
+                                let zDownloads = zItem.downloads || {};
+                                let zipAudio = zItem.audio_language || zItem.audio || cardDetails?.audio_language || "Dual Audio (Hindi + Japanese)";
+
+                                let zipKeys = Object.keys(zDownloads);
+                                if (zipKeys.length > 0) {
+                                    zipKeys.forEach(zipDlKey => {
+                                        let sMatch = zipDlKey.match(/Season\s*(\d+)/i) || zipDlKey.match(/S(\d+)/i);
+                                        let seasonNum = sMatch ? sMatch[1] : "1";
+                                        let seasonStr = `Season ${seasonNum}`;
+
+                                        let qMatch = zipDlKey.match(/(480p|720p|1080p|4K|2160p)/i);
+                                        let qualityStr = qMatch ? qMatch[1].toUpperCase() : zKey.toUpperCase();
+
+                                        zipCombosList.push({
+                                            zipKey: zipDlKey,
+                                            season: seasonStr,
+                                            quality: qualityStr,
+                                            dbFile: zFilename,
+                                            lineNum: zLineNum,
+                                            audio: zipAudio
+                                        });
+                                    });
+                                } else {
+                                    zipCombosList.push({
+                                        zipKey: zKey.toUpperCase(),
+                                        season: "Season 1",
+                                        quality: zKey.toUpperCase(),
+                                        dbFile: zFilename,
+                                        lineNum: zLineNum,
+                                        audio: zipAudio
+                                    });
+                                }
                             }
                         }
                     } catch (err) {}
@@ -458,7 +485,6 @@
             const section = document.getElementById("zipDownloadSection");
             const container = document.getElementById("zipDownloadContainer");
             const animeTitle = animeData ? (animeData.title || rawSlug.replace(/_/g, ' ').toUpperCase()) : rawSlug.replace(/_/g, ' ').toUpperCase();
-            const audioType = animeData ? (animeData.audio_language || animeData.language || animeData.audio || "Dual Audio (Hindi + Japanese)") : "Dual Audio (Hindi + Japanese)";
 
             if (!zipList || zipList.length === 0) {
                 section.classList.add("hidden");
@@ -467,18 +493,18 @@
 
             section.classList.remove("hidden");
             container.innerHTML = zipList.map(zip => {
-                const targetAdsUrl = `ads1.html?anime=${rawSlug}&type=zip&title=${encodeURIComponent(zip.title)}&index=${paramIndexFile}&card_file=${paramCardFile}&card_line=${paramCardLine}&db=${encodeURIComponent(zip.dbFile)}&db_line=${zip.lineNum}`;
+                const targetAdsUrl = `ads1.html?anime=${rawSlug}&type=zip&season=${encodeURIComponent(zip.season)}&quality=${encodeURIComponent(zip.quality)}&title=${encodeURIComponent(zip.zipKey)}&index=${paramIndexFile}&card_file=${paramCardFile}&card_line=${paramCardLine}&db=${encodeURIComponent(zip.dbFile)}&db_line=${zip.lineNum}`;
 
                 return `
                     <div class="bg-gray-900 p-3.5 rounded-xl border border-amber-800/50 shadow space-y-2">
                         <div class="text-[11px] text-amber-300 font-semibold border-b border-gray-800/80 pb-1.5 flex items-center justify-between">
-                            <span><i class="fa-solid fa-circle-info mr-1 text-amber-400"></i> ${animeTitle} - Full Season Zip (${zip.title})</span>
-                            <span class="text-emerald-400 text-[10px]">${audioType}</span>
+                            <span><i class="fa-solid fa-file-zipper mr-1 text-amber-400"></i> ${animeTitle} - ${zip.season} (${zip.quality}) Zip Archive</span>
+                            <span class="text-emerald-400 text-[10px]">${zip.audio}</span>
                         </div>
                         <div class="flex items-center justify-between">
                             <div class="flex items-center gap-2">
                                 <i class="fa-solid fa-file-zipper text-amber-400"></i>
-                                <span class="text-xs font-extrabold text-white uppercase">${zip.title} (ZIP / BATCH)</span>
+                                <span class="text-xs font-extrabold text-white uppercase">${zip.zipKey}</span>
                             </div>
                             <a 
                                 href="${targetAdsUrl}" 
