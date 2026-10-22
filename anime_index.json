@@ -1,21 +1,14 @@
 {
   "ranma1_2": {
     "type": "series",
-    "channel": "@ranma1_2_7anime",
-    "card_file": "",
-    "card_line": 1,
+    "channel": "sevenanime_ch1",
+    "card_file": "ANIME_1.JSON",
+    "card_line": 3,
     "video_files": {},
-    "zip_files": {
-      "1080p": {
-        "file": "zip_anime_1_1080p.json",
-        "line": 3
-      }
-    },
+    "zip_files": {},
     "seasons": [
       "Season 1"
     ],
-    "qualities": [
-      "1080p"
-    ]
+    "qualities": []
   }
 }
