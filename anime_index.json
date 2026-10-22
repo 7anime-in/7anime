@@ -8,6 +8,10 @@
       "480p": {
         "file": "anime_1_480p.json",
         "line": 3
+      },
+      "720p": {
+        "file": "anime_1_720p.json",
+        "line": 3
       }
     },
     "zip_files": {
@@ -21,7 +25,8 @@
     ],
     "qualities": [
       "1080p",
-      "480p"
+      "480p",
+      "720p"
     ]
   },
   "tomb_raider_king_hindi_dubbed": {
