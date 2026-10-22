@@ -1,0 +1,34 @@
+{
+  "cards": {
+    "ranma1_2": {
+      "title": "RANMA1/2",
+      "image": "https://drive.google.com/file/d/12k6_uu9rtbkjOIcLJUos1DqBQtatPmCu/view?usp=drivesdk",
+      "genres": "Action, Fantasy",
+      "rating": "9.0",
+      "type": "series",
+      "description": "Name: Ranma1/2\n\nSeason: 01\n\nEpisodes: 12\n\nRelease Year: 2024\n\nRunTime: 23min\n\n Genre: Animation, Action & Adventure, Comedy, Sci-Fi & Fantasy\n\nLanguage: Hindi\n\nQuality: (480p, 720p, 1080p)",
+      "slug": "ranma1_2",
+      "screenshots": []
+    },
+    "tomb_raider_king_hindi_dubbed": {
+      "title": "Tomb Raider King Hindi Dubbed",
+      "image": "https://drive.google.com/file/d/1_GKbBHpObfJfKGZfEjNj107vUh5VHPUr/view?usp=drivesdk",
+      "genres": "Action, Fantasy",
+      "rating": "9.0",
+      "type": "series",
+      "description": "🎬 ᴀɴɪᴍᴇ : Tomb Raider King \n━━━━━━━━━━━━━━━━━━━⭒\n❖ Sᴇᴀsᴏɴ: 01\n❖ ᴇᴘɪꜱᴏᴅᴇꜱ: 12\n❖ ᴀᴜᴅɪᴏ: [Hindi] #Official \n❖ Qᴜᴀʟɪᴛʏ: 480ᴘ • 720ᴘ • 1080ᴘ\n❖ ɢᴇɴʀᴇꜱ: Action, Adventure, Fantasy\n━━━━━━━━━━━━━━━━━━━⭒\n‣ Synopsis : Chaos ensues overnight when mysterious tombs suddenly surface, filled with divine relics granting overwhelming power, triggering a global power struggle to claim them for dominion. Among the havoc, a raider, Jooheon Suh, is betrayed and left for dead until a second chance brings him back years before the relics. Fueled by fury and future knowledge, he sets out to raid each tomb before they arise.\n\n(Source: Crunchyroll)",
+      "slug": "tomb_raider_king_hindi_dubbed",
+      "screenshots": []
+    },
+    "solo_leveling": {
+      "title": "solo leveling",
+      "image": "https://drive.google.com/file/d/1J1BGy-wa3xewU7Butc-SdEv6gEU2tzEw/view?usp=drivesdk",
+      "genres": "Action, Fantasy",
+      "rating": "9.0",
+      "type": "series",
+      "description": "Solo Leveling\n\n╭━━━━━━━━━━━━━━━━━━━━━━━━━\n┣‣Season :- 01,02,03\n┣‣Episodes :- 12\n┣‣Quality :- 480p, 720p, 1080p, 4K [Dual]\n┣‣Language :- Hindi Dub [#OFFICIAL]\n┣‣Ganr :- Action, Adventure, Fantasy, Magic, Animation, Demons, Dark\n╰━━━━━━━━━━━━━━━━━━━━━━━━━",
+      "slug": "solo_leveling",
+      "screenshots": []
+    }
+  }
+}
