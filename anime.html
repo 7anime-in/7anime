@@ -84,6 +84,16 @@
             </div>
         </div>
 
+        <!-- ==================== ZIP FILE DOWNLOAD SECTION (NEW) ==================== -->
+        <div id="zipDownloadSection" class="bg-[#1f2833] p-4 md:p-6 rounded-xl border border-gray-800 shadow-xl space-y-4 hidden">
+            <h3 class="text-xs font-bold text-amber-400 uppercase tracking-wider border-b border-gray-800 pb-2 text-center">
+                <i class="fa-solid fa-file-zipper mr-1"></i> Full Season Zip Downloads (Direct Batch)
+            </h3>
+            <div id="zipDownloadContainer" class="space-y-3">
+            </div>
+        </div>
+
+        <!-- ==================== VIDEO DOWNLOAD SECTION ==================== -->
         <div class="bg-[#1f2833] p-4 md:p-6 rounded-xl border border-gray-800 shadow-xl space-y-4">
             <h3 class="text-xs font-bold text-white uppercase tracking-wider border-b border-gray-800 pb-2 text-center">
                 <i class="fa-solid fa-cloud-arrow-down text-[#66fcf1] mr-1"></i> Download High-Speed Links
@@ -106,7 +116,7 @@
         <p>© 2026 7anime. Direct Telegram & Server Downloads.</p>
     </footer>
 
-    <!-- ==================== JS LOGIC (DEBUG-ENABLED & ROBUST DIRECT POINTER RESOLUTION) ==================== -->
+    <!-- ==================== JS LOGIC (WITH ZIP FILE SUPPORT & DIRECT POINTER ROUTING) ==================== -->
     <script>
         "use strict";
 
@@ -118,8 +128,6 @@
         const paramIndexFile = urlParams.get('index') || 'anime_index.json';
         const paramCardFile = urlParams.get('card_file') || 'ANIME_1.JSON';
         const paramCardLine = urlParams.get('card_line') || '1';
-        const paramDbFile = urlParams.get('db');
-        const paramDbLine = urlParams.get('db_line') || '1';
 
         function formatImageUrl(url) {
             if (!url) return "https://via.placeholder.com/200x300?text=7anime";
@@ -134,8 +142,8 @@
             let entry = null;
             let cardDetails = null;
 
-            // 1. Direct Master Index Fetch with Fallback Casing
-            const indexCandidates = [paramIndexFile, paramIndexFile.toLowerCase(), 'anime_index.json', 'anime_index_2.json'];
+            // 1. Fetch Master Index File
+            const indexCandidates = [paramIndexFile, paramIndexFile.toLowerCase(), 'anime_index.json', 'movie_index.json', 'hantai_index.json'];
             for (let idxFile of [...new Set(indexCandidates)]) {
                 try {
                     const res = await fetch(`./${idxFile}?v=${Date.now()}`);
@@ -146,13 +154,11 @@
                             break;
                         }
                     }
-                } catch (err) {
-                    console.warn(`Could not load index file: ${idxFile}`, err);
-                }
+                } catch (err) {}
             }
 
-            // 2. Direct Card File Fetch with Fallback Casing
-            const cardCandidates = [paramCardFile, paramCardFile.toLowerCase(), paramCardFile.toUpperCase(), 'ANIME_1.JSON', 'anime_1.json', 'ANIME_1_2.JSON'];
+            // 2. Fetch Card Details File
+            const cardCandidates = [paramCardFile, paramCardFile.toLowerCase(), paramCardFile.toUpperCase(), 'ANIME_1.JSON', 'anime_1.json'];
             for (let cFile of [...new Set(cardCandidates)]) {
                 try {
                     const cardRes = await fetch(`./${cFile}?v=${Date.now()}`);
@@ -164,104 +170,116 @@
                             break;
                         }
                     }
-                } catch (err) {
-                    console.warn(`Could not load card file: ${cFile}`, err);
-                }
+                } catch (err) {}
             }
 
-            // 3. Direct Database File Fallback if Card details are missing
+            // 3. Process Video Files from Master Index
             let uniqueCombosMap = new Map();
             let detectedQualities = new Set();
             let detectedSeasons = new Set();
             let maxEpisodes = 0;
 
-            let filesToFetch = new Set();
-            if (paramDbFile) filesToFetch.add(paramDbFile);
             if (entry && entry.video_files) {
-                Object.values(entry.video_files).forEach(vInfo => {
-                    let f = typeof vInfo === 'string' ? vInfo : (vInfo ? vInfo.file : null);
-                    if (f) filesToFetch.add(f);
-                });
-            }
-            // Add default fallback DB if none specified
-            filesToFetch.add('anime_1_480p.json');
+                for (let qKey of Object.keys(entry.video_files)) {
+                    let vInfo = entry.video_files[qKey];
+                    let vFilename = typeof vInfo === 'string' ? vInfo : (vInfo ? vInfo.file : null);
+                    let lineNum = (typeof vInfo === 'object') ? (vInfo.line || 1) : 1;
 
-            for (let vFilename of filesToFetch) {
-                try {
-                    const vRes = await fetch(`./${vFilename}?v=${Date.now()}`);
-                    if (vRes.ok) {
-                        const vJson = await vRes.json();
-                        const vDict = vJson.cards || vJson;
-                        if (vDict[rawSlug]) {
-                            let item = vDict[rawSlug];
-                            
-                            // If cardDetails was missing, extract info from db item directly!
-                            if (!cardDetails) {
-                                cardDetails = item;
-                            }
+                    if (!vFilename) continue;
 
-                            let downloads = item.downloads || {};
-                            let epCount = Object.keys(downloads).length;
-                            if (epCount > maxEpisodes) maxEpisodes = epCount;
+                    try {
+                        const vRes = await fetch(`./${vFilename}?v=${Date.now()}`);
+                        if (vRes.ok) {
+                            const vJson = await vRes.json();
+                            const vDict = vJson.cards || vJson;
+                            if (vDict[rawSlug]) {
+                                let item = vDict[rawSlug];
+                                if (!cardDetails) cardDetails = item;
 
-                            let matchedQ = "480p";
-                            if (vFilename.includes("720p")) matchedQ = "720p";
-                            if (vFilename.includes("1080p")) matchedQ = "1080p";
-                            if (entry && entry.video_files) {
-                                for (let qKey of Object.keys(entry.video_files)) {
-                                    let info = entry.video_files[qKey];
-                                    let fName = typeof info === 'string' ? info : info.file;
-                                    if (fName === vFilename) {
-                                        matchedQ = qKey;
-                                        break;
-                                    }
-                                }
-                            }
+                                let downloads = item.downloads || {};
+                                let epCount = Object.keys(downloads).length;
+                                if (epCount > maxEpisodes) maxEpisodes = epCount;
 
-                            Object.keys(downloads).forEach(dlKey => {
-                                let sMatch = dlKey.match(/Season\s*(\d+)/i) || dlKey.match(/S(\d+)/i);
-                                let seasonNum = sMatch ? sMatch[1] : "1";
-                                let seasonStr = `Season ${seasonNum}`;
-                                detectedSeasons.add(seasonStr);
+                                let qualityName = qKey.toUpperCase();
+                                detectedQualities.add(qualityName);
 
-                                let qMatch = dlKey.match(/(480p|720p|1080p|4k)/i);
-                                let detectedQuality = qMatch ? qMatch[1].toLowerCase() : matchedQ;
-                                detectedQualities.add(detectedQuality.toUpperCase());
+                                let seasonsInDownloads = Object.keys(downloads);
+                                if (seasonsInDownloads.length > 0) {
+                                    seasonsInDownloads.forEach(dlKey => {
+                                        let sMatch = dlKey.match(/Season\s*(\d+)/i) || dlKey.match(/S(\d+)/i);
+                                        let seasonNum = sMatch ? sMatch[1] : "1";
+                                        let seasonStr = `Season ${seasonNum}`;
+                                        detectedSeasons.add(seasonStr);
 
-                                let comboKey = `${seasonStr}|${detectedQuality}`;
-                                if (!uniqueCombosMap.has(comboKey)) {
-                                    let lineNum = paramDbLine;
-                                    if (entry && entry.video_files && entry.video_files[detectedQuality]) {
-                                        let inf = entry.video_files[detectedQuality];
-                                        lineNum = (typeof inf === 'object') ? (inf.line || paramDbLine) : paramDbLine;
-                                    }
-
-                                    uniqueCombosMap.set(comboKey, {
-                                        season: seasonStr,
-                                        quality: detectedQuality,
-                                        dbFile: vFilename,
-                                        lineNum: lineNum
+                                        let comboKey = `${seasonStr}|${qualityName}`;
+                                        if (!uniqueCombosMap.has(comboKey)) {
+                                            uniqueCombosMap.set(comboKey, {
+                                                season: seasonStr,
+                                                quality: qualityName,
+                                                dbFile: vFilename,
+                                                lineNum: lineNum
+                                            });
+                                        }
                                     });
+                                } else {
+                                    detectedSeasons.add("Season 1");
+                                    let comboKey = `Season 1|${qualityName}`;
+                                    if (!uniqueCombosMap.has(comboKey)) {
+                                        uniqueCombosMap.set(comboKey, {
+                                            season: "Season 1",
+                                            quality: qualityName,
+                                            dbFile: vFilename,
+                                            lineNum: lineNum
+                                        });
+                                    }
                                 }
-                            });
+                            }
                         }
-                    }
-                } catch (err) {
-                    console.warn(`Could not load db file: ${vFilename}`, err);
+                    } catch (err) {}
                 }
             }
 
-            if (entry) {
-                if (detectedSeasons.size === 0 && entry.seasons) {
-                    entry.seasons.forEach(s => detectedSeasons.add(s));
-                }
-                if (entry.qualities) {
-                    entry.qualities.forEach(q => detectedQualities.add(q.toUpperCase()));
+            // 4. Process Zip Files from Master Index (Direct Pointer Routing)
+            let zipCombosList = [];
+            if (entry && entry.zip_files) {
+                for (let zKey of Object.keys(entry.zip_files)) {
+                    let zInfo = entry.zip_files[zKey];
+                    let zFilename = typeof zInfo === 'string' ? zInfo : (zInfo ? zInfo.file : null);
+                    let zLineNum = (typeof zInfo === 'object') ? (zInfo.line || 1) : 1;
+
+                    if (!zFilename) continue;
+
+                    try {
+                        const zRes = await fetch(`./${zFilename}?v=${Date.now()}`);
+                        if (zRes.ok) {
+                            const zJson = await zRes.json();
+                            const zDict = zJson.cards || zJson;
+                            if (zDict[rawSlug]) {
+                                let zItem = zDict[rawSlug];
+                                if (!cardDetails) cardDetails = zItem;
+
+                                zipCombosList.push({
+                                    title: zKey.toUpperCase(),
+                                    dbFile: zFilename,
+                                    lineNum: zLineNum
+                                });
+                            }
+                        }
+                    } catch (err) {}
                 }
             }
 
             if (detectedSeasons.size === 0) detectedSeasons.add("Season 1");
             if (detectedQualities.size === 0) detectedQualities.add("480p");
+
+            if (uniqueCombosMap.size === 0) {
+                uniqueCombosMap.set("Season 1|480p", {
+                    season: "Season 1",
+                    quality: "480p",
+                    dbFile: "anime_1_480p.json",
+                    lineNum: 1
+                });
+            }
 
             return {
                 card: cardDetails || { 
@@ -270,6 +288,7 @@
                     synopsis: "No synopsis available."
                 },
                 combos: Array.from(uniqueCombosMap.values()),
+                zipCombos: zipCombosList,
                 qualities: Array.from(detectedQualities),
                 seasons: Array.from(detectedSeasons),
                 totalEpisodes: maxEpisodes > 0 ? maxEpisodes : (cardDetails?.total_episodes || cardDetails?.episodes || "12")
@@ -289,13 +308,8 @@
                     populateUI(animeData);
                     renderScreenshots(animeData.screenshots || animeData.images || animeData.ss);
 
-                    let combos = masterResult.combos;
-                    if (combos.length === 0) {
-                        combos = [
-                            { season: "Season 1", quality: "480p", dbFile: paramDbFile || "anime_1_480p.json", lineNum: paramDbLine }
-                        ];
-                    }
-                    renderBatchQualityButtons(combos);
+                    renderBatchQualityButtons(masterResult.combos);
+                    renderZipDownloadButtons(masterResult.zipCombos);
                 } else {
                     console.error("Failed to resolve anime data for slug:", rawSlug);
                 }
@@ -346,14 +360,6 @@
                 genresArray = genresRaw.map(g => typeof g === 'string' ? g.trim() : '').filter(g => g.length > 0);
             }
 
-            if (genresArray.length === 0 && (info.synopsis || info.description)) {
-                let syn = info.synopsis || info.description;
-                let match = syn.match(/Ganr\s*[:-]\s*([^\n]+)/i);
-                if (match && match[1]) {
-                    genresArray = match[1].split(',').map(g => g.trim()).filter(g => g.length > 0);
-                }
-            }
-
             if (genresArray.length === 0) {
                 genresArray = ["Action", "Fantasy"];
             }
@@ -391,7 +397,7 @@
                 let btnColor = "bg-emerald-600 hover:bg-emerald-500 text-white";
                 if (quality.includes("720")) btnColor = "bg-blue-600 hover:bg-blue-500 text-white";
                 if (quality.includes("1080")) btnColor = "bg-purple-600 hover:bg-purple-500 text-white";
-                if (quality.includes("4k")) btnColor = "bg-amber-600 hover:bg-amber-500 text-white";
+                if (quality.includes("4K")) btnColor = "bg-amber-600 hover:bg-amber-500 text-white";
 
                 const targetAdsUrl = `ads1.html?anime=${rawSlug}&season=${encodeURIComponent(seasonName)}&quality=${encodeURIComponent(quality)}&index=${paramIndexFile}&card_file=${paramCardFile}&card_line=${paramCardLine}&db=${encodeURIComponent(dbFile)}&db_line=${lineNum}`;
 
@@ -407,6 +413,37 @@
                             class="${btnColor} font-extrabold text-xs px-5 py-2.5 rounded-lg transition shadow flex items-center gap-2"
                         >
                             <i class="fa-solid fa-download"></i> Fast Download
+                        </a>
+                    </div>
+                `;
+            }).join("");
+        }
+
+        function renderZipDownloadButtons(zipList) {
+            const section = document.getElementById("zipDownloadSection");
+            const container = document.getElementById("zipDownloadContainer");
+
+            if (!zipList || zipList.length === 0) {
+                section.classList.add("hidden");
+                return;
+            }
+
+            section.classList.remove("hidden");
+            container.innerHTML = zipList.map(zip => {
+                const targetAdsUrl = `ads1.html?anime=${rawSlug}&type=zip&title=${encodeURIComponent(zip.title)}&index=${paramIndexFile}&card_file=${paramCardFile}&card_line=${paramCardLine}&db=${encodeURIComponent(zip.dbFile)}&db_line=${zip.lineNum}`;
+
+                return `
+                    <div class="flex items-center justify-between bg-gray-900 p-3.5 rounded-xl border border-amber-800/50 shadow">
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-file-zipper text-amber-400"></i>
+                            <span class="text-xs font-extrabold text-white uppercase">${zip.title} (ZIP / BATCH)</span>
+                        </div>
+                        <a 
+                            href="${targetAdsUrl}" 
+                            onclick="handleAdRedirect(event, '${targetAdsUrl}')"
+                            class="bg-amber-600 hover:bg-amber-500 text-white font-extrabold text-xs px-5 py-2.5 rounded-lg transition shadow flex items-center gap-2"
+                        >
+                            <i class="fa-solid fa-download"></i> Download Zip
                         </a>
                     </div>
                 `;
