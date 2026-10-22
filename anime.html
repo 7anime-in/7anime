@@ -116,7 +116,7 @@
         <p>© 2026 7anime. Direct Telegram & Server Downloads.</p>
     </footer>
 
-    <!-- ==================== JS LOGIC (STRICT SEASON-FIRST SORTING) ==================== -->
+    <!-- ==================== JS LOGIC (INDIVIDUAL BUTTON INFO LINE) ==================== -->
     <script>
         "use strict";
 
@@ -258,7 +258,7 @@
             }
 
             // 4. Process Zip Files from Master Index
-            let zipCombosList = [];
+             let zipCombosList = [];
             if (entry && entry.zip_files) {
                 for (let zKey of Object.keys(entry.zip_files)) {
                     let zInfo = entry.zip_files[zKey];
@@ -301,12 +301,11 @@
                 });
             }
 
-            // 🔥 STRICT SEASON-FIRST SORTING: Season 1 (480p, 720p, 1080p) -> Season 2 (480p, 720p, 1080p)...
             let sortedCombos = Array.from(uniqueCombosMap.values()).sort((a, b) => {
                 if (a.seasonNum !== b.seasonNum) {
-                    return a.seasonNum - b.seasonNum; // Pehle Season 1, phir Season 2...
+                    return a.seasonNum - b.seasonNum;
                 }
-                return a.qualityOrder - b.qualityOrder; // Season ke andar 480p, 720p, 1080p...
+                return a.qualityOrder - b.qualityOrder;
             });
 
             return {
@@ -415,6 +414,8 @@
 
         function renderBatchQualityButtons(comboList) {
             const container = document.getElementById("qualityDownloadContainer");
+            const animeTitle = animeData ? (animeData.title || rawSlug.replace(/_/g, ' ').toUpperCase()) : rawSlug.replace(/_/g, ' ').toUpperCase();
+            const audioType = animeData ? (animeData.audio_language || animeData.language || animeData.audio || "Dual Audio (Hindi + Japanese)") : "Dual Audio (Hindi + Japanese)";
             
             container.innerHTML = comboList.map(combo => {
                 const seasonName = combo.season;
@@ -430,18 +431,24 @@
                 const targetAdsUrl = `ads1.html?anime=${rawSlug}&season=${encodeURIComponent(seasonName)}&quality=${encodeURIComponent(quality)}&index=${paramIndexFile}&card_file=${paramCardFile}&card_line=${paramCardLine}&db=${encodeURIComponent(dbFile)}&db_line=${lineNum}`;
 
                 return `
-                    <div class="flex items-center justify-between bg-gray-900 p-3.5 rounded-xl border border-gray-800 shadow">
-                        <div class="flex items-center gap-2">
-                            <i class="fa-solid fa-folder-closed text-[#66fcf1]"></i>
-                            <span class="text-xs font-extrabold text-white uppercase">${seasonName} (${quality.toUpperCase()})</span>
+                    <div class="bg-gray-900 p-3.5 rounded-xl border border-gray-800 shadow space-y-2">
+                        <div class="text-[11px] text-cyan-400 font-semibold border-b border-gray-800/80 pb-1.5 flex items-center justify-between">
+                            <span><i class="fa-solid fa-circle-info mr-1 text-[#66fcf1]"></i> ${animeTitle} - ${seasonName} (${quality.toUpperCase()})</span>
+                            <span class="text-emerald-400 text-[10px]">${audioType}</span>
                         </div>
-                        <a 
-                            href="${targetAdsUrl}" 
-                            onclick="handleAdRedirect(event, '${targetAdsUrl}')"
-                            class="${btnColor} font-extrabold text-xs px-5 py-2.5 rounded-lg transition shadow flex items-center gap-2"
-                        >
-                            <i class="fa-solid fa-download"></i> Fast Download
-                        </a>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <i class="fa-solid fa-folder-closed text-[#66fcf1]"></i>
+                                <span class="text-xs font-extrabold text-white uppercase">${seasonName} (${quality.toUpperCase()})</span>
+                            </div>
+                            <a 
+                                href="${targetAdsUrl}" 
+                                onclick="handleAdRedirect(event, '${targetAdsUrl}')"
+                                class="${btnColor} font-extrabold text-xs px-5 py-2.5 rounded-lg transition shadow flex items-center gap-2"
+                            >
+                                <i class="fa-solid fa-download"></i> Fast Download
+                            </a>
+                        </div>
                     </div>
                 `;
             }).join("");
@@ -450,6 +457,8 @@
         function renderZipDownloadButtons(zipList) {
             const section = document.getElementById("zipDownloadSection");
             const container = document.getElementById("zipDownloadContainer");
+            const animeTitle = animeData ? (animeData.title || rawSlug.replace(/_/g, ' ').toUpperCase()) : rawSlug.replace(/_/g, ' ').toUpperCase();
+            const audioType = animeData ? (animeData.audio_language || animeData.language || animeData.audio || "Dual Audio (Hindi + Japanese)") : "Dual Audio (Hindi + Japanese)";
 
             if (!zipList || zipList.length === 0) {
                 section.classList.add("hidden");
@@ -461,18 +470,24 @@
                 const targetAdsUrl = `ads1.html?anime=${rawSlug}&type=zip&title=${encodeURIComponent(zip.title)}&index=${paramIndexFile}&card_file=${paramCardFile}&card_line=${paramCardLine}&db=${encodeURIComponent(zip.dbFile)}&db_line=${zip.lineNum}`;
 
                 return `
-                    <div class="flex items-center justify-between bg-gray-900 p-3.5 rounded-xl border border-amber-800/50 shadow">
-                        <div class="flex items-center gap-2">
-                            <i class="fa-solid fa-file-zipper text-amber-400"></i>
-                            <span class="text-xs font-extrabold text-white uppercase">${zip.title} (ZIP / BATCH)</span>
+                    <div class="bg-gray-900 p-3.5 rounded-xl border border-amber-800/50 shadow space-y-2">
+                        <div class="text-[11px] text-amber-300 font-semibold border-b border-gray-800/80 pb-1.5 flex items-center justify-between">
+                            <span><i class="fa-solid fa-circle-info mr-1 text-amber-400"></i> ${animeTitle} - Full Season Zip (${zip.title})</span>
+                            <span class="text-emerald-400 text-[10px]">${audioType}</span>
                         </div>
-                        <a 
-                            href="${targetAdsUrl}" 
-                            onclick="handleAdRedirect(event, '${targetAdsUrl}')"
-                            class="bg-amber-600 hover:bg-amber-500 text-white font-extrabold text-xs px-5 py-2.5 rounded-lg transition shadow flex items-center gap-2"
-                        >
-                            <i class="fa-solid fa-download"></i> Download Zip
-                        </a>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <i class="fa-solid fa-file-zipper text-amber-400"></i>
+                                <span class="text-xs font-extrabold text-white uppercase">${zip.title} (ZIP / BATCH)</span>
+                            </div>
+                            <a 
+                                href="${targetAdsUrl}" 
+                                onclick="handleAdRedirect(event, '${targetAdsUrl}')"
+                                class="bg-amber-600 hover:bg-amber-500 text-white font-extrabold text-xs px-5 py-2.5 rounded-lg transition shadow flex items-center gap-2"
+                            >
+                                <i class="fa-solid fa-download"></i> Download Zip
+                            </a>
+                        </div>
                     </div>
                 `;
             }).join("");
