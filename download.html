@@ -66,13 +66,13 @@
             </div>
         </div>
 
-        <!-- ==================== DOWNLOAD SECTION (Smart Conditional View) ==================== -->
+        <!-- ==================== DOWNLOAD SECTION ==================== -->
         <div class="bg-[#1f2833] p-4 md:p-6 rounded-2xl border border-gray-800 flex flex-col gap-5">
             
-            <!-- Season Selector Header (Visible only for Series) -->
+            <!-- Season Selector Header -->
             <div id="seasonHeaderBox" class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-700/60 pb-4">
                 <h2 class="text-xl font-bold text-white flex items-center gap-2">
-                    <i class="fa-solid fa-cloud-arrow-down text-[#66fcf1]"></i> Available Downloads
+                    <i class="fa-solid fa-cloud-arrow-down text-[#66fcf1]"></i> Available Downloads (<span id="activeSeasonLabel" class="text-[#66fcf1]">Season 1</span>)
                 </h2>
                 
                 <!-- Season Buttons -->
@@ -81,7 +81,7 @@
                 </div>
             </div>
 
-            <!-- Download List Container (Dynamic: Series Episodes OR Single ZIP/Movie Card) -->
+            <!-- Download List Container -->
             <div id="episodesDownloadList" class="flex flex-col gap-2 max-h-[600px] overflow-y-auto pr-1">
                 <div class="animate-pulse bg-gray-800 h-14 rounded-lg"></div>
                 <div class="animate-pulse bg-gray-800 h-14 rounded-lg"></div>
@@ -217,8 +217,7 @@
                 let posterUrl = formatImageUrl(animeData.poster);
                 document.getElementById("animePoster").src = posterUrl || `https://via.placeholder.com/300x420/1f2833/66fcf1?text=${encodeURIComponent(animeData.title)}`;
 
-                // Check whether it's a ZIP / Single Archive or a Regular Series Episodes list
-                if (typeParam === 'zip' || Object.keys(animeData.downloads).length <= 2 && titleParam) {
+                if (typeParam === 'zip' || (Object.keys(animeData.downloads).length <= 2 && titleParam)) {
                     renderSingleFileLayout();
                 } else {
                     renderSeriesLayout();
@@ -231,7 +230,6 @@
             }
         }
 
-        // Layout for ZIP / Movie / Single Batch Archive (Clean & Premium Single-Card View)
         function renderSingleFileLayout() {
             document.getElementById("seasonHeaderBox").style.display = "none";
             document.getElementById("serverBadge").innerText = "ZIP / Batch Archive Server";
@@ -269,14 +267,20 @@
             `;
         }
 
-        // Layout for Series / Multiple Episodes (Tabbed Season & Episode List View)
         function renderSeriesLayout() {
             let seasonsMap = {};
             let downloads = animeData.downloads;
 
+            // Normalize requested season from URL for strict filtering
+            let normalizedReqSeason = requestedSeason.toLowerCase().replace(/\s+/g, '');
+
             Object.keys(downloads).forEach(dlKey => {
                 let sMatch = dlKey.match(/Season\s*(\d+)/i) || dlKey.match(/S(\d+)/i);
                 let seasonName = sMatch ? `Season ${sMatch[1]}` : "Season 1";
+                let normSeasonName = seasonName.toLowerCase().replace(/\s+/g, '');
+
+                // STRICT FILTER: Sirf wahi episodes lo jo URL ke requestedSeason se match karte hain
+                if (normSeasonName !== normalizedReqSeason) return;
                 
                 let epMatch = dlKey.match(/Ep\s*(\d+)/i) || dlKey.match(/Episode\s*(\d+)/i) || dlKey.match(/-\s*(\d+)$/);
                 let epNum = epMatch ? parseInt(epMatch[1]) : 1;
@@ -305,10 +309,11 @@
 
             const seasons = Object.keys(animeData.seasons);
             if (seasons.length > 0) {
-                currentSeason = seasons.includes(requestedSeason) ? requestedSeason : seasons[0];
+                currentSeason = seasons[0];
+                document.getElementById("activeSeasonLabel").innerText = currentSeason;
                 renderEpisodeDownloadList(currentSeason);
             } else {
-                document.getElementById("episodesDownloadList").innerHTML = `<p class="text-center py-8 text-gray-500">No episode download links found.</p>`;
+                document.getElementById("episodesDownloadList").innerHTML = `<p class="text-center py-8 text-gray-500">No episodes found for ${requestedSeason} (${requestedQuality.toUpperCase()}).</p>`;
                 document.getElementById("totalEpBadge").innerText = `0 Episodes`;
             }
         }
@@ -332,6 +337,7 @@
 
         function switchSeason(seasonName) {
             currentSeason = seasonName;
+            document.getElementById("activeSeasonLabel").innerText = currentSeason;
             updateTabStyles();
             renderEpisodeDownloadList(seasonName);
         }
