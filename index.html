@@ -150,7 +150,7 @@
 
     </main>
 
-    <!-- ==================== 18+ MODAL ==================== -->
+    <!-- ==================== 18+ AGE MODAL ==================== -->
     <div id="ageModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-[100] hidden flex items-center justify-center p-4">
         <div class="bg-[#1f2833] border border-red-800/80 rounded-2xl p-6 max-w-sm w-full text-center shadow-2xl">
             <div class="w-12 h-12 bg-red-950/60 border border-red-800 text-red-500 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl">
@@ -166,6 +166,27 @@
                 </button>
                 <button onclick="confirmAge()" class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-3 text-xs rounded-xl transition shadow-lg shadow-red-600/30">
                     I am 18 or Older
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== TELEGRAM POPUP MODAL ==================== -->
+    <div id="telegramPopup" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[110] hidden flex items-center justify-center p-4">
+        <div class="bg-[#1f2833] border border-[#66fcf1]/40 rounded-2xl p-6 max-w-sm w-full text-center shadow-2xl">
+            <div class="w-14 h-14 bg-[#66fcf1]/10 border border-[#66fcf1] text-[#66fcf1] rounded-full flex items-center justify-center mx-auto mb-3 text-2xl">
+                <i class="fa-brands fa-telegram"></i>
+            </div>
+            <h3 class="text-xl font-black text-white mb-1.5">Join Telegram Channel</h3>
+            <p class="text-xs text-gray-300 leading-relaxed mb-5">
+                Latest anime updates aur fast download links ke liye hamara official Telegram channel join karein!
+            </p>
+            <div class="flex flex-col gap-2.5">
+                <a href="https://t.me/sevenanimeonline" target="_blank" onclick="closeTelegramPopup()" class="w-full bg-[#66fcf1] hover:bg-[#45a29e] text-black font-bold py-2.5 px-4 text-xs rounded-xl transition shadow-lg shadow-[#66fcf1]/20 flex items-center justify-center gap-2">
+                    <i class="fa-brands fa-telegram text-base"></i> Join Now
+                </a>
+                <button onclick="closeTelegramPopup()" class="w-full bg-gray-800 hover:bg-gray-700 text-gray-300 font-medium py-2 px-4 text-xs rounded-xl transition border border-gray-700">
+                    Later
                 </button>
             </div>
         </div>
@@ -191,15 +212,24 @@
                 slug: "solo_leveling",
                 type: "series",
                 index_file: "anime_index.json",
-                card_file: "ANIME_1.JSON",
-                card_line: 3,
-                db_file: "anime_1_480p.json",
-                db_line: 3
+                card_file: "ANIME_1.JSON"
             }
         ];
 
         let currentBannerIndex = 0;
         let sliderTimer = null;
+
+        // Page load hone par 1 second baad Telegram popup show karne ke liye
+        window.addEventListener("DOMContentLoaded", () => {
+            setTimeout(() => {
+                document.getElementById("telegramPopup").classList.remove("hidden");
+            }, 1000);
+            initPage();
+        });
+
+        function closeTelegramPopup() {
+            document.getElementById("telegramPopup").classList.add("hidden");
+        }
 
         function triggerSmartLink() {
             window.open(SMART_LINK_URL, '_blank');
@@ -286,7 +316,6 @@
                     let entry = indexData[slug];
                     if (loadedCardsMap[slug]) continue;
 
-                    // FIX 1: Strictly inherit type from master index entry or fallback to category default
                     let cardType = entry.type ? entry.type.toLowerCase() : defaultType;
 
                     let cardDetails = {
@@ -308,26 +337,6 @@
                         }
                     }
 
-                    // FIX 2: Safely parse video files or zip files line numbers and filenames from master index
-                    let firstVideoFile = "";
-                    let firstLineNum = 1;
-                    let zipFileRef = "";
-                    let zipLineNum = 1;
-
-                    if (entry.video_files && Object.keys(entry.video_files).length > 0) {
-                        let firstQKey = Object.keys(entry.video_files)[0];
-                        let vInfo = entry.video_files[firstQKey];
-                        firstVideoFile = typeof vInfo === 'string' ? vInfo : (vInfo ? vInfo.file : "");
-                        firstLineNum = (vInfo && typeof vInfo === 'object') ? (vInfo.line || 1) : 1;
-                    }
-
-                    if (entry.zip_files && Object.keys(entry.zip_files).length > 0) {
-                        let firstZKey = Object.keys(entry.zip_files)[0];
-                        let zInfo = entry.zip_files[firstZKey];
-                        zipFileRef = typeof zInfo === 'string' ? zInfo : (zInfo ? zInfo.file : "");
-                        zipLineNum = (zInfo && typeof zInfo === 'object') ? (zInfo.line || 1) : 1;
-                    }
-
                     loadedCardsMap[slug] = {
                         title: cardDetails.title,
                         image: cardDetails.image,
@@ -337,12 +346,7 @@
                         language: "Dual Audio [Hindi - Jap]",
                         slug: slug,
                         index_file: indexFileName,
-                        card_file: entry.card_file || "ANIME_1.JSON",
-                        card_line: entry.card_line || 1,
-                        db_file: firstVideoFile || zipFileRef,
-                        db_line: firstLineNum || zipLineNum,
-                        video_files: entry.video_files || {},
-                        zip_files: entry.zip_files || {}
+                        card_file: entry.card_file || "ANIME_1.JSON"
                     };
                 }
             }
@@ -367,9 +371,9 @@
             }, 4000);
         }
 
-        // FIX 3: Master index parameter mapping correctly structured for detail page URL
+        // 🔥 SHORTER URL FUNCTION: Ab link sirf anime, index, aur card_file pass karega[span_3](start_span)[span_3](end_span)
         function getDetailUrl(card) {
-            return `anime.html?anime=${card.slug}&index=${card.index_file}&card_file=${card.card_file}&card_line=${card.card_line}&db=${card.db_file}&db_line=${card.db_line}`;
+            return `anime.html?anime=${card.slug}&index=${card.index_file}&card_file=${card.card_file}`;
         }
 
         function renderHeroBanner(banner) {
@@ -552,8 +556,6 @@
                 `;
             }).join("");
         }
-
-        window.addEventListener("DOMContentLoaded", initPage);
     </script>
 </body>
 </html>
