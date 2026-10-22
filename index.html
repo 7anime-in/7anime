@@ -226,7 +226,7 @@
             const normalizedType = (type || 'series').toLowerCase();
             if (normalizedType.includes('movie')) {
                 return `<span class="bg-purple-600/85 backdrop-blur-md text-white font-bold text-[9px] px-1.5 py-0.5 rounded uppercase">Movie</span>`;
-            } else if (normalizedType.includes('hentai') || normalizedType.includes('18') || normalizedType.includes('hatai') || normalizedType.includes('pulse')) {
+            } else if (normalizedType.includes('hentai') || normalizedType.includes('18') || normalizedType.includes('hantai') || normalizedType.includes('pulse')) {
                 return `<span class="bg-red-600/85 backdrop-blur-md text-white font-bold text-[9px] px-1.5 py-0.5 rounded uppercase">18+</span>`;
             }
             return `<span class="bg-cyan-600/85 backdrop-blur-md text-white font-bold text-[9px] px-1.5 py-0.5 rounded uppercase">Series</span>`;
@@ -286,6 +286,9 @@
                     let entry = indexData[slug];
                     if (loadedCardsMap[slug]) continue;
 
+                    // FIX 1: Strictly inherit type from master index entry or fallback to category default
+                    let cardType = entry.type ? entry.type.toLowerCase() : defaultType;
+
                     let cardDetails = {
                         title: slug.replace(/_/g, ' ').toUpperCase(),
                         image: "",
@@ -301,33 +304,45 @@
                             cardDetails.image = item.image || item.poster || "";
                             cardDetails.genres = item.genres || cardDetails.genres;
                             cardDetails.rating = item.rating || cardDetails.rating;
+                            if (item.type) cardType = item.type.toLowerCase();
                         }
                     }
 
+                    // FIX 2: Safely parse video files or zip files line numbers and filenames from master index
                     let firstVideoFile = "";
                     let firstLineNum = 1;
-                    if (entry.video_files) {
+                    let zipFileRef = "";
+                    let zipLineNum = 1;
+
+                    if (entry.video_files && Object.keys(entry.video_files).length > 0) {
                         let firstQKey = Object.keys(entry.video_files)[0];
-                        if (firstQKey) {
-                            let vInfo = entry.video_files[firstQKey];
-                            firstVideoFile = typeof vInfo === 'string' ? vInfo : (vInfo ? vInfo.file : "");
-                            firstLineNum = (vInfo && typeof vInfo === 'object') ? (vInfo.line || 1) : 1;
-                        }
+                        let vInfo = entry.video_files[firstQKey];
+                        firstVideoFile = typeof vInfo === 'string' ? vInfo : (vInfo ? vInfo.file : "");
+                        firstLineNum = (vInfo && typeof vInfo === 'object') ? (vInfo.line || 1) : 1;
+                    }
+
+                    if (entry.zip_files && Object.keys(entry.zip_files).length > 0) {
+                        let firstZKey = Object.keys(entry.zip_files)[0];
+                        let zInfo = entry.zip_files[firstZKey];
+                        zipFileRef = typeof zInfo === 'string' ? zInfo : (zInfo ? zInfo.file : "");
+                        zipLineNum = (zInfo && typeof zInfo === 'object') ? (zInfo.line || 1) : 1;
                     }
 
                     loadedCardsMap[slug] = {
                         title: cardDetails.title,
                         image: cardDetails.image,
                         genres: cardDetails.genres,
-                        type: defaultType,
+                        type: cardType,
                         rating: cardDetails.rating,
                         language: "Dual Audio [Hindi - Jap]",
                         slug: slug,
                         index_file: indexFileName,
                         card_file: entry.card_file || "ANIME_1.JSON",
                         card_line: entry.card_line || 1,
-                        db_file: firstVideoFile,
-                        db_line: firstLineNum
+                        db_file: firstVideoFile || zipFileRef,
+                        db_line: firstLineNum || zipLineNum,
+                        video_files: entry.video_files || {},
+                        zip_files: entry.zip_files || {}
                     };
                 }
             }
@@ -352,6 +367,7 @@
             }, 4000);
         }
 
+        // FIX 3: Master index parameter mapping correctly structured for detail page URL
         function getDetailUrl(card) {
             return `anime.html?anime=${card.slug}&index=${card.index_file}&card_file=${card.card_file}&card_line=${card.card_line}&db=${card.db_file}&db_line=${card.db_line}`;
         }
@@ -420,8 +436,8 @@
                 filtered = allAnimeCards.filter(c => {
                     let t = (c.type || 'series').toLowerCase();
                     if (cat === 'movie') return t.includes('movie');
-                    if (cat === 'hentai') return t.includes('hentai') || t.includes('18') || t.includes('hatai') || t.includes('pulse');
-                    return !t.includes('movie') && !t.includes('hentai') && !t.includes('18') && !t.includes('hatai') && !t.includes('pulse');
+                    if (cat === 'hentai') return t.includes('hentai') || t.includes('18') || t.includes('hantai') || t.includes('pulse');
+                    return !t.includes('movie') && !t.includes('hentai') && !t.includes('18') && !t.includes('hantai') && !t.includes('pulse');
                 });
             }
 
