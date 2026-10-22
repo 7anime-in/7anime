@@ -1,35 +1,14 @@
 {
   "your_name": {
-    "channel": "@sevenanimemovie",
+    "type": "movie",
+    "channel": "sevenanime_ch1",
     "card_file": "MOVIE_1.JSON",
     "card_line": 3,
-    "video_files": {
-      "480p": {
-        "file": "movie_1_480p.json",
-        "line": 3
-      },
-      "720p": {
-        "file": "movie_1_720p.json",
-        "line": 3
-      },
-      "1080p": {
-        "file": "movie_1_1080p.json",
-        "line": 3
-      },
-      "4k": {
-        "file": "movie_1_4k.json",
-        "line": 3
-      }
-    },
+    "video_files": {},
+    "zip_files": {},
     "seasons": [
-      "Season 1",
-      "Season non"
+      "Season 1"
     ],
-    "qualities": [
-      "480p",
-      "720p",
-      "1080p",
-      "4k"
-    ]
+    "qualities": []
   }
 }
