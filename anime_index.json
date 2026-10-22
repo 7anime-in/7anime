@@ -1,85 +1,21 @@
 {
-  "solo_leveling": {
-    "channel": "@sevenanime_ch1",
-    "card_file": "ANIME_1.JSON",
-    "card_line": 3,
-    "video_files": {
-      "480p": {
-        "file": "anime_1_480p.json",
-        "line": 3
-      }
-    },
-    "seasons": [
-      "Season 1",
-      "Season 2"
-    ],
-    "qualities": [
-      "480p"
-    ]
-  },
-  "tomb_raider_king_hindi_dubbed": {
-    "channel": "@sevenanime_ch1",
-    "card_file": "ANIME_1.JSON",
-    "card_line": 17,
-    "video_files": {
-      "480p": {
-        "file": "anime_1_480p.json",
-        "line": 45
-      },
-      "720p": {
-        "file": "anime_1_720p.json",
-        "line": 3
-      },
-      "1080p": {
-        "file": "anime_1_1080p.json",
-        "line": 3
-      }
-    },
-    "seasons": [
-      "Season 1"
-    ],
-    "qualities": [
-      "480p",
-      "720p",
-      "1080p"
-    ]
-  },
   "ranma1_2": {
+    "type": "series",
     "channel": "@ranma1_2_7anime",
-    "card_file": "ANIME_1.JSON",
-    "card_line": 27,
-    "video_files": {
-      "480p": {
-        "file": "anime_1_480p.json",
-        "line": 73
-      },
-      "720p": {
-        "file": "anime_1_720p.json",
-        "line": 31
-      },
+    "card_file": "",
+    "card_line": 1,
+    "video_files": {},
+    "zip_files": {
       "1080p": {
-        "file": "anime_1_1080p.json",
-        "line": 31
+        "file": "zip_anime_1_1080p.json",
+        "line": 3
       }
     },
     "seasons": [
-      "Season 1",
-      "Season 2"
-    ],
-    "qualities": [
-      "480p",
-      "720p",
-      "1080p"
-    ]
-  },
-  "your_name": {
-    "channel": "sevenanime_ch1",
-    "card_file": "MOVIE_1.JSON",
-    "card_line": 3,
-    "video_files": {},
-    "seasons": [
       "Season 1"
     ],
-    "qualities": []
+    "qualities": [
+      "1080p"
+    ]
   }
 }
