@@ -12,6 +12,10 @@
       "720p": {
         "file": "anime_1_720p.json",
         "line": 3
+      },
+      "1080p": {
+        "file": "anime_1_1080p.json",
+        "line": 3
       }
     },
     "zip_files": {
