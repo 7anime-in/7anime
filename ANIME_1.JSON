@@ -9,6 +9,16 @@
       "description": "details Name: Ranma1/2\n\nSeason: 01\n\nEpisodes: 12\n\nRelease Year: 2024\n\nRunTime: 23min\n\n Genre: Animation, Action & Adventure, Comedy, Sci-Fi & Fantasy\n\nLanguage: Hindi\n\nQuality: (480p, 720p, 1080p)",
       "slug": "title_ranma1_2",
       "screenshots": []
+    },
+    "title_ranma1_2_season_2": {
+      "title": "Title RANMA1/2 season 2",
+      "image": "imge_link https://drive.google.com/file/d/12k6_uu9rtbkjOIcLJUos1DqBQtatPmCu/view?usp=drivesdk",
+      "genres": "genres animation & adventure",
+      "rating": "9.0",
+      "type": "series",
+      "description": "details Name: Ranma1/2\n\nSeason: 01\n\nEpisodes: 12\n\nRelease Year: 2024\n\nRunTime: 23min\n\n Genre: Animation, Action & Adventure, Comedy, Sci-Fi & Fantasy\n\nLanguage: Hindi\n\nQuality: (480p, 720p, 1080p)",
+      "slug": "title_ranma1_2_season_2",
+      "screenshots": []
     }
   }
 }
