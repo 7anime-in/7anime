@@ -39,6 +39,16 @@
       "description": ")-(#(#--#",
       "slug": "solo_leveling",
       "screenshots": []
+    },
+    "ranma1_2": {
+      "title": "RANMA1/2",
+      "image": "https://drive.google.com/file/d/12k6_uu9rtbkjOIcLJUos1DqBQtatPmCu/view?usp=drivesdk",
+      "genres": "Action, Fantasy",
+      "rating": "9.0",
+      "type": "series",
+      "description": "Name: Ranma1/2\n\nSeason: 01\n\nEpisodes: 12\n\nRelease Year: 2024\n\nRunTime: 23min\n\n Genre: Animation, Action & Adventure, Comedy, Sci-Fi & Fantasy\n\nLanguage: Hindi\n\nQuality: (480p, 720p, 1080p)",
+      "slug": "ranma1_2",
+      "screenshots": []
     }
   }
 }
