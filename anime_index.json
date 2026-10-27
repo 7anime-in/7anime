@@ -1,0 +1,14 @@
+{
+  "reels": {
+    "type": "series",
+    "channel": "sevenanime_ch1",
+    "card_file": "ANIME_1.JSON",
+    "card_line": 3,
+    "video_files": {},
+    "zip_files": {},
+    "seasons": [
+      "Season 1"
+    ],
+    "qualities": []
+  }
+}
