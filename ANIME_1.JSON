@@ -1,0 +1,14 @@
+{
+  "cards": {
+    "ranma1_2": {
+      "title": "RANMA1/2",
+      "image": "imge_link https://drive.google.com/file/d/12k6_uu9rtbkjOIcLJUos1DqBQtatPmCu/view?usp=drivesdk",
+      "genres": "genres Animation, Action & Adventure, Comedy, Sci-Fi & Fantasy",
+      "rating": "9.0",
+      "type": "series",
+      "description": "details Name: Ranma1/2\nSeason: 01\nEpisodes: 12\nRelease Year: 2024\nRunTime: 23min\nLanguage: Hindi\nQuality: (480p, 720p, 1080p)",
+      "slug": "ranma1_2",
+      "screenshots": []
+    }
+  }
+}
