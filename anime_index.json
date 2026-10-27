@@ -1,0 +1,14 @@
+{
+  "title_ranma1_2": {
+    "type": "series",
+    "channel": "@ranma_7anime",
+    "card_file": "ANIME_1.JSON",
+    "card_line": 3,
+    "video_files": {},
+    "zip_files": {},
+    "seasons": [
+      "Season 1"
+    ],
+    "qualities": []
+  }
+}
