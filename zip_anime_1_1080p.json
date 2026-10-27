@@ -1,0 +1,22 @@
+{
+  "cards": {
+    "ranma1_2": {
+      "title": "ranma1/2 - S1 [ZIP]",
+      "poster": "https://via.placeholder.com/300x420/1f2833/66fcf1?text=7anime",
+      "synopsis": "Ranma 1-2 S01 [RareToonsIndia].zip",
+      "genres": [
+        "Action",
+        "Animation"
+      ],
+      "status": "Ongoing",
+      "rating": "8.5",
+      "format": "H.264 / AVC (AAC)",
+      "audio_language": "HUNDI OFFICAL",
+      "downloads": {
+        "Season 1 - 1080p [ZIP Archive]": "https://7anime-bot3-downloader.onrender.com/download/ranma_7anime/150"
+      },
+      "stream_link": "https://7anime-bot2-streamer.onrender.com/stream/ranma_7anime/150.mp4",
+      "slug": "ranma1_2"
+    }
+  }
+}
