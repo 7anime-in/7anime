@@ -6,7 +6,8 @@
       "Season 1"
     ],
     "qualities": [
-      "1080p"
+      "1080p",
+      "480p"
     ],
     "card_file": "ANIME_1.JSON",
     "ANIME_1.JSON_card_line": 3,
@@ -14,6 +15,12 @@
       "1080p": {
         "file": "zip_anime_1_1080p.json",
         "zip_anime_1_1080p.json_zip_line": 3
+      }
+    },
+    "video_files": {
+      "480p": {
+        "file": "anime_1_480p.json",
+        "anime_1_480p.json_video_line": 3
       }
     }
   }
