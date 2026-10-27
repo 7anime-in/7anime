@@ -8,7 +8,12 @@
       "type": "series",
       "description": "details Name: Ranma1/2\nSeason: 01\nEpisodes: 12\nRelease Year: 2024\nRunTime: 23min\nLanguage: Hindi\nQuality: (480p, 720p, 1080p)",
       "slug": "ranma1_2",
-      "screenshots": []
+      "screenshots": [
+        "https://lh3.googleusercontent.com/d/16OOeq_6fo6tLdSS5PC7aVhn5yiNPctKo=s0?authuser=0",
+        "https://lh3.googleusercontent.com/d/10VErCrpy6MVq4t-uEVpN1w3MFQJhvFUw=s0?authuser=0",
+        "https://lh3.googleusercontent.com/d/1chIPRL8lxsl7uTTwl11MqWXa45ezLq7u=s0?authuser=0",
+        "https://lh3.googleusercontent.com/d/1eoAKIfWqM0F9ENV8q08f5MxWP4iUt-s-=s0?authuser=0"
+      ]
     }
   }
 }
