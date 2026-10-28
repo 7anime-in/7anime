@@ -1,4 +1,4 @@
-fastapi
-uvicorn
 pyrogram
 tgcrypto
+fastapi
+uvicorn
