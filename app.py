@@ -60,8 +60,14 @@ async def direct_download(chat_id: str, message_id: int):
         raise HTTPException(status_code=503, detail="Telegram client is not connected")
 
     try:
-        target_chat = int(chat_id) if chat_id.lstrip("-").isdigit() else chat_id
+        # Chat ID ko intelligently handle karna (Public Username vs Private Numeric ID)
+        if chat_id.lstrip("-").isdigit():
+            target_chat = int(chat_id)  # Private channel ki numeric ID (jaise -100xxxxxxxxxx)
+        else:
+            target_chat = chat_id if chat_id.startswith("@") else f"@{chat_id}"  # Public channel username
         
+        print(f"Fetching from Target Chat: {target_chat}, Message ID: {message_id}", flush=True)
+
         # 1. Fetch message metadata from Telegram (0 bandwidth)
         msg = await userbot.get_messages(target_chat, message_id)
         if not msg or msg.empty:
@@ -85,6 +91,7 @@ async def direct_download(chat_id: str, message_id: int):
     except HTTPException as http_ex:
         raise http_ex
     except Exception as e:
+        print(f"Error details: {str(e)}", flush=True)
         raise HTTPException(status_code=500, detail=f"Redirect Error: {str(e)}")
 
 if __name__ == "__main__":
