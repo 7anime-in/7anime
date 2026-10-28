@@ -11,6 +11,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import RedirectResponse
 from pyrogram import Client
+import httpx
 
 API_ID = int(os.getenv("API_ID") or 0)
 API_HASH = os.getenv("API_HASH") or ""
@@ -62,13 +63,13 @@ async def direct_download(chat_id: str, message_id: int):
     try:
         # Chat ID ko intelligently handle karna (Public Username vs Private Numeric ID)
         if chat_id.lstrip("-").isdigit():
-            target_chat = int(chat_id)  # Private channel ki numeric ID (jaise -100xxxxxxxxxx)
+            target_chat = int(chat_id)
         else:
-            target_chat = chat_id if chat_id.startswith("@") else f"@{chat_id}"  # Public channel username
+            target_chat = chat_id if chat_id.startswith("@") else f"@{chat_id}"
         
         print(f"Fetching from Target Chat: {target_chat}, Message ID: {message_id}", flush=True)
 
-        # 1. Fetch message metadata from Telegram (0 bandwidth)
+        # 1. Fetch message metadata using Userbot (0 bandwidth)
         msg = await userbot.get_messages(target_chat, message_id)
         if not msg or msg.empty:
             raise HTTPException(status_code=404, detail="Message delete ho gaya hai ya mil nahi raha!")
@@ -77,13 +78,21 @@ async def direct_download(chat_id: str, message_id: int):
         if not media:
             raise HTTPException(status_code=404, detail="Is message mein koi media file nahi hai!")
 
-        # 2. Get direct file path reference from Telegram CDN
-        file_info = await userbot.get_file(media.file_id)
-        if not file_info or not file_info.file_path:
-            raise HTTPException(status_code=500, detail="Telegram se file path fetch nahi ho paya!")
+        file_id = media.file_id
+
+        # 2. Get file_path securely via Telegram Bot API getFile endpoint using httpx
+        api_url = f"https://api.telegram.org/bot{BOT_TOKEN}/getFile?file_id={file_id}"
+        async with httpx.AsyncClient() as client:
+            response = await client.get(api_url)
+            res_data = response.json()
+
+        if not res_data.get("ok"):
+            raise HTTPException(status_code=500, detail="Telegram Bot API se file path fetch nahi ho paya!")
+
+        file_path = res_data["result"]["file_path"]
 
         # 3. Build official Telegram CDN download URL
-        download_url = f"https://api.telegram.org/file/bot{BOT_TOKEN}/{file_info.file_path}"
+        download_url = f"https://api.telegram.org/file/bot{BOT_TOKEN}/{file_path}"
 
         # 4. 302 Redirect (0 Server Bandwidth)
         return RedirectResponse(url=download_url, status_code=302)
