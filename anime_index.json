@@ -24,5 +24,15 @@
         "anime_1_480p.json_video_line": 3
       }
     }
+  },
+  "solo_leveling": {
+    "type": "series",
+    "channel": "@ranma_7anime",
+    "seasons": [
+      "Season 1"
+    ],
+    "qualities": [],
+    "card_file": "ANIME_1.JSON",
+    "ANIME_1.JSON_card_line": 18
   }
 }
