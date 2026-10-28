@@ -1,5 +1,12 @@
-import os
 import asyncio
+import os
+
+# 🚨 FIX: Python 3.10+ / Render ke liye MainThread event loop setup
+try:
+    asyncio.get_event_loop()
+except RuntimeError:
+    asyncio.set_event_loop(asyncio.new_event_loop())
+
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import RedirectResponse
@@ -82,7 +89,6 @@ async def direct_download(chat_id: str, message_id: int):
 
 if __name__ == "__main__":
     import uvicorn
-    # Render dynamically assigns a port via os.getenv("PORT")
     port = int(os.getenv("PORT", 10000))
     uvicorn.run("app:app", host="0.0.0.0", port=port)
-  
+    
