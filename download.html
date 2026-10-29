@@ -94,7 +94,7 @@
 
     <!-- ==================== FOOTER ==================== -->
     <footer class="bg-[#1f2833] border-t border-gray-800 text-center py-6 text-sm text-gray-400 mt-auto">
-        <p>© 2026 7anime Engine. Powered by Hugging Face Downloader Backend.</p>
+        <p>© 2026 7anime Engine. Powered by Vercel Downloader Backend.</p>
     </footer>
 
     <!-- ==================== JS LOGIC ==================== -->
@@ -102,7 +102,7 @@
         let animeData = null;
         let currentSeason = "Season 1";
 
-        // Updated to Hugging Face Space backend URL for direct downloads[span_2](start_span)[span_2](end_span)
+        // Updated Vercel backend URL for direct downloads
         const RENDER_BACKEND_URL = "https://7anime-da-z8pwh6b-non-9a56.vercel.app";
 
         const urlParams = new URLSearchParams(window.location.search);
@@ -126,7 +126,8 @@
 
         function processDownloadUrl(rawUrl) {
             if (!rawUrl) return "#";
-            if (rawUrl.includes("hf.space") || rawUrl.includes("onrender.com")) {
+            // Forcefully catch any old render or hf links or external backend links
+            if (rawUrl.includes("hf.space") || rawUrl.includes("onrender.com") || (rawUrl.startsWith("http") && !rawUrl.includes("t.me") && !rawUrl.includes("vercel.app"))) {
                 let pathOnly = rawUrl.replace(/^https?:\/\/[^\/]+/, "");
                 return `${RENDER_BACKEND_URL}${pathOnly}`;
             }
