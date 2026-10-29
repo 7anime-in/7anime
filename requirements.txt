@@ -1,5 +1,5 @@
-pyrogram
-tgcrypto
 fastapi
 uvicorn
+pyrogram
+tgcrypto
 httpx
