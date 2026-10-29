@@ -1,0 +1,24 @@
+{
+  "cards": {
+    "title_ranma1_2_season_2": {
+      "title": "Title RANMA1/2 season 2",
+      "image": "imge_link https://drive.google.com/file/d/12k6_uu9rtbkjOIcLJUos1DqBQtatPmCu/view?usp=drivesdk",
+      "genres": "genres animation & adventure",
+      "rating": "9.0",
+      "type": "movie",
+      "description": "details Name: Ranma1/2\n\nSeason: 01\n\nEpisodes: 12\n\nRelease Year: 2024\n\nRunTime: 23min\n\n Genre: Animation, Action & Adventure, Comedy, Sci-Fi & Fantasy\n\nLanguage: Hindi\n\nQuality: (480p, 720p, 1080p)",
+      "slug": "title_ranma1_2_season_2",
+      "screenshots": []
+    },
+    "hello_world": {
+      "title": "HELLO WORLD",
+      "image": "https://drive.google.com/file/d/1CsuS92ioCV2iV8JL02CYrzbbbJeNZvi_/view?usp=drivesdk",
+      "genres": "Sci-Fi (Science Fiction), Romance, and Drama",
+      "rating": "9.0",
+      "type": "movie",
+      "description": "The 2019 anime film Hello World belongs to the Sci-Fi (Science Fiction), Romance, and Drama genres, with elements of Time Travel and Psychological mystery.\n\nKey Details\n\n• Genre Classification: Sci-Fi, Romance, Drama, and Time Travel\n• Format: Animated Feature Film (Movie)\n• Director: Tomohiko Itō\n• Studio: Graphinica\n• Premise: Set in a futuristic Kyoto in 2027, a socially awkward high schooler named Naomi Katagaki meets his future self from 10 years ahead. Together, they try to alter a tragic event involving his classmate Ruri Ichigyou while discovering that their reality is a complex quantum computer simulation.",
+      "slug": "hello_world",
+      "screenshots": []
+    }
+  }
+}
