@@ -16,39 +16,39 @@ import httpx
 
 API_ID = int(os.getenv("API_ID") or 0)
 API_HASH = os.getenv("API_HASH") or ""
-SESSION_STRING = os.getenv("SESSION_STRING") or ""
 BOT_TOKEN = os.getenv("BOT_TOKEN") or ""
 
-userbot: Client = None
+bot_client: Client = None
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    global userbot
-    print("Starting Pyrogram Client on Render...", flush=True)
+    global bot_client
+    print("Starting Pyrogram Bot Client on Render...", flush=True)
     
-    if not API_ID or not API_HASH or not SESSION_STRING or not BOT_TOKEN:
-        print("CRITICAL ERROR: API_ID, API_HASH, SESSION_STRING, ya BOT_TOKEN missing hain Render Environment Variables mein!", flush=True)
+    if not API_ID or not API_HASH or not BOT_TOKEN:
+        print("CRITICAL ERROR: API_ID, API_HASH, ya BOT_TOKEN missing hain Render Environment Variables mein!", flush=True)
         raise RuntimeError("Missing Telegram Secrets!")
     
     try:
-        userbot = Client(
-            "7anime_userbot",
+        # Userbot ki jagah ab hum Bot Token se client initialize kar rahe hain
+        bot_client = Client(
+            "7anime_bot",
             api_id=API_ID,
             api_hash=API_HASH,
-            session_string=SESSION_STRING,
+            bot_token=BOT_TOKEN,
             in_memory=True
         )
-        await userbot.start()
-        print("Pyrogram Userbot successfully connected!", flush=True)
+        await bot_client.start()
+        print("Pyrogram Bot successfully connected!", flush=True)
     except Exception as e:
-        print(f"Telegram start failed: {e}", flush=True)
+        print(f"Telegram bot start failed: {e}", flush=True)
         raise e
         
     yield
     
-    if userbot and userbot.is_connected:
-        await userbot.stop()
-        print("Pyrogram Userbot stopped.", flush=True)
+    if bot_client and bot_client.is_connected:
+        await bot_client.stop()
+        print("Pyrogram Bot stopped.", flush=True)
 
 app = FastAPI(lifespan=lifespan)
 
@@ -58,7 +58,7 @@ async def root():
 
 @app.get("/download/{chat_id}/{message_id}")
 async def direct_download(chat_id: str, message_id: int):
-    if not userbot or not userbot.is_connected:
+    if not bot_client or not bot_client.is_connected:
         raise HTTPException(status_code=503, detail="Telegram client is not connected")
 
     try:
@@ -70,8 +70,8 @@ async def direct_download(chat_id: str, message_id: int):
         
         print(f"Fetching from Target Chat: {target_chat}, Message ID: {message_id}", flush=True)
 
-        # 1. Fetch message metadata using Userbot (0 bandwidth)
-        msg = await userbot.get_messages(target_chat, message_id)
+        # 1. Fetch message metadata using Bot Client (0 bandwidth)
+        msg = await bot_client.get_messages(target_chat, message_id)
         if not msg or msg.empty:
             raise HTTPException(status_code=404, detail="Message delete ho gaya hai ya mil nahi raha!")
             
