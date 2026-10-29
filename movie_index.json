@@ -3,10 +3,19 @@
     "type": "movie",
     "channel": "-1004439629506",
     "seasons": [
-      "Season 1"
+      "Season 1",
+      "Season NON"
     ],
-    "qualities": [],
+    "qualities": [
+      "original quality"
+    ],
     "card_file": "MOVIE_1.JSON",
-    "MOVIE_1.JSON_card_line": 13
+    "MOVIE_1.JSON_card_line": 13,
+    "video_files": {
+      "original quality": {
+        "file": "movie_1_original quality.json",
+        "movie_1_original quality.json_video_line": 3
+      }
+    }
   }
 }
