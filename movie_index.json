@@ -1,0 +1,12 @@
+{
+  "hello_world": {
+    "type": "movie",
+    "channel": "-1004439629506",
+    "seasons": [
+      "Season 1"
+    ],
+    "qualities": [],
+    "card_file": "MOVIE_1.JSON",
+    "MOVIE_1.JSON_card_line": 13
+  }
+}
