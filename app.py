@@ -1,5 +1,6 @@
 import asyncio
 import os
+import traceback
 
 # 🚨 FIX: Python 3.10+ / Render ke liye MainThread event loop setup
 try:
@@ -86,8 +87,11 @@ async def direct_download(chat_id: str, message_id: int):
             response = await client.get(api_url)
             res_data = response.json()
 
+        print(f"Telegram API Response: {res_data}", flush=True)
+
         if not res_data.get("ok"):
-            raise HTTPException(status_code=500, detail="Telegram Bot API se file path fetch nahi ho paya!")
+            error_description = res_data.get("description", "Unknown Telegram API Error")
+            raise HTTPException(status_code=500, detail=f"Telegram API Error: {error_description}")
 
         file_path = res_data["result"]["file_path"]
 
@@ -100,7 +104,8 @@ async def direct_download(chat_id: str, message_id: int):
     except HTTPException as http_ex:
         raise http_ex
     except Exception as e:
-        print(f"Error details: {str(e)}", flush=True)
+        error_trace = traceback.format_exc()
+        print(f"CRITICAL ERROR:\n{error_trace}", flush=True)
         raise HTTPException(status_code=500, detail=f"Redirect Error: {str(e)}")
 
 if __name__ == "__main__":
