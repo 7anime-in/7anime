@@ -1,0 +1,27 @@
+{
+  "hello_world": {
+    "type": "movie",
+    "channel": "@ranma_7anime",
+    "seasons": [
+      "Season 1",
+      "Season NON",
+      "Season MOVIE"
+    ],
+    "qualities": [
+      "original quality",
+      "original_quality"
+    ],
+    "card_file": "MOVIE_1.JSON",
+    "MOVIE_1.JSON_card_line": 13,
+    "video_files": {
+      "original quality": {
+        "file": "movie_1_original quality.json",
+        "movie_1_original quality.json_video_line": 3
+      },
+      "original_quality": {
+        "file": "movie_1_original_quality.json",
+        "movie_1_original_quality.json_video_line": 3
+      }
+    }
+  }
+}
