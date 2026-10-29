@@ -9,7 +9,8 @@
     ],
     "qualities": [
       "original quality",
-      "original_quality"
+      "original_quality",
+      "1080p"
     ],
     "card_file": "MOVIE_1.JSON",
     "MOVIE_1.JSON_card_line": 13,
@@ -21,6 +22,10 @@
       "original_quality": {
         "file": "movie_1_original_quality.json",
         "movie_1_original_quality.json_video_line": 3
+      },
+      "1080p": {
+        "file": "movie_1_1080p.json",
+        "movie_1_1080p.json_video_line": 3
       }
     }
   }
